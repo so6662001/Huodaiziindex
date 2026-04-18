@@ -1,6 +1,6 @@
-# Huodaizi Backend (P01 + P02 + P03 + P08 + P09 后端与中台)
+# Huodaizi Backend (P01 + P02 + P03 + P08 + P09 + P10 后端与中台)
 
-本模块为 P01 首页、P02 现货大厅、P03 求购大厅、P08 仓储物流首页与 P09 找仓库页提供后端 API 与中台管理接口，采用 Spring Boot 3 + Java 21。
+本模块为 P01 首页、P02 现货大厅、P03 求购大厅、P08 仓储物流首页、P09 找仓库页与 P10 找车找线页提供后端 API 与中台管理接口，采用 Spring Boot 3 + Java 21。
 
 ## 目录说明
 
@@ -14,11 +14,14 @@
 - `controller/logistics/LogisticsAdminController.java`：P08 仓储物流中台接口
 - `controller/warehouse/WarehouseController.java`：P09 找仓库公共接口
 - `controller/warehouse/WarehouseAdminController.java`：P09 找仓库中台接口
+- `controller/freight/FreightController.java`：P10 找车找线公共接口
+- `controller/freight/FreightAdminController.java`：P10 找车找线中台接口
 - `repository/InMemoryHomeRepository.java`：内存数据仓储（MVP）
 - `repository/spot/InMemorySpotRepository.java`：现货大厅内存数据仓储（MVP）
 - `repository/buy/InMemoryBuyRepository.java`：求购大厅内存数据仓储（MVP）
 - `repository/logistics/InMemoryLogisticsRepository.java`：仓储物流内存数据仓储（MVP）
 - `repository/warehouse/InMemoryWarehouseRepository.java`：找仓库内存数据仓储（MVP）
+- `repository/freight/InMemoryFreightRepository.java`：找车找线内存数据仓储（MVP）
 - `dto/**`：返回与请求模型
 - `common/**`、`exception/**`：统一返回与异常处理
 
@@ -206,6 +209,38 @@ Base Path: `/api/admin/warehouse`
 - `DELETE /{id}`
   - 删除记录
 
+### 11) 找车找线公共接口（P10）
+
+Base Path: `/api/v1/freight`
+
+- `GET /filters`
+  - 返回筛选项（起运地/目的地/车型/时效/回程车）
+- `GET /`
+  - 返回车队与专线列表，支持筛选与分页参数：
+    - `origin`、`destination`、`vehicleType`、`timeliness`、`returnTruck`、`keyword`
+    - `page`、`pageSize`
+- `GET /{id}`
+  - 返回车线详情（仅上架记录可见）
+- `POST /`
+  - 前台发布车线（默认上架、默认不置顶）
+
+### 12) 找车找线中台接口（P10）
+
+Base Path: `/api/admin/freight`
+
+- `GET /`
+  - 中台车线列表（含上架/下架记录）
+- `POST /`
+  - 中台新增车线
+- `PUT /{id}`
+  - 中台编辑车线（基础字段、状态、置顶）
+- `PUT /{id}/status`
+  - 上下架（请求体传 `status=ONLINE|OFFLINE`）
+- `PUT /{id}/pin`
+  - 置顶/取消置顶（请求体传 `pinned=true|false`）
+- `DELETE /{id}`
+  - 删除记录
+
 ## 返回结构
 
 统一返回：
@@ -235,6 +270,7 @@ Base Path: `/api/admin/warehouse`
 - P03 求购数据保存在 `InMemoryBuyRepository` 中
 - P08 仓储物流数据保存在 `InMemoryLogisticsRepository` 中
 - P09 找仓库数据保存在 `InMemoryWarehouseRepository` 中
+- P10 找车找线数据保存在 `InMemoryFreightRepository` 中
 - 重启服务后数据会重置
 - 适用于：
   - P01 接口联调
