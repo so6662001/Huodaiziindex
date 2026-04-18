@@ -84,7 +84,9 @@ onMounted(() => {
         </nav>
         <div class="topbar__actions">
           <button class="btn btn--ghost">登录</button>
-          <button class="btn btn--primary">发布仓储需求</button>
+          <RouterLink class="btn btn--primary btn-link" to="/logistics/demand/storage/new">
+            发布仓储需求
+          </RouterLink>
         </div>
       </div>
     </header>
@@ -168,7 +170,9 @@ onMounted(() => {
               <div class="warehouse-card__bottom">
                 <p class="spot-card__price">{{ item.price }}</p>
                 <div class="spot-card__actions">
-                  <button class="btn btn--ghost">查看详情</button>
+                  <RouterLink class="btn btn--ghost btn-link" :to="`/logistics/warehouse/${item.id}`">
+                    查看详情
+                  </RouterLink>
                   <button class="btn btn--primary">联系TA</button>
                 </div>
               </div>

@@ -4,6 +4,7 @@ import SpotPage from '../pages/SpotPage.vue'
 import BuyPage from '../pages/BuyPage.vue'
 import LogisticsPage from '../pages/LogisticsPage.vue'
 import WarehousePage from '../pages/WarehousePage.vue'
+import WarehouseDetailPage from '../pages/WarehouseDetailPage.vue'
 import FreightPage from '../pages/FreightPage.vue'
 import FreightDetailPage from '../pages/FreightDetailPage.vue'
 import StorageDemandPage from '../pages/StorageDemandPage.vue'
@@ -101,6 +102,15 @@ const routes = [
       title: '找仓库_钢铁仓储服务查询-货袋子',
       description:
         '查询钢铁仓储服务，覆盖库型、库容、吊装能力与参考价格，支持按城市和品类快速联系仓库服务商。'
+    }
+  },
+  {
+    path: '/logistics/warehouse/:id',
+    name: 'warehouseDetail',
+    component: WarehouseDetailPage,
+    meta: {
+      title: '仓库详情-货袋子',
+      description: '查看仓库的库容、作业能力、仓储报价、服务范围与相关推荐信息。'
     }
   },
   {
