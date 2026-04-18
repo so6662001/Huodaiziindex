@@ -20,7 +20,17 @@ public class GlobalExceptionHandler {
   @ExceptionHandler({MethodArgumentNotValidException.class, ConstraintViolationException.class,
       HttpMessageNotReadableException.class, IllegalArgumentException.class})
   public ApiResponse<Void> handleBadRequest(Exception ex) {
-    return ApiResponse.fail(ErrorCode.BAD_REQUEST, ex.getMessage());
+    String msg;
+    if (ex instanceof MethodArgumentNotValidException manve
+        && manve.getBindingResult().getFieldError() != null) {
+      msg = manve.getBindingResult().getFieldError().getDefaultMessage();
+    } else if (ex instanceof ConstraintViolationException cve
+        && !cve.getConstraintViolations().isEmpty()) {
+      msg = cve.getConstraintViolations().iterator().next().getMessage();
+    } else {
+      msg = ex.getMessage();
+    }
+    return ApiResponse.fail(ErrorCode.BAD_REQUEST, msg);
   }
 
   @ExceptionHandler(Exception.class)
