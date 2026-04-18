@@ -1260,6 +1260,154 @@ select {
   gap: 10px;
 }
 
+.detail-main {
+  padding-bottom: 24px;
+}
+
+.detail-hero {
+  padding: 22px 0 14px;
+}
+
+.detail-hero h1 {
+  font-size: 34px;
+  margin-bottom: 8px;
+}
+
+.detail-hero p {
+  color: #666;
+}
+
+.detail-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 2.2fr) minmax(0, 1fr);
+  gap: 12px;
+}
+
+.detail-main-card {
+  padding: 18px;
+}
+
+.detail-main-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.detail-main-card__header h2 {
+  font-size: 24px;
+}
+
+.detail-main-card__meta {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.detail-main-card__meta div {
+  border: 1px solid #f1f1f1;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.detail-main-card__meta label {
+  display: block;
+  color: #8a8a8a;
+  font-size: 12px;
+}
+
+.detail-main-card__meta p {
+  margin-top: 4px;
+  font-size: 14px;
+  color: #444;
+}
+
+.detail-main-card__desc {
+  margin-top: 12px;
+  color: #666;
+  font-size: 14px;
+}
+
+.contact-card {
+  margin-top: 12px;
+  padding: 16px;
+}
+
+.contact-card h3 {
+  font-size: 18px;
+}
+
+.contact-grid {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.contact-grid div {
+  border: 1px solid #f1f1f1;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.contact-grid label {
+  display: block;
+  color: #8a8a8a;
+  font-size: 12px;
+}
+
+.contact-grid p {
+  margin-top: 4px;
+}
+
+.contact-note {
+  margin-top: 10px;
+  font-size: 13px;
+  color: #8a8a8a;
+}
+
+.contact-actions {
+  margin-top: 12px;
+  display: flex;
+  gap: 8px;
+}
+
+.detail-list-card {
+  margin-top: 12px;
+  padding: 16px;
+}
+
+.detail-list-card ul li {
+  border-top: 1px solid #f1f1f1;
+  padding: 10px 0;
+}
+
+.detail-list-card ul li:first-child {
+  border-top: none;
+}
+
+.detail-list-card ul li p {
+  font-size: 15px;
+}
+
+.detail-list-card ul li span {
+  display: block;
+  margin-top: 4px;
+  color: #8a8a8a;
+  font-size: 13px;
+}
+
+.detail-side {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.detail-bottom-actions {
+  display: none;
+}
+
 .mobile-tabs {
   position: fixed;
   left: 0;
@@ -1331,6 +1479,18 @@ select {
   }
 
   .demand-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-main-card__meta {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .contact-grid {
     grid-template-columns: 1fr;
   }
 
@@ -1422,6 +1582,10 @@ select {
     font-size: 28px;
   }
 
+  .detail-hero h1 {
+    font-size: 28px;
+  }
+
   .demand-steps {
     flex-wrap: wrap;
   }
@@ -1432,6 +1596,32 @@ select {
 
   .demand-actions .btn {
     width: 100%;
+  }
+
+  .contact-actions {
+    flex-direction: column;
+  }
+
+  .contact-actions .btn {
+    width: 100%;
+  }
+
+  .detail-main-card__meta {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-bottom-actions {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 58px;
+    background: #fff;
+    border-top: 1px solid #ececec;
+    padding: 10px 12px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    z-index: 20;
   }
 
   .freight-toolbar {

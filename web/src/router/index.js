@@ -6,6 +6,7 @@ import LogisticsPage from '../pages/LogisticsPage.vue'
 import WarehousePage from '../pages/WarehousePage.vue'
 import FreightPage from '../pages/FreightPage.vue'
 import StorageDemandPage from '../pages/StorageDemandPage.vue'
+import DemandDetailPage from '../pages/DemandDetailPage.vue'
 
 const routes = [
   {
@@ -76,6 +77,15 @@ const routes = [
       title: '发布仓储需求_钢铁仓储需求快速发布-货袋子',
       description:
         '在线发布钢铁仓储需求，填写城市、品类、吨位、存储天数与联系方式，平台快速匹配本地仓储服务商。'
+    }
+  },
+  {
+    path: '/logistics/demand/:id',
+    name: 'demandDetail',
+    component: DemandDetailPage,
+    meta: {
+      title: '仓储物流需求详情-货袋子',
+      description: '查看仓储与运输需求详情，包含货品、吨位、时效与服务商推荐信息。'
     }
   }
 ]

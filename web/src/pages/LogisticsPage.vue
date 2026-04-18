@@ -57,14 +57,32 @@ const freightItems = [
 
 const demandItems = {
   storage: [
-    '郑州钢贸商求300吨室内库，需2天内入库',
-    '佛山终端企业求500吨短期仓储，可夜间作业',
-    '南京项目部求200吨中板仓储，需分批出库'
+    {
+      id: 'SD2026041801',
+      title: '郑州钢贸商求300吨室内库，需2天内入库'
+    },
+    {
+      id: 'SD2026041802',
+      title: '佛山终端企业求500吨短期仓储，可夜间作业'
+    },
+    {
+      id: 'SD2026041803',
+      title: '南京项目部求200吨中板仓储，需分批出库'
+    }
   ],
   transport: [
-    '唐山到无锡螺纹钢 260吨，13米平板',
-    '天津到广州热卷 180吨，48小时到货',
-    '武汉到长沙型钢 120吨，次日发车'
+    {
+      id: 'TD2026041801',
+      title: '唐山到无锡螺纹钢 260吨，13米平板'
+    },
+    {
+      id: 'TD2026041802',
+      title: '天津到广州热卷 180吨，48小时到货'
+    },
+    {
+      id: 'TD2026041803',
+      title: '武汉到长沙型钢 120吨，次日发车'
+    }
   ]
 }
 
@@ -186,8 +204,10 @@ onMounted(() => {
               <RouterLink to="/logistics/demand/storage/new">发布仓储需求</RouterLink>
             </div>
             <ul>
-              <li v-for="item in demandItems.storage" :key="item">
-                <p>{{ item }}</p>
+              <li v-for="item in demandItems.storage" :key="item.id">
+                <RouterLink :to="`/logistics/demand/${item.id}`">
+                  <p>{{ item.title }}</p>
+                </RouterLink>
               </li>
             </ul>
           </div>
@@ -197,8 +217,10 @@ onMounted(() => {
               <a href="#">发布运输需求</a>
             </div>
             <ul>
-              <li v-for="item in demandItems.transport" :key="item">
-                <p>{{ item }}</p>
+              <li v-for="item in demandItems.transport" :key="item.id">
+                <RouterLink :to="`/logistics/demand/${item.id}`">
+                  <p>{{ item.title }}</p>
+                </RouterLink>
               </li>
             </ul>
           </div>
