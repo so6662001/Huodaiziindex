@@ -8,7 +8,7 @@ const quickEntries = [
     button: '立即发布',
     to: '/logistics/demand/storage/new'
   },
-  { title: '发运输需求', desc: '对接车队与专线', button: '立即发布' },
+  { title: '发运输需求', desc: '对接车队与专线', button: '立即发布', to: '/logistics/demand/freight/new' },
   { title: '找仓库', desc: '按城市和库型筛选', button: '立即查找', to: '/logistics/warehouse' },
   { title: '找车找线', desc: '按线路快速询价', button: '立即查找', to: '/logistics/freight' }
 ]
@@ -214,7 +214,7 @@ onMounted(() => {
           <div class="card log-block">
             <div class="section__header">
               <h2>最新运输需求</h2>
-              <a href="#">发布运输需求</a>
+              <RouterLink to="/logistics/demand/freight/new">发布运输需求</RouterLink>
             </div>
             <ul>
               <li v-for="item in demandItems.transport" :key="item.id">

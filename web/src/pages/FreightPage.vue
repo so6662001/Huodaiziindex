@@ -80,7 +80,9 @@ onMounted(() => {
         </nav>
         <div class="topbar__actions">
           <button class="btn btn--ghost">登录</button>
-          <button class="btn btn--primary">发布运输需求</button>
+          <RouterLink class="btn btn--primary btn-link" to="/logistics/demand/freight/new">
+            发布运输需求
+          </RouterLink>
         </div>
       </div>
     </header>

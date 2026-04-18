@@ -1243,6 +1243,23 @@ select {
   padding-bottom: 24px;
 }
 
+.freight-demand-main {
+  padding-bottom: 24px;
+}
+
+.freight-demand-hero {
+  padding: 22px 0 14px;
+}
+
+.freight-demand-hero h1 {
+  font-size: 34px;
+  margin-bottom: 8px;
+}
+
+.freight-demand-hero p {
+  color: #666;
+}
+
 .demand-hero {
   padding: 22px 0 14px;
 }
@@ -2464,6 +2481,10 @@ select {
 
   .demand-actions .btn {
     width: 100%;
+  }
+
+  .freight-demand-hero h1 {
+    font-size: 28px;
   }
 
   .contact-actions {

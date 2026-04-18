@@ -104,7 +104,7 @@ onMounted(() => {
         <div class="topbar__actions">
           <button class="btn btn--ghost">登录</button>
           <RouterLink class="btn btn--primary btn-link" to="/logistics/demand/storage/new">
-            发布需求
+            发布仓储需求
           </RouterLink>
         </div>
       </div>

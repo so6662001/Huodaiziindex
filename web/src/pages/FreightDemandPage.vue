@@ -6,13 +6,15 @@ const isSubmitted = ref(false)
 
 const form = ref({
   title: '',
-  city: '唐山',
+  originCity: '唐山',
+  destinationCity: '无锡',
   goodsCategory: '螺纹钢',
   tonnage: '',
-  storageDays: '',
-  inboundDate: '',
-  needLoading: true,
-  needSorting: false,
+  vehicleType: '13米平板',
+  timeliness: '48小时内',
+  loadDate: '',
+  needInvoice: true,
+  needLoading: false,
   contactName: '',
   contactPhone: '',
   companyName: '',
@@ -20,17 +22,18 @@ const form = ref({
   agreed: false
 })
 
-const cityOptions = ['唐山', '天津', '无锡', '佛山', '武汉', '成都']
+const cityOptions = ['唐山', '天津', '无锡', '佛山', '武汉', '广州', '长沙']
 const goodsOptions = ['螺纹钢', '热卷', '中厚板', '型钢', '管材', '其他']
+const vehicleOptions = ['13米平板', '17.5米平板', '13米高栏', '厢式货车', '不限车型']
+const timelinessOptions = ['24小时内', '48小时内', '72小时内', '一周内']
 
 const isStepOneValid = computed(() => {
   return (
     form.value.title.trim().length >= 8 &&
+    form.value.originCity !== form.value.destinationCity &&
     form.value.tonnage !== '' &&
     Number(form.value.tonnage) > 0 &&
-    form.value.storageDays !== '' &&
-    Number(form.value.storageDays) > 0 &&
-    form.value.inboundDate !== ''
+    form.value.loadDate !== ''
   )
 })
 
@@ -91,18 +94,16 @@ watch(
         </nav>
         <div class="topbar__actions">
           <button class="btn btn--ghost">登录</button>
-          <RouterLink class="btn btn--primary btn-link" to="/logistics/demand/storage/new">
-            发布仓储需求
-          </RouterLink>
+          <RouterLink class="btn btn--primary btn-link" to="/logistics/freight">找车找线</RouterLink>
         </div>
       </div>
     </header>
 
-    <main class="demand-main">
-      <section class="demand-hero">
+    <main class="demand-main freight-demand-main">
+      <section class="demand-hero freight-demand-hero">
         <div class="container">
-          <h1>发布仓储需求</h1>
-          <p>填写需求信息，平台审核后将快速匹配本地仓储服务商。</p>
+          <h1>发布运输需求</h1>
+          <p>填写路线、车型、吨位与时效，平台将快速匹配车队与专线服务商。</p>
         </div>
       </section>
 
@@ -111,7 +112,7 @@ watch(
           <div class="card demand-steps">
             <div :class="['demand-step', currentStep === 1 ? 'active' : currentStep > 1 ? 'done' : '']">
               <span>1</span>
-              <p>填写业务信息</p>
+              <p>填写运输信息</p>
             </div>
             <div class="demand-step__line"></div>
             <div :class="['demand-step', currentStep === 2 ? 'active' : currentStep > 2 ? 'done' : '']">
@@ -127,23 +128,33 @@ watch(
         </div>
       </section>
 
-      <section class="section" v-if="!isSubmitted">
+      <section v-if="!isSubmitted" class="section">
         <div class="container demand-layout">
           <div class="card demand-form">
             <template v-if="currentStep === 1">
               <div class="section__header">
-                <h2>步骤1：业务信息</h2>
+                <h2>步骤1：运输信息</h2>
                 <span>信息越完整，匹配越精准</span>
               </div>
               <div class="demand-form__grid">
                 <div class="full">
                   <label>需求标题</label>
-                  <input v-model="form.title" type="text" placeholder="示例：唐山螺纹钢短期仓储需求（8-40字）" />
+                  <input
+                    v-model="form.title"
+                    type="text"
+                    placeholder="示例：唐山到无锡螺纹钢运输需求（8-40字）"
+                  />
                 </div>
                 <div>
-                  <label>城市</label>
-                  <select v-model="form.city">
-                    <option v-for="item in cityOptions" :key="item">{{ item }}</option>
+                  <label>起运地</label>
+                  <select v-model="form.originCity">
+                    <option v-for="item in cityOptions" :key="`o-${item}`">{{ item }}</option>
+                  </select>
+                </div>
+                <div>
+                  <label>目的地</label>
+                  <select v-model="form.destinationCity">
+                    <option v-for="item in cityOptions" :key="`d-${item}`">{{ item }}</option>
                   </select>
                 </div>
                 <div>
@@ -157,16 +168,24 @@ watch(
                   <input v-model="form.tonnage" type="number" placeholder="请输入吨位" />
                 </div>
                 <div>
-                  <label>存储天数（天）</label>
-                  <input v-model="form.storageDays" type="number" placeholder="请输入存储天数" />
+                  <label>车型要求</label>
+                  <select v-model="form.vehicleType">
+                    <option v-for="item in vehicleOptions" :key="item">{{ item }}</option>
+                  </select>
                 </div>
                 <div>
-                  <label>入库日期</label>
-                  <input v-model="form.inboundDate" type="date" />
+                  <label>时效要求</label>
+                  <select v-model="form.timeliness">
+                    <option v-for="item in timelinessOptions" :key="item">{{ item }}</option>
+                  </select>
+                </div>
+                <div>
+                  <label>装货日期</label>
+                  <input v-model="form.loadDate" type="date" />
                 </div>
                 <div class="full demand-checks">
-                  <label><input v-model="form.needLoading" type="checkbox" /> 需要装卸服务</label>
-                  <label><input v-model="form.needSorting" type="checkbox" /> 需要分拣服务</label>
+                  <label><input v-model="form.needInvoice" type="checkbox" /> 需要开票</label>
+                  <label><input v-model="form.needLoading" type="checkbox" /> 需要装卸协同</label>
                 </div>
               </div>
               <div class="demand-form__actions">
@@ -198,7 +217,7 @@ watch(
                   <textarea
                     v-model="form.remark"
                     rows="4"
-                    placeholder="可填写装卸要求、作业时间、是否长期合作等（选填）"
+                    placeholder="可填写装货时段、到货要求、回单要求等（选填）"
                   ></textarea>
                 </div>
                 <div class="full demand-agree">
@@ -219,26 +238,26 @@ watch(
             <div class="card side-card">
               <h3>发布提示</h3>
               <ul>
-                <li>1. 标题请写明品类、城市和用途</li>
-                <li>2. 吨位与入库时间越准确，匹配越快</li>
+                <li>1. 路线与吨位越清晰，报价越准确</li>
+                <li>2. 建议写明车型与时效要求</li>
                 <li>3. 联系方式需保持可接通</li>
               </ul>
             </div>
             <div class="card side-card">
               <p class="ad__flag">广告</p>
-              <h3>仓储需求置顶推广</h3>
-              <p>支持按城市与品类精准曝光，提升对接效率。</p>
+              <h3>运输需求置顶推广</h3>
+              <p>支持按起终点与车型精准曝光，提升运输需求对接效率。</p>
               <button class="btn btn--primary">咨询投放</button>
             </div>
           </aside>
         </div>
       </section>
 
-      <section class="section" v-else>
+      <section v-else class="section">
         <div class="container">
           <div class="card demand-success">
             <h2>需求已提交</h2>
-            <p>预计 1 小时内完成审核并分发服务商，请保持电话畅通。</p>
+            <p>预计 1 小时内完成审核并分发承运服务商，请保持电话畅通。</p>
             <div class="demand-success__actions">
               <RouterLink class="btn btn--ghost btn-link" to="/logistics">返回物流首页</RouterLink>
               <button class="btn btn--primary">查看我的需求</button>
