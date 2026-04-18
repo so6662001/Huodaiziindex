@@ -169,7 +169,9 @@ onMounted(() => {
                 <p class="wh-card__price">{{ item.price }}</p>
                 <p class="wh-card__updated">更新：10分钟前</p>
                 <div class="wh-card__actions">
-                  <button class="btn btn--ghost">查看详情</button>
+                  <RouterLink class="btn btn--ghost btn-link" :to="`/logistics/freight/${item.id}`">
+                    查看详情
+                  </RouterLink>
                   <button class="btn btn--primary">联系TA</button>
                 </div>
               </div>

@@ -5,6 +5,7 @@ import BuyPage from '../pages/BuyPage.vue'
 import LogisticsPage from '../pages/LogisticsPage.vue'
 import WarehousePage from '../pages/WarehousePage.vue'
 import FreightPage from '../pages/FreightPage.vue'
+import FreightDetailPage from '../pages/FreightDetailPage.vue'
 import StorageDemandPage from '../pages/StorageDemandPage.vue'
 import DemandDetailPage from '../pages/DemandDetailPage.vue'
 import SiteCityPage from '../pages/SiteCityPage.vue'
@@ -109,6 +110,15 @@ const routes = [
       title: '找车找线_钢铁运输服务查询-货袋子',
       description:
         '提供钢铁运输车队与专线信息，支持按起运地、目的地、车型与时效筛选，快速联系承运服务商。'
+    }
+  },
+  {
+    path: '/logistics/freight/:id',
+    name: 'freightDetail',
+    component: FreightDetailPage,
+    meta: {
+      title: '运输专线详情-货袋子',
+      description: '查看车队专线的路线、时效、报价、服务能力与相关推荐信息。'
     }
   },
   {

@@ -925,6 +925,145 @@ select {
   padding-bottom: 24px;
 }
 
+.freight-detail-main {
+  padding-bottom: 24px;
+}
+
+.freight-detail-hero {
+  padding: 22px 0 14px;
+}
+
+.freight-detail-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #8a8a8a;
+}
+
+.freight-detail-breadcrumb a {
+  color: #666;
+}
+
+.freight-detail-breadcrumb a:hover {
+  color: #f57c00;
+}
+
+.freight-detail-hero h1 {
+  margin-top: 10px;
+  font-size: 34px;
+}
+
+.freight-detail-hero p {
+  margin-top: 8px;
+  color: #666;
+}
+
+.freight-detail-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 2.2fr) minmax(0, 1fr);
+  gap: 12px;
+}
+
+.freight-detail-card {
+  padding: 16px;
+}
+
+.freight-detail-card + .freight-detail-card {
+  margin-top: 12px;
+}
+
+.freight-detail-card__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.freight-detail-card__top h2 {
+  font-size: 22px;
+}
+
+.freight-detail-meta {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  color: #666;
+  font-size: 14px;
+}
+
+.freight-detail-quote {
+  margin-top: 12px;
+  font-size: 28px;
+  color: #d55100;
+  font-weight: 700;
+}
+
+.freight-detail-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.freight-detail-tags span {
+  height: 28px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: #f6f6f6;
+  color: #666;
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.freight-detail-note {
+  margin-top: 10px;
+  color: #666;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.freight-detail-list li {
+  border-top: 1px solid #f1f1f1;
+  padding: 10px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.freight-detail-list li:first-child {
+  border-top: none;
+}
+
+.freight-detail-list li a:hover {
+  color: #f57c00;
+}
+
+.freight-detail-list li span {
+  color: #8a8a8a;
+  font-size: 13px;
+}
+
+.freight-detail-side {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.freight-detail-side-note {
+  margin-top: 10px;
+  color: #8a8a8a;
+  font-size: 13px;
+}
+
+.freight-detail-side-actions {
+  margin-top: 12px;
+  display: flex;
+  gap: 8px;
+}
+
 .freight-hero {
   padding: 22px 0 14px;
 }
@@ -2101,6 +2240,10 @@ select {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
+  .freight-detail-layout {
+    grid-template-columns: 1fr;
+  }
+
   .site-market__row {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -2221,8 +2364,25 @@ select {
     font-size: 28px;
   }
 
+  .freight-detail-hero h1 {
+    font-size: 28px;
+  }
+
   .freight-filter__grid {
     grid-template-columns: 1fr;
+  }
+
+  .freight-detail-side-actions {
+    flex-direction: column;
+  }
+
+  .freight-detail-side-actions .btn {
+    width: 100%;
+  }
+
+  .freight-detail-list li {
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   .site-hero h1 {
