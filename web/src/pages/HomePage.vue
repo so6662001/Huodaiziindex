@@ -208,7 +208,7 @@ onMounted(() => {
             <p class="ad__flag">广告</p>
             <h3>分站广告招商</h3>
             <p>支持按城市、品类、频道定向投放，帮助仓库、车队与钢贸商精准获客。</p>
-            <button class="btn btn--primary">咨询投放</button>
+            <RouterLink class="btn btn--primary btn-link" to="/site/ad">咨询投放</RouterLink>
           </aside>
         </div>
       </section>

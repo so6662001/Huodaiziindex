@@ -245,7 +245,12 @@ onMounted(() => {
             <p class="ad__flag">广告</p>
             <h3>仓储物流招商专区</h3>
             <p>支持城市、路线、车型与品类精准投放，帮助仓库与车队获取高质量线索。</p>
-            <button class="btn btn--primary">咨询投放</button>
+            <RouterLink
+              class="btn btn--primary btn-link"
+              :to="`/site/ad?placement=${encodeURIComponent('分站仓储物流推荐位')}`"
+            >
+              咨询投放
+            </RouterLink>
           </aside>
         </div>
       </section>

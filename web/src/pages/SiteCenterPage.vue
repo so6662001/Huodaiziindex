@@ -50,7 +50,7 @@ const adProducts = [
     price: '120元/天起'
   },
   {
-    title: '仓储物流推荐位',
+    title: '分站仓储物流推荐位',
     desc: '面向仓库与车队专线，按线路与车型精准触达。',
     price: '1800元/月起'
   }
@@ -84,7 +84,7 @@ onMounted(() => {
         </nav>
         <div class="topbar__actions">
           <button class="btn btn--ghost">登录</button>
-          <button class="btn btn--primary">申请开通分站</button>
+          <RouterLink class="btn btn--primary btn-link" to="/site/ad">申请开通分站</RouterLink>
         </div>
       </div>
     </header>
@@ -132,7 +132,9 @@ onMounted(() => {
             <h3>{{ item.title }}</h3>
             <p>{{ item.desc }}</p>
             <strong>{{ item.price }}</strong>
-            <button class="btn btn--primary">咨询投放</button>
+            <RouterLink class="btn btn--primary btn-link" :to="`/site/ad?placement=${encodeURIComponent(item.title)}`">
+              咨询投放
+            </RouterLink>
           </article>
         </div>
       </section>

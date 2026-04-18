@@ -208,7 +208,12 @@ onMounted(() => {
             <p class="ad__flag">广告</p>
             <h3>{{ currentCity.name }}分站品牌推广位</h3>
             <p>适合本地钢贸商、仓储与车队品牌曝光，支持按品类和时段定向。</p>
-            <button class="btn btn--primary">咨询投放</button>
+            <RouterLink
+              class="btn btn--primary btn-link"
+              :to="`/site/ad?city=${encodeURIComponent(currentCity.name)}&placement=${encodeURIComponent('分站品牌推广位')}`"
+            >
+              咨询投放
+            </RouterLink>
           </article>
           <article class="card site-ad">
             <p class="ad__flag">广告</p>

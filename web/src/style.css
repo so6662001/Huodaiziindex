@@ -1875,6 +1875,193 @@ select {
   border-top: none;
 }
 
+.site-ad-main {
+  padding-bottom: 24px;
+}
+
+.site-ad-hero {
+  padding: 22px 0 14px;
+}
+
+.site-ad-hero h1 {
+  font-size: 34px;
+  margin-bottom: 8px;
+}
+
+.site-ad-hero p {
+  color: #666;
+}
+
+.site-ad-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 2.2fr) minmax(0, 1fr);
+  gap: 12px;
+}
+
+.site-ad-form {
+  padding: 16px;
+}
+
+.site-ad-form-grid {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.site-ad-form-grid > div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.site-ad-form-grid > .full {
+  grid-column: 1 / -1;
+}
+
+.site-ad-form-grid label {
+  font-size: 13px;
+  color: #787878;
+}
+
+.site-ad-form-grid input,
+.site-ad-form-grid select,
+.site-ad-form-grid textarea {
+  border: 1px solid #dddddd;
+  border-radius: 8px;
+  outline: none;
+  padding: 0 12px;
+}
+
+.site-ad-form-grid input,
+.site-ad-form-grid select {
+  height: 40px;
+}
+
+.site-ad-form-grid textarea {
+  min-height: 96px;
+  padding-top: 10px;
+  resize: vertical;
+}
+
+.site-ad-form-grid input:focus,
+.site-ad-form-grid select:focus,
+.site-ad-form-grid textarea:focus {
+  border-color: #f57c00;
+}
+
+.site-ad-budget {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.site-ad-budget input {
+  width: 220px;
+}
+
+.site-ad-agreement {
+  margin-top: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #666;
+  font-size: 14px;
+}
+
+.site-ad-agreement a {
+  color: #f57c00;
+}
+
+.site-ad-actions {
+  margin-top: 16px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.site-ad-side {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.site-ad-packages li {
+  border-top: 1px solid #f1f1f1;
+  padding: 10px 0;
+}
+
+.site-ad-packages li:first-child {
+  border-top: none;
+}
+
+.site-ad-packages li p {
+  font-size: 15px;
+}
+
+.site-ad-packages li span {
+  margin-top: 4px;
+  display: block;
+  color: #8a8a8a;
+  font-size: 13px;
+}
+
+.site-ad-success {
+  margin-top: 12px;
+  border: 1px solid #f1f1f1;
+  border-radius: 10px;
+  padding: 18px;
+  background: #fffaf4;
+}
+
+.site-ad-success h3 {
+  font-size: 22px;
+}
+
+.site-ad-success p {
+  margin-top: 8px;
+  color: #666;
+}
+
+.site-ad-success__actions {
+  margin-top: 14px;
+  display: flex;
+  gap: 8px;
+}
+
+.site-ad-products {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.site-ad-product {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.site-ad-product h2 {
+  font-size: 20px;
+}
+
+.site-ad-product p {
+  color: #666;
+  font-size: 14px;
+}
+
+.site-ad-product strong {
+  color: #d55100;
+  font-size: 24px;
+}
+
+.site-ad-note {
+  margin-top: 10px;
+  font-size: 13px;
+  color: #8a8a8a;
+}
+
 .market-main {
   padding-bottom: 24px;
 }
@@ -2657,6 +2844,14 @@ select {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .site-ad-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .site-ad-products {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .market-layout {
     grid-template-columns: 1fr;
   }
@@ -2845,6 +3040,34 @@ select {
 
   .site-center-services {
     grid-template-columns: 1fr;
+  }
+
+  .site-ad-hero h1 {
+    font-size: 28px;
+  }
+
+  .site-ad-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .site-ad-actions {
+    flex-direction: column;
+  }
+
+  .site-ad-actions .btn {
+    width: 100%;
+  }
+
+  .site-ad-products {
+    grid-template-columns: 1fr;
+  }
+
+  .site-ad-success__actions {
+    flex-direction: column;
+  }
+
+  .site-ad-success__actions .btn {
+    width: 100%;
   }
 
   .market-hero h1 {

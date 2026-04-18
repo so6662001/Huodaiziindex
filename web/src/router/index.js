@@ -8,6 +8,7 @@ import WarehouseDetailPage from '../pages/WarehouseDetailPage.vue'
 import FreightPage from '../pages/FreightPage.vue'
 import FreightDetailPage from '../pages/FreightDetailPage.vue'
 import SiteCenterPage from '../pages/SiteCenterPage.vue'
+import SiteAdPage from '../pages/SiteAdPage.vue'
 import StorageDemandPage from '../pages/StorageDemandPage.vue'
 import FreightDemandPage from '../pages/FreightDemandPage.vue'
 import DemandDetailPage from '../pages/DemandDetailPage.vue'
@@ -169,6 +170,15 @@ const routes = [
     meta: {
       title: '分站中心_城市钢铁交易分站导航-货袋子',
       description: '浏览全国城市分站，按区域快速进入本地供求、行情、仓储物流与广告招商页面。'
+    }
+  },
+  {
+    path: '/site/ad',
+    name: 'siteAd',
+    component: SiteAdPage,
+    meta: {
+      title: '分站广告投放_城市站点流量曝光方案-货袋子',
+      description: '查看分站广告位类型、价格与投放流程，提交城市定向投放需求。'
     }
   },
   {
