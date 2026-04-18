@@ -112,7 +112,7 @@ onMounted(() => {
           <a href="#">钢铁资讯</a>
           <RouterLink class="active" to="/logistics">仓储物流</RouterLink>
           <a href="#">企业黄页</a>
-          <a href="#">分站中心</a>
+          <RouterLink to="/site/tangshan">分站中心</RouterLink>
         </nav>
         <div class="topbar__actions">
           <button class="btn btn--ghost">登录</button>

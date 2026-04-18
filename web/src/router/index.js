@@ -7,6 +7,7 @@ import WarehousePage from '../pages/WarehousePage.vue'
 import FreightPage from '../pages/FreightPage.vue'
 import StorageDemandPage from '../pages/StorageDemandPage.vue'
 import DemandDetailPage from '../pages/DemandDetailPage.vue'
+import SiteCityPage from '../pages/SiteCityPage.vue'
 
 const routes = [
   {
@@ -86,6 +87,15 @@ const routes = [
     meta: {
       title: '仓储物流需求详情-货袋子',
       description: '查看仓储与运输需求详情，包含货品、吨位、时效与服务商推荐信息。'
+    }
+  },
+  {
+    path: '/site/:city',
+    name: 'siteCity',
+    component: SiteCityPage,
+    meta: {
+      title: '城市分站-货袋子',
+      description: '查看城市分站的本地行情、供求、仓储物流和企业信息。'
     }
   }
 ]
