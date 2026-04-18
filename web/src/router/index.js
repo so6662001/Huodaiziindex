@@ -3,6 +3,7 @@ import HomePage from '../pages/HomePage.vue'
 import SpotPage from '../pages/SpotPage.vue'
 import BuyPage from '../pages/BuyPage.vue'
 import LogisticsPage from '../pages/LogisticsPage.vue'
+import WarehousePage from '../pages/WarehousePage.vue'
 
 const routes = [
   {
@@ -43,6 +44,16 @@ const routes = [
       title: '钢铁仓储物流_找仓库找车线与需求发布-货袋子',
       description:
         '提供钢铁仓库与车队专线信息，支持发布仓储与运输需求，快速对接本地服务商。'
+    }
+  },
+  {
+    path: '/logistics/warehouse',
+    name: 'warehouse',
+    component: WarehousePage,
+    meta: {
+      title: '找仓库_钢铁仓储服务查询-货袋子',
+      description:
+        '查询钢铁仓储服务，覆盖库型、库容、吊装能力与参考价格，支持按城市和品类快速联系仓库服务商。'
     }
   }
 ]

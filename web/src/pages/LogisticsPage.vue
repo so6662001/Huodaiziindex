@@ -4,7 +4,7 @@ import { onMounted } from 'vue'
 const quickEntries = [
   { title: '发仓储需求', desc: '快速匹配本地仓库', button: '立即发布' },
   { title: '发运输需求', desc: '对接车队与专线', button: '立即发布' },
-  { title: '找仓库', desc: '按城市和库型筛选', button: '立即查找' },
+  { title: '找仓库', desc: '按城市和库型筛选', button: '立即查找', to: '/logistics/warehouse' },
   { title: '找车找线', desc: '按线路快速询价', button: '立即查找' }
 ]
 
@@ -134,7 +134,10 @@ onMounted(() => {
           <article v-for="item in quickEntries" :key="item.title" class="card quick-card">
             <h3>{{ item.title }}</h3>
             <p>{{ item.desc }}</p>
-            <button class="btn btn--ghost">{{ item.button }}</button>
+            <RouterLink v-if="item.to" class="btn btn--ghost btn-link" :to="item.to">
+              {{ item.button }}
+            </RouterLink>
+            <button v-else class="btn btn--ghost">{{ item.button }}</button>
           </article>
         </div>
       </section>
@@ -144,7 +147,7 @@ onMounted(() => {
           <div class="card log-block">
             <div class="section__header">
               <h2>推荐仓库</h2>
-              <a href="#">查看更多</a>
+              <RouterLink to="/logistics/warehouse">查看更多</RouterLink>
             </div>
             <ul>
               <li v-for="item in warehouseItems" :key="item.name">
