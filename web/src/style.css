@@ -1626,6 +1626,127 @@ select {
   gap: 10px;
 }
 
+.news-main {
+  padding-bottom: 24px;
+}
+
+.news-hero {
+  padding: 22px 0 14px;
+}
+
+.news-hero h1 {
+  font-size: 34px;
+  margin-bottom: 8px;
+}
+
+.news-hero p {
+  color: #666;
+}
+
+.news-tabs {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.news-tab {
+  height: 34px;
+  padding: 0 14px;
+  border: 1px solid #dddddd;
+  border-radius: 999px;
+  background: #fff;
+  color: #666;
+  cursor: pointer;
+}
+
+.news-tab.active,
+.news-tab:hover {
+  border-color: #f57c00;
+  color: #f57c00;
+  background: #fff7ef;
+}
+
+.news-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 2.2fr) minmax(0, 1fr);
+  gap: 12px;
+}
+
+.news-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.news-card {
+  padding: 16px;
+}
+
+.news-card__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.news-card__top h2 {
+  font-size: 20px;
+}
+
+.news-card__summary {
+  margin-top: 10px;
+  color: #666;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.news-card__meta {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 13px;
+  color: #8a8a8a;
+}
+
+.news-card__actions {
+  margin-top: 12px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.news-side {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.news-hot-list {
+  margin-top: 10px;
+}
+
+.news-hot-list li {
+  padding: 10px 0;
+  border-top: 1px solid #f1f1f1;
+}
+
+.news-hot-list li:first-child {
+  border-top: none;
+}
+
+.news-hot-list li p {
+  font-size: 15px;
+}
+
+.news-hot-list li span {
+  margin-top: 4px;
+  display: block;
+  color: #8a8a8a;
+  font-size: 13px;
+}
+
 .detail-hero {
   padding: 22px 0 14px;
 }
@@ -1852,6 +1973,10 @@ select {
     grid-template-columns: 1fr;
   }
 
+  .news-layout {
+    grid-template-columns: 1fr;
+  }
+
   .market-detail-layout {
     grid-template-columns: 1fr;
   }
@@ -1968,8 +2093,16 @@ select {
     font-size: 28px;
   }
 
+  .news-hero h1 {
+    font-size: 28px;
+  }
+
   .market-toolbar {
     grid-template-columns: 1fr;
+  }
+
+  .news-card__actions {
+    justify-content: flex-start;
   }
 
   .market-summary {

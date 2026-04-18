@@ -10,6 +10,7 @@ import DemandDetailPage from '../pages/DemandDetailPage.vue'
 import SiteCityPage from '../pages/SiteCityPage.vue'
 import MarketPage from '../pages/MarketPage.vue'
 import MarketDetailPage from '../pages/MarketDetailPage.vue'
+import NewsPage from '../pages/NewsPage.vue'
 
 const routes = [
   {
@@ -59,6 +60,15 @@ const routes = [
     meta: {
       title: '钢铁行情详情-货袋子',
       description: '查看品种在指定城市的价格走势、历史区间、相关资讯与供求信息。'
+    }
+  },
+  {
+    path: '/news',
+    name: 'news',
+    component: NewsPage,
+    meta: {
+      title: '钢铁资讯_政策库存与市场动态-货袋子',
+      description: '聚合钢铁行业政策、库存、市场动态与产业链解读，帮助企业把握市场节奏。'
     }
   },
   {

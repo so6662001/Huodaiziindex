@@ -102,7 +102,7 @@ onMounted(() => {
           <RouterLink to="/spot">现货大厅</RouterLink>
           <RouterLink to="/buy">求购大厅</RouterLink>
           <RouterLink to="/market">行情中心</RouterLink>
-          <a href="#">钢铁资讯</a>
+          <RouterLink to="/news">钢铁资讯</RouterLink>
           <RouterLink to="/logistics">仓储物流</RouterLink>
           <a href="#">企业黄页</a>
           <RouterLink class="active" :to="`/site/${route.params.city || 'tangshan'}`">分站中心</RouterLink>
