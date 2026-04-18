@@ -1,6 +1,6 @@
-# Huodaizi Backend (P01 + P02 + P03 + P08 + P09 + P10 后端与中台)
+# Huodaizi Backend (P01 + P02 + P03 + P08 + P09 + P10 + P11 后端与中台)
 
-本模块为 P01 首页、P02 现货大厅、P03 求购大厅、P08 仓储物流首页、P09 找仓库页与 P10 找车找线页提供后端 API 与中台管理接口，采用 Spring Boot 3 + Java 21。
+本模块为 P01 首页、P02 现货大厅、P03 求购大厅、P08 仓储物流首页、P09 找仓库页、P10 找车找线页与 P11 发布仓储需求页提供后端 API 与中台管理接口，采用 Spring Boot 3 + Java 21。
 
 ## 目录说明
 
@@ -16,12 +16,15 @@
 - `controller/warehouse/WarehouseAdminController.java`：P09 找仓库中台接口
 - `controller/freight/FreightController.java`：P10 找车找线公共接口
 - `controller/freight/FreightAdminController.java`：P10 找车找线中台接口
+- `controller/storagedemand/StorageDemandController.java`：P11 仓储需求公共接口
+- `controller/storagedemand/StorageDemandAdminController.java`：P11 仓储需求中台接口
 - `repository/InMemoryHomeRepository.java`：内存数据仓储（MVP）
 - `repository/spot/InMemorySpotRepository.java`：现货大厅内存数据仓储（MVP）
 - `repository/buy/InMemoryBuyRepository.java`：求购大厅内存数据仓储（MVP）
 - `repository/logistics/InMemoryLogisticsRepository.java`：仓储物流内存数据仓储（MVP）
 - `repository/warehouse/InMemoryWarehouseRepository.java`：找仓库内存数据仓储（MVP）
 - `repository/freight/InMemoryFreightRepository.java`：找车找线内存数据仓储（MVP）
+- `repository/storagedemand/InMemoryStorageDemandRepository.java`：仓储需求内存数据仓储（MVP）
 - `dto/**`：返回与请求模型
 - `common/**`、`exception/**`：统一返回与异常处理
 
@@ -241,6 +244,38 @@ Base Path: `/api/admin/freight`
 - `DELETE /{id}`
   - 删除记录
 
+### 13) 发布仓储需求公共接口（P11）
+
+Base Path: `/api/v1/storage-demand`
+
+- `GET /filters`
+  - 返回筛选项（城市/品类/服务需求）
+- `GET /`
+  - 返回仓储需求列表，支持筛选与分页参数：
+    - `city`、`goodsCategory`、`serviceNeed`、`keyword`
+    - `page`、`pageSize`
+- `GET /{id}`
+  - 返回仓储需求详情（仅上架记录可见）
+- `POST /`
+  - 前台发布仓储需求（默认上架、默认不置顶）
+
+### 14) 发布仓储需求中台接口（P11）
+
+Base Path: `/api/admin/storage-demand`
+
+- `GET /`
+  - 中台仓储需求列表（含上架/下架记录）
+- `POST /`
+  - 中台新增仓储需求
+- `PUT /{id}`
+  - 中台编辑仓储需求（业务字段、状态、置顶）
+- `PUT /{id}/status`
+  - 上下架（请求体传 `status=ONLINE|OFFLINE`）
+- `PUT /{id}/pin`
+  - 置顶/取消置顶（请求体传 `pinned=true|false`）
+- `DELETE /{id}`
+  - 删除记录
+
 ## 返回结构
 
 统一返回：
@@ -271,6 +306,7 @@ Base Path: `/api/admin/freight`
 - P08 仓储物流数据保存在 `InMemoryLogisticsRepository` 中
 - P09 找仓库数据保存在 `InMemoryWarehouseRepository` 中
 - P10 找车找线数据保存在 `InMemoryFreightRepository` 中
+- P11 仓储需求数据保存在 `InMemoryStorageDemandRepository` 中
 - 重启服务后数据会重置
 - 适用于：
   - P01 接口联调
