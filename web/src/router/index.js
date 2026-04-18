@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomePage from '../pages/HomePage.vue'
 import SpotPage from '../pages/SpotPage.vue'
 import BuyPage from '../pages/BuyPage.vue'
+import LogisticsPage from '../pages/LogisticsPage.vue'
 
 const routes = [
   {
@@ -32,6 +33,16 @@ const routes = [
       title: '钢铁求购大厅_采购需求查询与发布-货袋子',
       description:
         '实时更新钢铁求购信息，覆盖多城市与多品类，支持快速筛选并联系买家，提升供需撮合效率。'
+    }
+  },
+  {
+    path: '/logistics',
+    name: 'logistics',
+    component: LogisticsPage,
+    meta: {
+      title: '钢铁仓储物流_找仓库找车线与需求发布-货袋子',
+      description:
+        '提供钢铁仓库与车队专线信息，支持发布仓储与运输需求，快速对接本地服务商。'
     }
   }
 ]

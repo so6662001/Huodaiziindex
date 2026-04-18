@@ -83,7 +83,7 @@ onMounted(() => {
           <RouterLink to="/buy">求购大厅</RouterLink>
           <a href="#">行情中心</a>
           <a href="#">钢铁资讯</a>
-          <a href="#">仓储物流</a>
+          <RouterLink to="/logistics">仓储物流</RouterLink>
           <a href="#">企业黄页</a>
           <a href="#">分站中心</a>
         </nav>
@@ -224,7 +224,7 @@ onMounted(() => {
     <nav class="mobile-tabs" aria-label="移动端底部导航">
       <RouterLink to="/">首页</RouterLink>
       <RouterLink class="active" to="/spot">供求</RouterLink>
-      <a href="#">物流</a>
+      <RouterLink to="/logistics">物流</RouterLink>
       <a href="#">分站</a>
       <a href="#">我的</a>
     </nav>

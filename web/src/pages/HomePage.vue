@@ -60,7 +60,7 @@ onMounted(() => {
           <RouterLink to="/buy">求购大厅</RouterLink>
           <a href="#">行情中心</a>
           <a href="#">钢铁资讯</a>
-          <a href="#">仓储物流</a>
+          <RouterLink to="/logistics">仓储物流</RouterLink>
           <a href="#">企业黄页</a>
           <a href="#">分站中心</a>
         </nav>
@@ -80,7 +80,7 @@ onMounted(() => {
             <div class="hero__quick">
               <button class="btn btn--primary">发布供应</button>
               <button class="btn btn--ghost">发布求购</button>
-              <button class="btn btn--ghost">发布物流需求</button>
+              <RouterLink class="btn btn--ghost" to="/logistics">发布物流需求</RouterLink>
             </div>
           </div>
           <div class="hero__search card">
@@ -152,7 +152,7 @@ onMounted(() => {
           <div class="card logistics__block">
             <div class="section__header">
               <h2>仓储推荐</h2>
-              <a href="#">进入仓储物流</a>
+              <RouterLink to="/logistics">进入仓储物流</RouterLink>
             </div>
             <ul>
               <li v-for="item in warehouseItems" :key="item.name">
@@ -224,7 +224,7 @@ onMounted(() => {
     <nav class="mobile-tabs" aria-label="移动端底部导航">
       <RouterLink class="active" to="/">首页</RouterLink>
       <RouterLink to="/buy">供求</RouterLink>
-      <a href="#">物流</a>
+      <RouterLink to="/logistics">物流</RouterLink>
       <a href="#">分站</a>
       <a href="#">我的</a>
     </nav>

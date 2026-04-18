@@ -420,6 +420,10 @@ select {
   padding-bottom: 24px;
 }
 
+.logistics-main {
+  padding-bottom: 24px;
+}
+
 .spot-hero {
   padding: 22px 0 14px;
 }
@@ -431,6 +435,38 @@ select {
 
 .spot-hero p {
   color: #666;
+}
+
+.quick-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.quick-card {
+  min-height: 76px;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #f1d6b7;
+  background: #fff9f2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+}
+
+.quick-card h3 {
+  font-size: 16px;
+}
+
+.quick-card p {
+  font-size: 13px;
+  color: #7a7a7a;
+}
+
+.quick-card:hover {
+  border-color: #f57c00;
+  background: #fff3e3;
 }
 
 .filter-panel {
@@ -512,6 +548,36 @@ select {
   display: grid;
   gap: 12px;
   grid-template-columns: minmax(0, 2.15fr) minmax(0, 1fr);
+}
+
+.demand-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.demand-card {
+  padding: 16px;
+}
+
+.demand-card li {
+  padding: 10px 0;
+  border-top: 1px solid #f1f1f1;
+}
+
+.demand-card li:first-child {
+  border-top: none;
+}
+
+.demand-card li p {
+  font-size: 15px;
+}
+
+.demand-card li span {
+  margin-top: 4px;
+  display: block;
+  color: #7a7a7a;
+  font-size: 13px;
 }
 
 .spot-list {
@@ -652,6 +718,24 @@ select {
   background: #fff7ef;
 }
 
+.ad-banner {
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.ad-banner h3 {
+  margin-top: 6px;
+  font-size: 24px;
+}
+
+.ad-banner p {
+  margin-top: 8px;
+  color: #666;
+}
+
 .mobile-tabs {
   position: fixed;
   left: 0;
@@ -693,7 +777,8 @@ select {
   .supply,
   .logistics,
   .info,
-  .spot-layout {
+  .spot-layout,
+  .demand-grid {
     grid-template-columns: 1fr;
   }
 
@@ -706,6 +791,10 @@ select {
   }
 
   .quote-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .quick-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
@@ -753,6 +842,10 @@ select {
     grid-template-columns: 1fr;
   }
 
+  .quick-grid {
+    grid-template-columns: 1fr;
+  }
+
   .spot-hero h1 {
     font-size: 28px;
   }
@@ -767,6 +860,11 @@ select {
 
   .filter-actions .btn {
     width: 100%;
+  }
+
+  .ad-banner {
+    flex-direction: column;
+    align-items: stretch;
   }
 
   .section__header h2 {
