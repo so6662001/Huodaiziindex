@@ -231,7 +231,7 @@ onMounted(() => {
         <div class="container city">
           <div class="section__header">
             <h2>热门城市入口</h2>
-            <a href="#">查看全部分站</a>
+            <RouterLink to="/site">查看全部分站</RouterLink>
           </div>
           <div class="city__tags">
             <a v-for="item in stationItems" :key="item" href="#">{{ item }}</a>

@@ -1656,6 +1656,225 @@ select {
   gap: 10px;
 }
 
+.site-center-main {
+  padding-bottom: 24px;
+}
+
+.site-center-hero {
+  padding: 22px 0 14px;
+}
+
+.site-center-hero h1 {
+  font-size: 34px;
+  margin-bottom: 8px;
+}
+
+.site-center-hero p {
+  color: #666;
+}
+
+.site-center-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.site-center-stat {
+  padding: 14px;
+}
+
+.site-center-stat p {
+  font-size: 13px;
+  color: #7a7a7a;
+}
+
+.site-center-stat strong {
+  margin-top: 6px;
+  display: inline-block;
+  font-size: 26px;
+  color: #d55100;
+}
+
+.site-center-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.site-center-region {
+  padding: 16px;
+}
+
+.site-center-city-list {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.site-center-city {
+  border: 1px solid #f1f1f1;
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.site-center-city h3 {
+  font-size: 18px;
+}
+
+.site-center-city p {
+  margin-top: 6px;
+  color: #666;
+  font-size: 14px;
+}
+
+.site-center-city span {
+  margin-top: 6px;
+  display: block;
+  color: #8a8a8a;
+  font-size: 13px;
+}
+
+.site-center-city .btn {
+  margin-top: 10px;
+}
+
+.site-center-services {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.site-center-service {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.site-center-service h3 {
+  font-size: 20px;
+}
+
+.site-center-service p {
+  color: #666;
+  font-size: 14px;
+}
+
+.site-center-service strong {
+  color: #d55100;
+  font-size: 24px;
+}
+
+.site-center-search {
+  margin-top: 12px;
+  padding: 14px;
+}
+
+.site-center-search__row {
+  display: grid;
+  grid-template-columns: 1fr 140px 100px;
+  gap: 10px;
+}
+
+.site-center-search__row input,
+.site-center-search__row select {
+  height: 40px;
+  border: 1px solid #dddddd;
+  border-radius: 8px;
+  padding: 0 12px;
+  outline: none;
+}
+
+.site-center-search__row input:focus,
+.site-center-search__row select:focus {
+  border-color: #f57c00;
+}
+
+.site-center-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 2.2fr) minmax(0, 1fr);
+  gap: 12px;
+}
+
+.site-city-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.site-city-card {
+  padding: 16px;
+}
+
+.site-city-card__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.site-city-card__head h3 {
+  font-size: 22px;
+}
+
+.site-city-card__meta {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  color: #8a8a8a;
+  font-size: 13px;
+}
+
+.site-city-card__stats {
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.site-city-card__stats div {
+  border: 1px solid #f1f1f1;
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+
+.site-city-card__stats label {
+  display: block;
+  font-size: 12px;
+  color: #8a8a8a;
+}
+
+.site-city-card__stats p {
+  margin-top: 4px;
+  font-size: 16px;
+  color: #444;
+  font-weight: 600;
+}
+
+.site-city-card__actions {
+  margin-top: 12px;
+  display: flex;
+  gap: 8px;
+}
+
+.site-center-side {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.site-center-side-list li {
+  border-top: 1px solid #f1f1f1;
+  padding: 10px 0;
+  font-size: 14px;
+  color: #555;
+}
+
+.site-center-side-list li:first-child {
+  border-top: none;
+}
+
 .market-main {
   padding-bottom: 24px;
 }
@@ -2418,6 +2637,26 @@ select {
     grid-template-columns: 1fr;
   }
 
+  .site-center-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .site-city-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .site-center-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .site-center-city-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .site-center-services {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .market-layout {
     grid-template-columns: 1fr;
   }
@@ -2572,7 +2811,39 @@ select {
     font-size: 28px;
   }
 
+  .site-center-hero h1 {
+    font-size: 28px;
+  }
+
   .site-market__row {
+    grid-template-columns: 1fr;
+  }
+
+  .site-center-search__row {
+    grid-template-columns: 1fr;
+  }
+
+  .site-city-card__stats {
+    grid-template-columns: 1fr;
+  }
+
+  .site-city-card__actions {
+    flex-direction: column;
+  }
+
+  .site-city-card__actions .btn {
+    width: 100%;
+  }
+
+  .site-center-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .site-center-city-list {
+    grid-template-columns: 1fr;
+  }
+
+  .site-center-services {
     grid-template-columns: 1fr;
   }
 

@@ -6,7 +6,11 @@ const route = useRoute()
 
 const cityMap = {
   tangshan: { name: '唐山', code: 'TS' },
+  handan: { name: '邯郸', code: 'HD' },
+  tianjin: { name: '天津', code: 'TJ' },
   wuxi: { name: '无锡', code: 'WX' },
+  nanjing: { name: '南京', code: 'NJ' },
+  shanghai: { name: '上海', code: 'SH' },
   foshan: { name: '佛山', code: 'FS' },
   wuhan: { name: '武汉', code: 'WH' },
   zhengzhou: { name: '郑州', code: 'ZZ' },

@@ -180,10 +180,15 @@ onMounted(() => {
         <div class="container city">
           <div class="section__header">
             <h2>热门城市分站</h2>
-            <a href="#">查看全部分站</a>
+            <RouterLink to="/site">查看全部分站</RouterLink>
           </div>
           <div class="city__tags">
-            <a v-for="item in stationItems" :key="item" href="#">{{ item }}</a>
+            <RouterLink to="/site/tangshan">唐山分站</RouterLink>
+            <RouterLink to="/site/handan">邯郸分站</RouterLink>
+            <RouterLink to="/site/wuxi">无锡分站</RouterLink>
+            <RouterLink to="/site/foshan">佛山分站</RouterLink>
+            <RouterLink to="/site/wuhan">武汉分站</RouterLink>
+            <RouterLink to="/site/chengdu">成都分站</RouterLink>
           </div>
         </div>
       </section>

@@ -7,6 +7,7 @@ import WarehousePage from '../pages/WarehousePage.vue'
 import WarehouseDetailPage from '../pages/WarehouseDetailPage.vue'
 import FreightPage from '../pages/FreightPage.vue'
 import FreightDetailPage from '../pages/FreightDetailPage.vue'
+import SiteCenterPage from '../pages/SiteCenterPage.vue'
 import StorageDemandPage from '../pages/StorageDemandPage.vue'
 import FreightDemandPage from '../pages/FreightDemandPage.vue'
 import DemandDetailPage from '../pages/DemandDetailPage.vue'
@@ -159,6 +160,15 @@ const routes = [
     meta: {
       title: '仓储物流需求详情-货袋子',
       description: '查看仓储与运输需求详情，包含货品、吨位、时效与服务商推荐信息。'
+    }
+  },
+  {
+    path: '/site',
+    name: 'siteCenter',
+    component: SiteCenterPage,
+    meta: {
+      title: '分站中心_城市钢铁交易分站导航-货袋子',
+      description: '浏览全国城市分站，按区域快速进入本地供求、行情、仓储物流与广告招商页面。'
     }
   },
   {
