@@ -5,7 +5,7 @@ const quickEntries = [
   { title: '发仓储需求', desc: '快速匹配本地仓库', button: '立即发布' },
   { title: '发运输需求', desc: '对接车队与专线', button: '立即发布' },
   { title: '找仓库', desc: '按城市和库型筛选', button: '立即查找', to: '/logistics/warehouse' },
-  { title: '找车找线', desc: '按线路快速询价', button: '立即查找' }
+  { title: '找车找线', desc: '按线路快速询价', button: '立即查找', to: '/logistics/freight' }
 ]
 
 const warehouseItems = [
@@ -159,7 +159,7 @@ onMounted(() => {
           <div class="card log-block">
             <div class="section__header">
               <h2>推荐车队专线</h2>
-              <a href="#">查看更多</a>
+              <RouterLink to="/logistics/freight">查看更多</RouterLink>
             </div>
             <ul>
               <li v-for="item in freightItems" :key="item.line">
