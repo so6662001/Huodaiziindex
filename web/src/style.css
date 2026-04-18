@@ -1094,6 +1094,172 @@ select {
   gap: 8px;
 }
 
+.demand-main {
+  padding-bottom: 24px;
+}
+
+.demand-hero {
+  padding: 22px 0 14px;
+}
+
+.demand-hero h1 {
+  font-size: 34px;
+  margin-bottom: 8px;
+}
+
+.demand-hero p {
+  color: #666;
+}
+
+.demand-steps {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.demand-step {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #8a8a8a;
+  font-size: 14px;
+}
+
+.demand-step__num {
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  background: #f0f0f0;
+  color: #8a8a8a;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.demand-step.active {
+  color: #f57c00;
+  font-weight: 600;
+}
+
+.demand-step.active .demand-step__num {
+  background: #f57c00;
+  color: #fff;
+}
+
+.demand-card {
+  padding: 18px;
+}
+
+.demand-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.demand-form-grid > div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.demand-form-grid > .full {
+  grid-column: 1 / -1;
+}
+
+.demand-form-grid label {
+  font-size: 13px;
+  color: #787878;
+}
+
+.demand-form-grid input,
+.demand-form-grid select,
+.demand-form-grid textarea {
+  border: 1px solid #dddddd;
+  border-radius: 8px;
+  outline: none;
+  padding: 0 12px;
+}
+
+.demand-form-grid input,
+.demand-form-grid select {
+  height: 40px;
+}
+
+.demand-form-grid textarea {
+  min-height: 96px;
+  padding-top: 10px;
+  resize: vertical;
+}
+
+.demand-form-grid input:focus,
+.demand-form-grid select:focus,
+.demand-form-grid textarea:focus {
+  border-color: #f57c00;
+}
+
+.demand-switches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+}
+
+.demand-switches label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #666;
+}
+
+.demand-note {
+  margin-top: 12px;
+  font-size: 13px;
+  color: #8a8a8a;
+}
+
+.demand-actions {
+  margin-top: 16px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.agreement {
+  margin-top: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #666;
+  font-size: 14px;
+}
+
+.agreement a {
+  color: #f57c00;
+}
+
+.success-card {
+  padding: 30px 18px;
+  text-align: center;
+}
+
+.success-card h2 {
+  font-size: 30px;
+}
+
+.success-card p {
+  margin-top: 10px;
+  color: #666;
+}
+
+.success-card__actions {
+  margin-top: 18px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
 .mobile-tabs {
   position: fixed;
   left: 0;
@@ -1162,6 +1328,10 @@ select {
 
   .freight-filter__grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .demand-form-grid {
+    grid-template-columns: 1fr;
   }
 
   .warehouse-card__bottom {
@@ -1246,6 +1416,22 @@ select {
 
   .freight-filter__grid {
     grid-template-columns: 1fr;
+  }
+
+  .demand-hero h1 {
+    font-size: 28px;
+  }
+
+  .demand-steps {
+    flex-wrap: wrap;
+  }
+
+  .demand-actions {
+    flex-direction: column;
+  }
+
+  .demand-actions .btn {
+    width: 100%;
   }
 
   .freight-toolbar {

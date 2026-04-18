@@ -5,6 +5,7 @@ import BuyPage from '../pages/BuyPage.vue'
 import LogisticsPage from '../pages/LogisticsPage.vue'
 import WarehousePage from '../pages/WarehousePage.vue'
 import FreightPage from '../pages/FreightPage.vue'
+import StorageDemandPage from '../pages/StorageDemandPage.vue'
 
 const routes = [
   {
@@ -65,6 +66,16 @@ const routes = [
       title: '找车找线_钢铁运输服务查询-货袋子',
       description:
         '提供钢铁运输车队与专线信息，支持按起运地、目的地、车型与时效筛选，快速联系承运服务商。'
+    }
+  },
+  {
+    path: '/logistics/demand/storage/new',
+    name: 'storageDemandCreate',
+    component: StorageDemandPage,
+    meta: {
+      title: '发布仓储需求_钢铁仓储需求快速发布-货袋子',
+      description:
+        '在线发布钢铁仓储需求，填写城市、品类、吨位、存储天数与联系方式，平台快速匹配本地仓储服务商。'
     }
   }
 ]

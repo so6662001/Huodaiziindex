@@ -2,7 +2,12 @@
 import { onMounted } from 'vue'
 
 const quickEntries = [
-  { title: '发仓储需求', desc: '快速匹配本地仓库', button: '立即发布' },
+  {
+    title: '发仓储需求',
+    desc: '快速匹配本地仓库',
+    button: '立即发布',
+    to: '/logistics/demand/storage/new'
+  },
   { title: '发运输需求', desc: '对接车队与专线', button: '立即发布' },
   { title: '找仓库', desc: '按城市和库型筛选', button: '立即查找', to: '/logistics/warehouse' },
   { title: '找车找线', desc: '按线路快速询价', button: '立即查找', to: '/logistics/freight' }
@@ -93,7 +98,9 @@ onMounted(() => {
         </nav>
         <div class="topbar__actions">
           <button class="btn btn--ghost">登录</button>
-          <button class="btn btn--primary">发布物流需求</button>
+          <RouterLink class="btn btn--primary btn-link" to="/logistics/demand/storage/new">
+            发布仓储需求
+          </RouterLink>
         </div>
       </div>
     </header>
@@ -176,7 +183,7 @@ onMounted(() => {
           <div class="card log-block">
             <div class="section__header">
               <h2>最新仓储需求</h2>
-              <a href="#">发布仓储需求</a>
+              <RouterLink to="/logistics/demand/storage/new">发布仓储需求</RouterLink>
             </div>
             <ul>
               <li v-for="item in demandItems.storage" :key="item">
