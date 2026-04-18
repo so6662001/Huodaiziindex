@@ -8,6 +8,7 @@ import FreightPage from '../pages/FreightPage.vue'
 import StorageDemandPage from '../pages/StorageDemandPage.vue'
 import DemandDetailPage from '../pages/DemandDetailPage.vue'
 import SiteCityPage from '../pages/SiteCityPage.vue'
+import MarketPage from '../pages/MarketPage.vue'
 
 const routes = [
   {
@@ -38,6 +39,16 @@ const routes = [
       title: '钢铁求购大厅_采购需求查询与发布-货袋子',
       description:
         '实时更新钢铁求购信息，覆盖多城市与多品类，支持快速筛选并联系买家，提升供需撮合效率。'
+    }
+  },
+  {
+    path: '/market',
+    name: 'market',
+    component: MarketPage,
+    meta: {
+      title: '钢铁行情中心_品种价格走势与市场解读-货袋子',
+      description:
+        '提供螺纹钢、热卷、中厚板等品种的城市行情快照与走势分析，辅助采购、销售与库存决策。'
     }
   },
   {
