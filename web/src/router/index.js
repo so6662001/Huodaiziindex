@@ -11,6 +11,7 @@ import SiteCityPage from '../pages/SiteCityPage.vue'
 import MarketPage from '../pages/MarketPage.vue'
 import MarketDetailPage from '../pages/MarketDetailPage.vue'
 import NewsPage from '../pages/NewsPage.vue'
+import NewsDetailPage from '../pages/NewsDetailPage.vue'
 
 const routes = [
   {
@@ -69,6 +70,15 @@ const routes = [
     meta: {
       title: '钢铁资讯_政策库存与市场动态-货袋子',
       description: '聚合钢铁行业政策、库存、市场动态与产业链解读，帮助企业把握市场节奏。'
+    }
+  },
+  {
+    path: '/news/:id',
+    name: 'newsDetail',
+    component: NewsDetailPage,
+    meta: {
+      title: '钢铁资讯详情-货袋子',
+      description: '查看钢铁资讯正文、标签与相关推荐，快速关联行情与供求机会。'
     }
   },
   {

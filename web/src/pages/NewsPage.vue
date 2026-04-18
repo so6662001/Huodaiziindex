@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 
 const categoryTabs = ['全部', '政策', '市场', '库存', '产业链']
 const activeTab = ref(categoryTabs[0])
@@ -45,6 +45,13 @@ const hotItems = [
   '仓储物流需求活跃，短驳与专线协同增强',
   '库存边际下降，贸易商挺价意愿提升'
 ]
+
+const filteredNewsItems = computed(() => {
+  if (activeTab.value === '全部') {
+    return newsItems
+  }
+  return newsItems.filter((item) => item.category === activeTab.value)
+})
 </script>
 
 <template>
@@ -96,12 +103,16 @@ const hotItems = [
       <section class="section">
         <div class="container news-layout">
           <div>
-            <article v-for="item in newsItems" :key="item.id" class="card news-card">
+            <article v-for="item in filteredNewsItems" :key="item.id" class="card news-card">
               <p class="news-card__meta">{{ item.category }} · {{ item.city }} · {{ item.publishAt }}</p>
-              <h2>{{ item.title }}</h2>
+              <h2>
+                <RouterLink class="news-card__title-link" :to="`/news/${item.id}`">
+                  {{ item.title }}
+                </RouterLink>
+              </h2>
               <p class="news-card__summary">{{ item.summary }}</p>
               <div class="news-card__actions">
-                <button class="btn btn--ghost">查看详情</button>
+                <RouterLink class="btn btn--ghost btn-link" :to="`/news/${item.id}`">查看详情</RouterLink>
                 <RouterLink class="btn btn--primary btn-link" to="/market">查看相关行情</RouterLink>
               </div>
             </article>
