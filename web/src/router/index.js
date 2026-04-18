@@ -1,0 +1,200 @@
+import { createRouter, createWebHistory } from 'vue-router'
+import HomePage from '../pages/HomePage.vue'
+import SpotPage from '../pages/SpotPage.vue'
+import BuyPage from '../pages/BuyPage.vue'
+import LogisticsPage from '../pages/LogisticsPage.vue'
+import WarehousePage from '../pages/WarehousePage.vue'
+import WarehouseDetailPage from '../pages/WarehouseDetailPage.vue'
+import FreightPage from '../pages/FreightPage.vue'
+import FreightDetailPage from '../pages/FreightDetailPage.vue'
+import SiteCenterPage from '../pages/SiteCenterPage.vue'
+import SiteAdPage from '../pages/SiteAdPage.vue'
+import StorageDemandPage from '../pages/StorageDemandPage.vue'
+import FreightDemandPage from '../pages/FreightDemandPage.vue'
+import DemandDetailPage from '../pages/DemandDetailPage.vue'
+import SiteCityPage from '../pages/SiteCityPage.vue'
+import MarketPage from '../pages/MarketPage.vue'
+import MarketDetailPage from '../pages/MarketDetailPage.vue'
+import NewsPage from '../pages/NewsPage.vue'
+import NewsDetailPage from '../pages/NewsDetailPage.vue'
+
+const routes = [
+  {
+    path: '/',
+    name: 'home',
+    component: HomePage,
+    meta: {
+      title: '钢铁现货交易与仓储物流信息平台-货袋子',
+      description:
+        '货袋子提供钢铁现货、求购、行情、仓储物流与城市分站服务，支持按品类、城市快速筛选与发布。'
+    }
+  },
+  {
+    path: '/spot',
+    name: 'spot',
+    component: SpotPage,
+    meta: {
+      title: '钢铁现货大厅_供应信息查询与发布-货袋子',
+      description:
+        '汇聚全国钢铁现货供应信息，支持按品类、规格、城市、价格筛选，快速联系卖家并发布现货。'
+    }
+  },
+  {
+    path: '/buy',
+    name: 'buy',
+    component: BuyPage,
+    meta: {
+      title: '钢铁求购大厅_采购需求查询与发布-货袋子',
+      description:
+        '实时更新钢铁求购信息，覆盖多城市与多品类，支持快速筛选并联系买家，提升供需撮合效率。'
+    }
+  },
+  {
+    path: '/market',
+    name: 'market',
+    component: MarketPage,
+    meta: {
+      title: '钢铁行情中心_品种价格走势与市场解读-货袋子',
+      description:
+        '提供螺纹钢、热卷、中厚板等品种的城市行情快照与走势分析，辅助采购、销售与库存决策。'
+    }
+  },
+  {
+    path: '/market/:symbol/:city',
+    name: 'marketDetail',
+    component: MarketDetailPage,
+    meta: {
+      title: '钢铁行情详情-货袋子',
+      description: '查看品种在指定城市的价格走势、历史区间、相关资讯与供求信息。'
+    }
+  },
+  {
+    path: '/news',
+    name: 'news',
+    component: NewsPage,
+    meta: {
+      title: '钢铁资讯_政策库存与市场动态-货袋子',
+      description: '聚合钢铁行业政策、库存、市场动态与产业链解读，帮助企业把握市场节奏。'
+    }
+  },
+  {
+    path: '/news/:id',
+    name: 'newsDetail',
+    component: NewsDetailPage,
+    meta: {
+      title: '钢铁资讯详情-货袋子',
+      description: '查看钢铁资讯正文、标签与相关推荐，快速关联行情与供求机会。'
+    }
+  },
+  {
+    path: '/logistics',
+    name: 'logistics',
+    component: LogisticsPage,
+    meta: {
+      title: '钢铁仓储物流_找仓库找车线与需求发布-货袋子',
+      description:
+        '提供钢铁仓库与车队专线信息，支持发布仓储与运输需求，快速对接本地服务商。'
+    }
+  },
+  {
+    path: '/logistics/warehouse',
+    name: 'warehouse',
+    component: WarehousePage,
+    meta: {
+      title: '找仓库_钢铁仓储服务查询-货袋子',
+      description:
+        '查询钢铁仓储服务，覆盖库型、库容、吊装能力与参考价格，支持按城市和品类快速联系仓库服务商。'
+    }
+  },
+  {
+    path: '/logistics/warehouse/:id',
+    name: 'warehouseDetail',
+    component: WarehouseDetailPage,
+    meta: {
+      title: '仓库详情-货袋子',
+      description: '查看仓库的库容、作业能力、仓储报价、服务范围与相关推荐信息。'
+    }
+  },
+  {
+    path: '/logistics/freight',
+    name: 'freight',
+    component: FreightPage,
+    meta: {
+      title: '找车找线_钢铁运输服务查询-货袋子',
+      description:
+        '提供钢铁运输车队与专线信息，支持按起运地、目的地、车型与时效筛选，快速联系承运服务商。'
+    }
+  },
+  {
+    path: '/logistics/freight/:id',
+    name: 'freightDetail',
+    component: FreightDetailPage,
+    meta: {
+      title: '运输专线详情-货袋子',
+      description: '查看车队专线的路线、时效、报价、服务能力与相关推荐信息。'
+    }
+  },
+  {
+    path: '/logistics/demand/storage/new',
+    name: 'storageDemandCreate',
+    component: StorageDemandPage,
+    meta: {
+      title: '发布仓储需求_钢铁仓储需求快速发布-货袋子',
+      description:
+        '在线发布钢铁仓储需求，填写城市、品类、吨位、存储天数与联系方式，平台快速匹配本地仓储服务商。'
+    }
+  },
+  {
+    path: '/logistics/demand/freight/new',
+    name: 'freightDemandCreate',
+    component: FreightDemandPage,
+    meta: {
+      title: '发布运输需求_钢铁运输需求快速发布-货袋子',
+      description:
+        '在线发布钢铁运输需求，填写起运地、目的地、车型、吨位与时效，平台快速匹配本地车队与专线。'
+    }
+  },
+  {
+    path: '/logistics/demand/:id',
+    name: 'demandDetail',
+    component: DemandDetailPage,
+    meta: {
+      title: '仓储物流需求详情-货袋子',
+      description: '查看仓储与运输需求详情，包含货品、吨位、时效与服务商推荐信息。'
+    }
+  },
+  {
+    path: '/site',
+    name: 'siteCenter',
+    component: SiteCenterPage,
+    meta: {
+      title: '分站中心_城市钢铁交易分站导航-货袋子',
+      description: '浏览全国城市分站，按区域快速进入本地供求、行情、仓储物流与广告招商页面。'
+    }
+  },
+  {
+    path: '/site/ad',
+    name: 'siteAd',
+    component: SiteAdPage,
+    meta: {
+      title: '分站广告投放_城市站点流量曝光方案-货袋子',
+      description: '查看分站广告位类型、价格与投放流程，提交城市定向投放需求。'
+    }
+  },
+  {
+    path: '/site/:city',
+    name: 'siteCity',
+    component: SiteCityPage,
+    meta: {
+      title: '城市分站-货袋子',
+      description: '查看城市分站的本地行情、供求、仓储物流和企业信息。'
+    }
+  }
+]
+
+const router = createRouter({
+  history: createWebHistory(),
+  routes
+})
+
+export default router
