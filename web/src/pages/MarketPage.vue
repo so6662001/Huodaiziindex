@@ -8,6 +8,13 @@ const activeCategory = ref(categoryTabs[0])
 const activeCity = ref(cityTabs[0])
 const activeRange = ref('7日')
 
+const symbolMap = {
+  螺纹钢: 'rebar',
+  热卷: 'hrc',
+  中厚板: 'plate',
+  型钢: 'section'
+}
+
 const quotePanels = [
   { label: '今日参考价', value: '3,620 元/吨', trend: '+25' },
   { label: '近7日波动', value: '2.9%', trend: '-0.4%' },

@@ -9,6 +9,7 @@ import StorageDemandPage from '../pages/StorageDemandPage.vue'
 import DemandDetailPage from '../pages/DemandDetailPage.vue'
 import SiteCityPage from '../pages/SiteCityPage.vue'
 import MarketPage from '../pages/MarketPage.vue'
+import MarketDetailPage from '../pages/MarketDetailPage.vue'
 
 const routes = [
   {
@@ -49,6 +50,15 @@ const routes = [
       title: '钢铁行情中心_品种价格走势与市场解读-货袋子',
       description:
         '提供螺纹钢、热卷、中厚板等品种的城市行情快照与走势分析，辅助采购、销售与库存决策。'
+    }
+  },
+  {
+    path: '/market/:symbol/:city',
+    name: 'marketDetail',
+    component: MarketDetailPage,
+    meta: {
+      title: '钢铁行情详情-货袋子',
+      description: '查看品种在指定城市的价格走势、历史区间、相关资讯与供求信息。'
     }
   },
   {
