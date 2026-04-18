@@ -1,6 +1,6 @@
-# Huodaizi Backend (P01 + P02 后端与中台)
+# Huodaizi Backend (P01 + P02 + P03 后端与中台)
 
-本模块为 P01 首页与 P02 现货大厅提供后端 API 与中台管理接口，采用 Spring Boot 3 + Java 21。
+本模块为 P01 首页、P02 现货大厅与 P03 求购大厅提供后端 API 与中台管理接口，采用 Spring Boot 3 + Java 21。
 
 ## 目录说明
 
@@ -8,8 +8,11 @@
 - `controller/AdminController.java`：中台管理接口
 - `controller/spot/SpotController.java`：P02 现货大厅公共接口
 - `controller/spot/SpotAdminController.java`：P02 现货大厅中台接口
+- `controller/buy/BuyController.java`：P03 求购大厅公共接口
+- `controller/buy/BuyAdminController.java`：P03 求购大厅中台接口
 - `repository/InMemoryHomeRepository.java`：内存数据仓储（MVP）
 - `repository/spot/InMemorySpotRepository.java`：现货大厅内存数据仓储（MVP）
+- `repository/buy/InMemoryBuyRepository.java`：求购大厅内存数据仓储（MVP）
 - `dto/**`：返回与请求模型
 - `common/**`、`exception/**`：统一返回与异常处理
 
@@ -90,6 +93,38 @@ Base Path: `/api/admin/spot`
 - `DELETE /{id}`
   - 删除记录
 
+### 5) 求购大厅公共接口（P03）
+
+Base Path: `/api/v1/buy`
+
+- `GET /filters`
+  - 返回筛选项（品类/规格/城市/交期）
+- `GET /`
+  - 返回求购列表，支持筛选与分页参数：
+    - `category`、`spec`、`city`、`arrival`、`keyword`
+    - `page`、`pageSize`
+- `GET /{id}`
+  - 返回求购详情（仅上架记录可见）
+- `POST /`
+  - 前台发布求购（默认上架、默认不置顶）
+
+### 6) 求购大厅中台接口（P03）
+
+Base Path: `/api/admin/buy`
+
+- `GET /`
+  - 中台求购列表（含上架/下架记录）
+- `POST /`
+  - 中台新增求购
+- `PUT /{id}`
+  - 中台编辑求购（基础字段、状态、置顶）
+- `PUT /{id}/status`
+  - 上下架（请求体传 `status=ONLINE|OFFLINE`）
+- `PUT /{id}/pin`
+  - 置顶/取消置顶（请求体传 `pinned=true|false`）
+- `DELETE /{id}`
+  - 删除记录
+
 ## 返回结构
 
 统一返回：
@@ -116,6 +151,7 @@ Base Path: `/api/admin/spot`
 
 - 当前为 **MVP 内存版中台**，数据保存在 `InMemoryHomeRepository` 中
 - P02 现货数据保存在 `InMemorySpotRepository` 中
+- P03 求购数据保存在 `InMemoryBuyRepository` 中
 - 重启服务后数据会重置
 - 适用于：
   - P01 接口联调
