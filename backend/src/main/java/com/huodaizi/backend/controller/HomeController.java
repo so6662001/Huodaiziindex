@@ -5,6 +5,7 @@ import com.huodaizi.backend.dto.HomeOverviewResponse;
 import com.huodaizi.backend.dto.HomeSearchRequest;
 import com.huodaizi.backend.service.HomeService;
 import jakarta.validation.Valid;
+import com.huodaizi.backend.repository.model.BaseAdminEntity;
 import java.util.List;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,7 +30,7 @@ public class HomeController {
   }
 
   @GetMapping("/search")
-  public ApiResponse<List<Object>> search(@Valid @ModelAttribute HomeSearchRequest request) {
+  public ApiResponse<List<BaseAdminEntity>> search(@Valid @ModelAttribute HomeSearchRequest request) {
     return ApiResponse.success(homeService.search(request));
   }
 }

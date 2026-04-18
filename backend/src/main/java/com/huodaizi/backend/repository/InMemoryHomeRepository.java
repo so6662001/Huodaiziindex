@@ -193,6 +193,7 @@ public class InMemoryHomeRepository {
             valueOrFallback(request.title(), request.name()),
             valueOrFallback(request.city(), inferCity(request.title())),
             valueOrFallback(request.category(), request.type()),
+            request.content(),
             valueOrFallback(request.meta(), request.content()),
             request.price(),
             request.trend(),
@@ -212,6 +213,7 @@ public class InMemoryHomeRepository {
             config.getCity(),
             config.getCategory(),
             content,
+            config.getMeta(),
             config.getPrice(),
             config.getTrend(),
             LocalDateTime.now());
@@ -230,7 +232,8 @@ public class InMemoryHomeRepository {
             valueOrFallback(request.title(), request.name(), existing.getTitle()),
             valueOrFallback(request.city(), existing.getCity()),
             valueOrFallback(request.category(), request.type(), existing.getCategory()),
-            valueOrFallback(request.meta(), valueOrFallback(request.content(), existing.getMeta())),
+            valueOrFallback(request.content(), existing.getContent()),
+            valueOrFallback(request.meta(), existing.getMeta()),
             valueOrFallback(request.price(), existing.getPrice()),
             valueOrFallback(request.trend(), existing.getTrend()),
             LocalDateTime.now());
@@ -322,6 +325,10 @@ public class InMemoryHomeRepository {
     List<String> cities =
         List.of("唐山", "无锡", "佛山", "武汉", "天津", "郑州", "南京", "上海", "成都", "邯郸");
     return cities.stream().filter(text::contains).findFirst().orElse("全国");
+  }
+
+  public List<BaseAdminEntity> search(String city, String type, String keyword) {
+    return searchEntities(city, type, keyword);
   }
 
   private String slugify(String text) {
@@ -539,6 +546,7 @@ public class InMemoryHomeRepository {
             title,
             city,
             category,
+            content,
             meta,
             price,
             trend,

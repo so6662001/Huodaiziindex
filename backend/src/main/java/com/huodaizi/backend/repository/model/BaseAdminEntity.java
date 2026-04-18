@@ -9,6 +9,7 @@ public class BaseAdminEntity {
   private String title;
   private String city;
   private String category;
+  private String content;
   private String meta;
   private String price;
   private String trend;
@@ -21,6 +22,7 @@ public class BaseAdminEntity {
       String title,
       String city,
       String category,
+      String content,
       String meta,
       String price,
       String trend,
@@ -31,6 +33,7 @@ public class BaseAdminEntity {
     this.title = title;
     this.city = city;
     this.category = category;
+    this.content = content;
     this.meta = meta;
     this.price = price;
     this.trend = trend;
@@ -61,6 +64,10 @@ public class BaseAdminEntity {
     return category;
   }
 
+  public String getContent() {
+    return content;
+  }
+
   public String getMeta() {
     return meta;
   }
@@ -82,6 +89,7 @@ public class BaseAdminEntity {
       String title,
       String city,
       String category,
+      String content,
       String meta,
       String price,
       String trend) {
@@ -89,6 +97,7 @@ public class BaseAdminEntity {
     this.title = title;
     this.city = city;
     this.category = category;
+    this.content = content;
     this.meta = meta;
     this.price = price;
     this.trend = trend;
