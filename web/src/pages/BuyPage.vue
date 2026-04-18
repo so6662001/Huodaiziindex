@@ -4,65 +4,65 @@ import { onMounted } from 'vue'
 const filters = {
   categories: ['全部品类', '螺纹钢', '热卷', '中厚板', '型钢', '管材'],
   specs: ['全部规格', 'HRB400E', 'Q235B', 'Q355B', '10-25mm', '16-40mm'],
-  cities: ['全部城市', '唐山', '天津', '无锡', '佛山', '武汉'],
-  prices: ['全部价格', '3000以下', '3000-3500', '3500-4000', '4000以上']
+  cities: ['全部城市', '郑州', '南京', '武汉', '佛山', '成都'],
+  arrivals: ['全部交期', '现货即提', '3天内到货', '7天内到货', '长期采购']
 }
 
-const spotItems = [
+const buyItems = [
   {
-    id: 'S20260418001',
-    title: '唐山螺纹钢 HRB400E 12-25mm',
-    seller: '唐山宏信钢贸',
-    tonnage: '860吨',
-    city: '唐山',
-    price: '3620元/吨',
-    delivery: '现货即提',
-    updatedAt: '5分钟前'
+    id: 'B20260418001',
+    title: '求购螺纹钢 HRB400E 16-25mm',
+    buyer: '郑州中原钢材采购中心',
+    demand: '600吨',
+    city: '郑州',
+    budget: '3580元/吨',
+    arrival: '3天内到货',
+    updatedAt: '8分钟前'
   },
   {
-    id: 'S20260418002',
-    title: '无锡热卷 Q235B 4.75*1500',
-    seller: '无锡金港供应链',
-    tonnage: '520吨',
-    city: '无锡',
-    price: '3780元/吨',
-    delivery: '2天内发货',
-    updatedAt: '12分钟前'
+    id: 'B20260418002',
+    title: '求购热卷 Q235B 4.75*1500',
+    buyer: '南京华东制造企业',
+    demand: '420吨',
+    city: '南京',
+    budget: '3750元/吨',
+    arrival: '7天内到货',
+    updatedAt: '15分钟前'
   },
   {
-    id: 'S20260418003',
-    title: '天津中厚板 Q355B 16-40mm',
-    seller: '天津北方钢材',
-    tonnage: '300吨',
-    city: '天津',
-    price: '3950元/吨',
-    delivery: '可分批提货',
-    updatedAt: '18分钟前'
-  },
-  {
-    id: 'S20260418004',
-    title: '佛山镀锌卷 DX51D 1.0mm',
-    seller: '佛山汇海钢铁',
-    tonnage: '240吨',
-    city: '佛山',
-    price: '4230元/吨',
-    delivery: '现货即提',
-    updatedAt: '26分钟前'
-  },
-  {
-    id: 'S20260418005',
-    title: '武汉型钢 H型钢 200*200',
-    seller: '武汉联盛钢贸',
-    tonnage: '410吨',
+    id: 'B20260418003',
+    title: '求购中厚板 Q355B 20mm',
+    buyer: '武汉桥梁工程项目部',
+    demand: '300吨',
     city: '武汉',
-    price: '3880元/吨',
-    delivery: '48小时内发货',
-    updatedAt: '31分钟前'
+    budget: '3920元/吨',
+    arrival: '现货即提',
+    updatedAt: '19分钟前'
+  },
+  {
+    id: 'B20260418004',
+    title: '求购镀锌卷 DX51D 1.2mm',
+    buyer: '佛山家电制造工厂',
+    demand: '260吨',
+    city: '佛山',
+    budget: '4260元/吨',
+    arrival: '5天内到货',
+    updatedAt: '24分钟前'
+  },
+  {
+    id: 'B20260418005',
+    title: '求购H型钢 Q235B 200*200',
+    buyer: '成都基建施工单位',
+    demand: '450吨',
+    city: '成都',
+    budget: '3850元/吨',
+    arrival: '长期采购',
+    updatedAt: '33分钟前'
   }
 ]
 
 onMounted(() => {
-  document.title = '钢铁现货大厅_供应信息查询与发布-货袋子'
+  document.title = '钢铁求购大厅_采购需求查询与发布-货袋子'
 })
 </script>
 
@@ -79,8 +79,8 @@ onMounted(() => {
         </RouterLink>
         <nav class="nav">
           <RouterLink to="/">首页</RouterLink>
-          <RouterLink class="active" to="/spot">现货大厅</RouterLink>
-          <RouterLink to="/buy">求购大厅</RouterLink>
+          <RouterLink to="/spot">现货大厅</RouterLink>
+          <RouterLink class="active" to="/buy">求购大厅</RouterLink>
           <a href="#">行情中心</a>
           <a href="#">钢铁资讯</a>
           <a href="#">仓储物流</a>
@@ -89,7 +89,7 @@ onMounted(() => {
         </nav>
         <div class="topbar__actions">
           <button class="btn btn--ghost">登录</button>
-          <button class="btn btn--primary">发布现货</button>
+          <button class="btn btn--primary">发布求购</button>
         </div>
       </div>
     </header>
@@ -97,8 +97,8 @@ onMounted(() => {
     <main class="spot-main">
       <section class="spot-hero">
         <div class="container">
-          <h1>现货大厅</h1>
-          <p>海量钢材现货，按品类、规格、城市与价格快速筛选，精准对接优质卖家。</p>
+          <h1>求购大厅</h1>
+          <p>实时采购需求汇聚，按品类、规格、交货地与交期筛选，快速对接优质买家。</p>
         </div>
       </section>
 
@@ -131,24 +131,24 @@ onMounted(() => {
             </div>
             <div class="filter-grid">
               <div>
-                <label>交货城市</label>
+                <label>到货城市</label>
                 <select>
                   <option v-for="item in filters.cities" :key="item">{{ item }}</option>
                 </select>
               </div>
               <div>
-                <label>价格区间</label>
+                <label>交期</label>
                 <select>
-                  <option v-for="item in filters.prices" :key="item">{{ item }}</option>
+                  <option v-for="item in filters.arrivals" :key="item">{{ item }}</option>
                 </select>
               </div>
               <div>
                 <label>关键词</label>
-                <input type="text" placeholder="品类/材质/规格/企业" />
+                <input type="text" placeholder="品类/材质/规格/采购企业" />
               </div>
               <div class="filter-actions">
                 <button class="btn btn--ghost">重置</button>
-                <button class="btn btn--primary">查询现货</button>
+                <button class="btn btn--primary">查询求购</button>
               </div>
             </div>
           </div>
@@ -158,23 +158,23 @@ onMounted(() => {
       <section class="section">
         <div class="container spot-layout">
           <div class="spot-list">
-            <article v-for="item in spotItems" :key="item.id" class="card spot-card">
+            <article v-for="item in buyItems" :key="item.id" class="card spot-card">
               <div class="spot-card__top">
                 <h2>{{ item.title }}</h2>
-                <span class="tag">现货</span>
+                <span class="tag buy">求购</span>
               </div>
-              <p class="spot-card__seller">{{ item.seller }}</p>
+              <p class="spot-card__seller">{{ item.buyer }}</p>
               <div class="spot-card__meta">
-                <span>库存：{{ item.tonnage }}</span>
-                <span>城市：{{ item.city }}</span>
-                <span>交货：{{ item.delivery }}</span>
+                <span>需求：{{ item.demand }}</span>
+                <span>到货地：{{ item.city }}</span>
+                <span>交期：{{ item.arrival }}</span>
               </div>
               <div class="spot-card__bottom">
-                <p class="spot-card__price">{{ item.price }}</p>
+                <p class="spot-card__price">{{ item.budget }}</p>
                 <p class="spot-card__time">更新：{{ item.updatedAt }}</p>
                 <div class="spot-card__actions">
                   <button class="btn btn--ghost">收藏</button>
-                  <button class="btn btn--primary">联系卖家</button>
+                  <button class="btn btn--primary">联系买家</button>
                 </div>
               </div>
             </article>
@@ -191,16 +191,16 @@ onMounted(() => {
           <aside class="spot-side">
             <div class="card side-card">
               <p class="ad__flag">广告</p>
-              <h3>现货置顶推广</h3>
-              <p>支持按城市和品类精准曝光，提升询盘与成交机会。</p>
+              <h3>求购信息推广</h3>
+              <p>支持求购需求优先曝光，面向对应城市和品类精准触达供应方。</p>
               <button class="btn btn--primary">立即咨询</button>
             </div>
             <div class="card side-card">
-              <h3>发布现货指南</h3>
+              <h3>发布求购建议</h3>
               <ul>
-                <li>1. 填写真实品类与规格</li>
-                <li>2. 明确库存吨位与交货地</li>
-                <li>3. 保持联系方式在线可达</li>
+                <li>1. 明确规格与采购吨位</li>
+                <li>2. 填写真实到货城市和交期</li>
+                <li>3. 保持联系人可及时沟通</li>
               </ul>
               <RouterLink class="side-link" to="/">返回首页查看更多入口</RouterLink>
             </div>
@@ -223,7 +223,7 @@ onMounted(() => {
 
     <nav class="mobile-tabs" aria-label="移动端底部导航">
       <RouterLink to="/">首页</RouterLink>
-      <RouterLink class="active" to="/spot">供求</RouterLink>
+      <RouterLink class="active" to="/buy">供求</RouterLink>
       <a href="#">物流</a>
       <a href="#">分站</a>
       <a href="#">我的</a>

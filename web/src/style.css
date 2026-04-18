@@ -407,6 +407,277 @@ select {
   color: #fff;
 }
 
+.brand--link {
+  color: inherit;
+}
+
+.nav a.active {
+  color: #f57c00;
+  font-weight: 600;
+}
+
+.spot-main {
+  padding-bottom: 24px;
+}
+
+.spot-hero {
+  padding: 22px 0 14px;
+}
+
+.spot-hero h1 {
+  font-size: 34px;
+  margin-bottom: 8px;
+}
+
+.spot-hero p {
+  color: #666;
+}
+
+.filter-panel {
+  padding: 18px;
+}
+
+.filter-row {
+  display: grid;
+  grid-template-columns: 70px 1fr;
+  align-items: start;
+  gap: 8px;
+}
+
+.filter-row + .filter-row {
+  margin-top: 12px;
+}
+
+.filter-row label,
+.filter-grid label {
+  font-size: 13px;
+  color: #787878;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  height: 34px;
+  padding: 0 12px;
+  border: 1px solid #e5e5e5;
+  border-radius: 999px;
+  background: #fff;
+  color: #4a4a4a;
+  cursor: pointer;
+}
+
+.chip.active,
+.chip:hover {
+  border-color: #f57c00;
+  background: #fff7ef;
+  color: #c96a00;
+}
+
+.filter-grid {
+  margin-top: 14px;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.filter-grid > div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.filter-grid select,
+.filter-grid input {
+  height: 40px;
+  border: 1px solid #dddddd;
+  border-radius: 8px;
+  padding: 0 12px;
+  outline: none;
+}
+
+.filter-grid select:focus,
+.filter-grid input:focus {
+  border-color: #f57c00;
+}
+
+.filter-actions {
+  justify-content: end;
+}
+
+.spot-layout {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: minmax(0, 2.15fr) minmax(0, 1fr);
+}
+
+.spot-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.spot-card {
+  padding: 16px;
+}
+
+.spot-card__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.spot-card__top h2 {
+  font-size: 20px;
+}
+
+.tag {
+  height: 24px;
+  padding: 0 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  background: #fff4e8;
+  color: #bf6500;
+  display: inline-flex;
+  align-items: center;
+}
+
+.tag.buy {
+  background: #ffeaea;
+  color: #cb3030;
+}
+
+.spot-card__seller {
+  margin: 10px 0 8px;
+  font-size: 14px;
+  color: #666;
+}
+
+.spot-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  font-size: 13px;
+  color: #7a7a7a;
+}
+
+.spot-card__bottom {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  align-items: center;
+  gap: 12px;
+}
+
+.spot-card__price {
+  color: #d55100;
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.spot-card__time {
+  color: #8a8a8a;
+  font-size: 13px;
+}
+
+.spot-card__actions {
+  justify-self: end;
+  display: flex;
+  gap: 8px;
+}
+
+.spot-side {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.side-card {
+  padding: 16px;
+}
+
+.side-card h3 {
+  font-size: 20px;
+  margin-top: 8px;
+}
+
+.side-card p {
+  color: #666;
+  margin-top: 8px;
+}
+
+.side-card ul {
+  margin-top: 10px;
+}
+
+.side-card li {
+  padding: 6px 0;
+  font-size: 14px;
+  color: #666;
+}
+
+.side-link {
+  display: inline-block;
+  margin-top: 10px;
+  color: #f57c00;
+  font-size: 14px;
+}
+
+.pagination {
+  padding: 12px;
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.page-btn {
+  height: 34px;
+  padding: 0 12px;
+  border: 1px solid #dddddd;
+  border-radius: 7px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.page-btn.active,
+.page-btn:hover {
+  border-color: #f57c00;
+  color: #f57c00;
+  background: #fff7ef;
+}
+
+.mobile-tabs {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 58px;
+  background: #fff;
+  border-top: 1px solid #e8e8e8;
+  display: none;
+  z-index: 30;
+}
+
+.mobile-tabs a {
+  flex: 1;
+  font-size: 13px;
+  color: #666;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile-tabs a.active {
+  color: #f57c00;
+  font-weight: 600;
+}
+
 @media (max-width: 980px) {
   .nav {
     display: none;
@@ -421,7 +692,8 @@ select {
   .hero__inner,
   .supply,
   .logistics,
-  .info {
+  .info,
+  .spot-layout {
     grid-template-columns: 1fr;
   }
 
@@ -435,6 +707,24 @@ select {
 
   .quote-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .spot-card__bottom {
+    grid-template-columns: 1fr;
+    align-items: start;
+    gap: 6px;
+  }
+
+  .spot-card__actions {
+    justify-self: start;
+  }
+
+  .mobile-tabs {
+    display: flex;
+  }
+
+  .page {
+    padding-bottom: 60px;
   }
 }
 
@@ -461,6 +751,22 @@ select {
 
   .quote-grid {
     grid-template-columns: 1fr;
+  }
+
+  .spot-hero h1 {
+    font-size: 28px;
+  }
+
+  .filter-row {
+    grid-template-columns: 1fr;
+  }
+
+  .filter-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .filter-actions .btn {
+    width: 100%;
   }
 
   .section__header h2 {
