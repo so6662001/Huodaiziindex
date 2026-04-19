@@ -61,6 +61,9 @@ public class NewsAdminController {
       @PathVariable("section") NewsSectionType section,
       @PathVariable("id") String id,
       @Valid @RequestBody NewsAdminUpdateRequest request) {
+    if (request.pinned() == null) {
+      throw new IllegalArgumentException("pinned 不能为空");
+    }
     return ApiResponse.success(newsService.adminPin(section, id, request.pinned()));
   }
 

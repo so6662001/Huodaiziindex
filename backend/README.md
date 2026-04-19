@@ -30,6 +30,9 @@ Base Path: `/api/v1/news`
 
 Base Path: `/api/admin/news`
 
+> 安全要求：所有 `/api/admin/**` 接口需携带请求头  
+> `X-Admin-Token: <token>`
+
 - `GET /{section}`
   - 查询指定板块中台列表（含上下架）
 - `POST /{section}`
@@ -90,4 +93,11 @@ Base Path: `/api/admin/news`
 ```bash
 cd backend
 mvn spring-boot:run
+```
+
+本地调试示例：
+
+```bash
+curl -H "X-Admin-Token: change-this-admin-token" \
+  http://127.0.0.1:8080/api/admin/news/NEWS
 ```

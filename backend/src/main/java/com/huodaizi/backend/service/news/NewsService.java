@@ -93,10 +93,11 @@ public class NewsService {
   }
 
   private NewsItemDTO toDTO(NewsEntity entity) {
+    String summary = fallback(entity.getSummary(), entity.getTitle());
     return new NewsItemDTO(
         entity.getId(),
         entity.getTitle(),
-        entity.getSummary(),
+        summary,
         entity.getCategory(),
         entity.getCity(),
         entity.getPublishAt(),
@@ -104,5 +105,12 @@ public class NewsService {
         entity.getStatus(),
         entity.isPinned(),
         entity.getUpdatedAt().toString());
+  }
+
+  private String fallback(String value, String defaultText) {
+    if (value == null || value.isBlank() || "-".equals(value.trim())) {
+      return defaultText;
+    }
+    return value;
   }
 }
