@@ -83,6 +83,10 @@ function goto(url) {
     router.push('/h5/reconcile-orders?contactMobile=13800138000')
     return
   }
+  if (url.includes('/h5/member') || url.includes('/subscription')) {
+    router.push('/h5/member?merchantId=S001')
+    return
+  }
   router.push(url)
 }
 

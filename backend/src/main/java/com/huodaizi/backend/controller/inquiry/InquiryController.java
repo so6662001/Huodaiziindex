@@ -62,6 +62,14 @@ import com.huodaizi.backend.dto.inquiry.InquiryH5ReconcileOrderListRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryH5ReconcileOrderListResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryH5ReconcileOrderQuickStatusRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryH5ReconcileOrderQuickStatusResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryH5MemberCreateRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryH5MemberCreateResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryH5MemberMineRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryH5MemberMineResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryH5MemberOverviewRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryH5MemberOverviewResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryH5MemberPlanListRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryH5MemberPlanListResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryH5QuickQuoteInitRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryH5QuickQuoteInitResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryH5MerchantLeadRequest;
@@ -380,6 +388,30 @@ public class InquiryController {
       @PathVariable("reconcileOrderId") String reconcileOrderId,
       @Valid @RequestBody InquiryH5ReconcileOrderQuickStatusRequest request) {
     return ApiResponse.success(service.h5ReconcileOrderQuickStatus(reconcileOrderId, request));
+  }
+
+  @GetMapping("/h5/member/overview")
+  public ApiResponse<InquiryH5MemberOverviewResponse> h5MemberOverview(
+      @Valid @ModelAttribute InquiryH5MemberOverviewRequest request) {
+    return ApiResponse.success(service.h5MemberOverview(request));
+  }
+
+  @GetMapping("/h5/member/plans")
+  public ApiResponse<InquiryH5MemberPlanListResponse> h5MemberPlans(
+      @Valid @ModelAttribute InquiryH5MemberPlanListRequest request) {
+    return ApiResponse.success(service.h5MemberPlans(request));
+  }
+
+  @GetMapping("/h5/member/mine")
+  public ApiResponse<InquiryH5MemberMineResponse> h5MemberMine(
+      @Valid @ModelAttribute InquiryH5MemberMineRequest request) {
+    return ApiResponse.success(service.h5MemberMine(request));
+  }
+
+  @PostMapping("/h5/member/open")
+  public ApiResponse<InquiryH5MemberCreateResponse> h5MemberOpen(
+      @Valid @RequestBody InquiryH5MemberCreateRequest request) {
+    return ApiResponse.success(service.h5MemberOpen(request));
   }
 
   @GetMapping("/merchant/messages")

@@ -485,6 +485,13 @@ public class InMemoryInquiryRepository {
                 "/h5/reconcile-orders?contactMobile=13800138000",
                 ""),
             new InquiryH5HomeEntity.QuickNavEntity(
+                "NAV010",
+                "H5我的会员",
+                "套餐订阅与权益管理",
+                "member-h5",
+                "/h5/member?merchantId=S001",
+                ""),
+            new InquiryH5HomeEntity.QuickNavEntity(
                 "NAV006", "信用规则", "分发评分公开", "rule", "/dispatch/score-rules", ""));
 
     List<InquiryH5HomeEntity.MarketCardEntity> marketCards =

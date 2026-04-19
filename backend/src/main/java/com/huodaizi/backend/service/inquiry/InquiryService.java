@@ -92,6 +92,14 @@ import com.huodaizi.backend.dto.inquiry.InquiryH5MerchantLeadQuickStatusRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryH5MerchantLeadQuickStatusResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryH5MerchantLeadRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryH5MerchantLeadResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryH5MemberCreateRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryH5MemberCreateResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryH5MemberMineRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryH5MemberMineResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryH5MemberOverviewRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryH5MemberOverviewResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryH5MemberPlanListRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryH5MemberPlanListResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryH5PickupOrderCreateRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryH5PickupOrderCreateResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryH5PickupOrderDetailRequest;
@@ -1213,6 +1221,81 @@ public class InquiryService {
         updated.order().status(),
         updated.order().statusText(),
         "对账单状态已更新");
+  }
+
+  public InquiryH5MemberPlanListResponse h5MemberPlans(InquiryH5MemberPlanListRequest request) {
+    InquirySubscriptionPlanListResponse plans =
+        subscriptionPlans(new InquirySubscriptionPlanListRequest(request.merchantId().trim()));
+    return new InquiryH5MemberPlanListResponse(
+        request.merchantId().trim(),
+        plans.plans(),
+        plans.recommendPlanCode(),
+        "优先选择推荐套餐，提升线索处理效率与履约协同能力");
+  }
+
+  public InquiryH5MemberCreateResponse h5MemberOpen(InquiryH5MemberCreateRequest request) {
+    InquirySubscriptionCreateResponse created =
+        createSubscription(
+            new InquirySubscriptionCreateRequest(
+                request.merchantId().trim(),
+                request.planCode().trim(),
+                request.billingCycle().trim(),
+                request.operator()));
+    return new InquiryH5MemberCreateResponse(
+        created.subscriptionId(),
+        created.subscriptionNo(),
+        created.merchantId(),
+        created.planCode(),
+        created.planName(),
+        created.status(),
+        subscriptionStatusText(created.status()),
+        created.payAmount(),
+        "/h5/member?merchantId=" + request.merchantId().trim(),
+        "H5会员开通成功，权益已生效");
+  }
+
+  public InquiryH5MemberMineResponse h5MemberMine(InquiryH5MemberMineRequest request) {
+    InquirySubscriptionMineResponse mine =
+        subscriptionMine(new InquirySubscriptionMineRequest(request.merchantId().trim()));
+    return new InquiryH5MemberMineResponse(
+        request.merchantId().trim(),
+        mine.items(),
+        mine.total(),
+        mine.activeCount(),
+        mine.expiringSoonCount(),
+        mine.expiredCount(),
+        "建议在到期前7天续费，避免功能中断");
+  }
+
+  public InquiryH5MemberOverviewResponse h5MemberOverview(InquiryH5MemberOverviewRequest request) {
+    InquirySubscriptionMineResponse mine =
+        subscriptionMine(new InquirySubscriptionMineRequest(request.merchantId().trim()));
+    InquirySubscriptionMineItemDTO current = mine.items().isEmpty() ? null : mine.items().get(0);
+    String level = current == null ? "FREE" : planTierByCode(current.planCode());
+    String levelText =
+        switch (level) {
+          case "ENTERPRISE" -> "企业会员";
+          case "PRO" -> "专业会员";
+          case "BASIC" -> "基础会员";
+          default -> "免费用户";
+        };
+    String renewSuggestion =
+        mine.expiringSoonCount() > 0
+            ? "存在临近到期会员，建议尽快续费保障权益连续"
+            : "会员状态稳定，可持续观察权益使用与回款转化";
+    return new InquiryH5MemberOverviewResponse(
+        request.merchantId().trim(),
+        level,
+        levelText,
+        current == null ? "" : current.planCode(),
+        current == null ? "" : current.planName(),
+        current == null ? "NONE" : current.status(),
+        current == null ? "未开通" : current.statusText(),
+        mine.activeCount(),
+        mine.expiringSoonCount(),
+        mine.expiredCount(),
+        renewSuggestion,
+        "会员中心可统一管理套餐权益、续费节奏与经营成本");
   }
 
   public InquiryMerchantLeadDetailResponse merchantLeadDetail(
