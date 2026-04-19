@@ -37,6 +37,9 @@ Base Path: `/api/v1/home`
 
 Base Path: `/api/admin`
 
+> 安全要求：所有 `/api/admin/**` 接口必须携带请求头  
+> `X-Admin-Token: <token>`
+
 - `GET /config`
 - `PUT /config`
 - `GET /{type}`
@@ -97,6 +100,23 @@ Base Path: `/api/admin`
 ```bash
 cd backend
 mvn spring-boot:run
+```
+
+本地调试可使用默认 token：
+
+```bash
+curl -H "X-Admin-Token: change-this-admin-token" \
+  http://127.0.0.1:8080/api/admin/config
+```
+
+可在 `application.yml` 中修改：
+
+```yaml
+huodaizi:
+  admin:
+    auth:
+      enabled: true
+      token: your-admin-token
 ```
 
 ## 后续建议（下一阶段）
