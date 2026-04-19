@@ -331,7 +331,7 @@ public class InquiryController {
   @GetMapping("/h5/pickup-orders")
   public ApiResponse<InquiryH5PickupOrderListResponse> h5ListPickupOrders(
       @Valid @ModelAttribute InquiryH5PickupOrderListRequest request) {
-    return ApiResponse.success(service.h5ListPickupOrders(request));
+    return ApiResponse.success(service.h5PickupOrders(request));
   }
 
   @GetMapping("/h5/pickup-orders/{pickupOrderId}")
