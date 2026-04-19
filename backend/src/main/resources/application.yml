@@ -1,0 +1,8 @@
+server:
+  port: 8080
+
+huodaizi:
+  admin:
+    auth:
+      enabled: true
+      token: change-this-admin-token
