@@ -63,6 +63,10 @@ async function loadHome() {
 
 function goto(url) {
   if (!url) return
+  if (url === '/inquiry/create') {
+    router.push('/h5/inquiry/step1')
+    return
+  }
   router.push(url)
 }
 

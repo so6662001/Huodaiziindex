@@ -73,6 +73,11 @@ import com.huodaizi.backend.dto.inquiry.InquiryH5HomeQuickNavItemDTO;
 import com.huodaizi.backend.dto.inquiry.InquiryH5HomeRecommendationItemDTO;
 import com.huodaizi.backend.dto.inquiry.InquiryH5HomeRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryH5HomeResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryH5InquiryStep1InitRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryH5InquiryStep1InitResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryH5InquiryStep1OptionDTO;
+import com.huodaizi.backend.dto.inquiry.InquiryH5InquiryStep1SaveRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryH5InquiryStep1SaveResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchBatchUpdateRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchOverviewRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchOverviewResponse;
@@ -88,6 +93,7 @@ import com.huodaizi.backend.repository.inquiry.InquiryMerchantCreditScoreEntity;
 import com.huodaizi.backend.repository.inquiry.InquiryMerchantLeadEntity;
 import com.huodaizi.backend.repository.inquiry.InquiryMessageCenterEntity;
 import com.huodaizi.backend.repository.inquiry.InquiryH5HomeEntity;
+import com.huodaizi.backend.repository.inquiry.InquiryH5InquiryStep1DraftEntity;
 import com.huodaizi.backend.repository.inquiry.InquiryMerchantSubscriptionEntity;
 import com.huodaizi.backend.repository.inquiry.InquiryPickupOrderEntity;
 import com.huodaizi.backend.repository.inquiry.InquiryReconcileOrderEntity;
@@ -734,6 +740,48 @@ public class InquiryService {
             .toList());
   }
 
+  public InquiryH5InquiryStep1InitResponse h5InquiryStep1Init(InquiryH5InquiryStep1InitRequest request) {
+    String city = request.city() == null || request.city().isBlank() ? "全国" : request.city().trim();
+    InquiryH5InquiryStep1DraftEntity draft = repository.initH5InquiryStep1Draft(city);
+    List<InquiryH5InquiryStep1OptionDTO> categories =
+        List.of(
+            new InquiryH5InquiryStep1OptionDTO("REBAR", "螺纹钢"),
+            new InquiryH5InquiryStep1OptionDTO("HOT_ROLL", "热轧卷板"),
+            new InquiryH5InquiryStep1OptionDTO("MEDIUM_PLATE", "中厚板"),
+            new InquiryH5InquiryStep1OptionDTO("COLD_ROLL", "冷轧板卷"));
+    List<InquiryH5InquiryStep1OptionDTO> deliveryCities =
+        List.of(
+            new InquiryH5InquiryStep1OptionDTO("唐山", "唐山"),
+            new InquiryH5InquiryStep1OptionDTO("无锡", "无锡"),
+            new InquiryH5InquiryStep1OptionDTO("郑州", "郑州"),
+            new InquiryH5InquiryStep1OptionDTO("佛山", "佛山"),
+            new InquiryH5InquiryStep1OptionDTO(city, city));
+    return new InquiryH5InquiryStep1InitResponse(
+        city,
+        draft.getCategoryCode(),
+        draft.getDraftId(),
+        uniqueOptions(categories),
+        uniqueOptions(deliveryCities),
+        "已为您保存草稿，可稍后继续填写");
+  }
+
+  public InquiryH5InquiryStep1SaveResponse h5InquiryStep1Save(InquiryH5InquiryStep1SaveRequest request) {
+    InquiryH5InquiryStep1DraftEntity draft = repository.saveH5InquiryStep1Draft(request);
+    String summary =
+        draft.getSpecText()
+            + " · "
+            + draft.getDeliveryCity()
+            + " · "
+            + draft.getDemandQtyTon()
+            + "吨";
+    return new InquiryH5InquiryStep1SaveResponse(
+        draft.getDraftId(),
+        draft.getStatus(),
+        "/h5/inquiry/step2?draftId=" + draft.getDraftId(),
+        summary,
+        draft.getUpdatedAt().toString());
+  }
+
   public InquiryMerchantLeadDetailResponse merchantLeadDetail(
       String leadId, InquiryMerchantLeadListRequest request) {
     InquiryMerchantLeadEntity lead = repository.merchantLeadDetail(leadId, request.merchantId());
@@ -1241,6 +1289,17 @@ public class InquiryService {
       return "***";
     }
     return digits.substring(0, 3) + "****" + digits.substring(digits.length() - 4);
+  }
+
+  private List<InquiryH5InquiryStep1OptionDTO> uniqueOptions(List<InquiryH5InquiryStep1OptionDTO> options) {
+    java.util.LinkedHashMap<String, InquiryH5InquiryStep1OptionDTO> dedup = new java.util.LinkedHashMap<>();
+    for (InquiryH5InquiryStep1OptionDTO option : options) {
+      if (option == null || option.code() == null || option.code().isBlank()) {
+        continue;
+      }
+      dedup.putIfAbsent(option.code(), option);
+    }
+    return List.copyOf(dedup.values());
   }
 }
 

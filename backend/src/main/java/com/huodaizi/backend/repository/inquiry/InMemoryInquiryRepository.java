@@ -20,7 +20,7 @@ import com.huodaizi.backend.dto.inquiry.InquiryMessageCenterListRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryMessageCenterReadAllRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryMessageCenterReadRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryH5HomeRequest;
-import com.huodaizi.backend.dto.inquiry.InquiryH5HomeRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryH5InquiryStep1SaveRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryPickupOrderCreateRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryPickupOrderListRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryPickupOrderStatus;
@@ -33,15 +33,13 @@ import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchBatchUpdateRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchOverviewRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchTaskRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryDispatchScoreRuleRequest;
-import com.huodaizi.backend.dto.inquiry.InquiryMessageCenterListRequest;
-import com.huodaizi.backend.dto.inquiry.InquiryMessageCenterReadAllRequest;
-import com.huodaizi.backend.dto.inquiry.InquiryMessageCenterReadRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryStatus;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ConcurrentHashMap;
@@ -59,6 +57,7 @@ public class InMemoryInquiryRepository {
   private final AtomicLong reconcileSeq = new AtomicLong(20260418000L);
   private final AtomicLong subscriptionSeq = new AtomicLong(20260418000L);
   private final AtomicLong billingSeq = new AtomicLong(20260418000L);
+  private final AtomicLong h5InquiryDraftSeq = new AtomicLong(20260418000L);
   private final ConcurrentMap<String, InquiryEntity> store = new ConcurrentHashMap<>();
   private final ConcurrentMap<String, List<InquiryQuoteCompareEntity>> quoteStore = new ConcurrentHashMap<>();
   private final ConcurrentMap<String, InquiryMerchantLeadEntity> merchantLeadStore = new ConcurrentHashMap<>();
@@ -74,6 +73,8 @@ public class InMemoryInquiryRepository {
   private final ConcurrentMap<String, InquiryMessageCenterEntity> messageCenterStore =
       new ConcurrentHashMap<>();
   private final ConcurrentMap<String, InquiryH5HomeEntity> h5HomeStore = new ConcurrentHashMap<>();
+  private final ConcurrentMap<String, InquiryH5InquiryStep1DraftEntity> h5InquiryStep1DraftStore =
+      new ConcurrentHashMap<>();
   private final ConcurrentMap<String, InquiryPickupOrderEntity> pickupOrderStore = new ConcurrentHashMap<>();
   private final ConcurrentMap<String, InquiryReconcileOrderEntity> reconcileOrderStore =
       new ConcurrentHashMap<>();
@@ -459,13 +460,13 @@ public class InMemoryInquiryRepository {
                 "BNR002",
                 "AI询价限时提速",
                 "3步提交，10分钟内拿到首批报价",
-                "/inquiry/create",
+                "/h5/inquiry/step1",
                 "https://cdn.huodaizi.com/h5/banner-ai.png"));
 
     List<InquiryH5HomeEntity.QuickNavEntity> quickNavs =
         List.of(
             new InquiryH5HomeEntity.QuickNavEntity(
-                "NAV001", "AI询价", "3步快速找货", "inquiry", "/inquiry/create", "HOT"),
+                "NAV001", "AI询价", "3步快速找货", "inquiry", "/h5/inquiry/step1", "HOT"),
             new InquiryH5HomeEntity.QuickNavEntity(
                 "NAV002", "现货大厅", "热门规格现货", "spot", "/", ""),
             new InquiryH5HomeEntity.QuickNavEntity(
@@ -510,6 +511,57 @@ public class InMemoryInquiryRepository {
         marketCards,
         recommendations,
         LocalDateTime.now());
+  }
+
+  public InquiryH5InquiryStep1DraftEntity initH5InquiryStep1Draft(String city) {
+    LocalDateTime now = LocalDateTime.now();
+    String draftId = buildH5InquiryDraftId();
+    InquiryH5InquiryStep1DraftEntity entity =
+        new InquiryH5InquiryStep1DraftEntity(
+            draftId,
+            "REBAR",
+            "",
+            defaultText(city, "全国").trim(),
+            "",
+            "ANY",
+            "",
+            "",
+            "INIT",
+            now,
+            now);
+    h5InquiryStep1DraftStore.put(draftId, entity);
+    return entity;
+  }
+
+  public InquiryH5InquiryStep1DraftEntity saveH5InquiryStep1Draft(InquiryH5InquiryStep1SaveRequest request) {
+    String draftId = defaultText(request.draftId(), "").trim();
+    if (draftId.isEmpty()) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "draftId 不能为空");
+    }
+    InquiryH5InquiryStep1DraftEntity existing = h5InquiryStep1DraftStore.get(draftId);
+    if (existing == null) {
+      throw new BaseException(ErrorCode.NOT_FOUND.getCode(), "询价草稿不存在");
+    }
+    LocalDateTime now = LocalDateTime.now();
+    InquiryH5InquiryStep1DraftEntity saved =
+        new InquiryH5InquiryStep1DraftEntity(
+            draftId,
+            request.categoryCode().trim().toUpperCase(Locale.ROOT),
+            request.specText().trim(),
+            request.deliveryCity().trim(),
+            request.demandQtyTon().stripTrailingZeros().toPlainString(),
+            normalizeInvoiceNeedForH5(request.invoiceNeed()),
+            request.contactMobile().trim(),
+            defaultText(request.remark(), ""),
+            "STEP1_SAVED",
+            existing.getCreatedAt(),
+            now);
+    h5InquiryStep1DraftStore.put(draftId, saved);
+    return saved;
+  }
+
+  private String buildH5InquiryDraftId() {
+    return "H5DRAFT" + NO_FMT.format(LocalDateTime.now()) + h5InquiryDraftSeq.incrementAndGet();
   }
 
   public List<InquiryMerchantLeadEntity> workbenchTasks(InquiryQuoteWorkbenchTaskRequest request) {
@@ -937,6 +989,14 @@ public class InMemoryInquiryRepository {
     };
   }
 
+  private String normalizeInvoiceNeedForH5(String invoiceNeed) {
+    String normalized = defaultText(invoiceNeed, "ANY").trim().toUpperCase(Locale.ROOT);
+    return switch (normalized) {
+      case "ANY", "YES", "NO" -> normalized;
+      default -> throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "invoiceNeed 仅支持 ANY/YES/NO");
+    };
+  }
+
   private BigDecimal parsePositiveMoney(String text, String field) {
     BigDecimal value = parseMoney(text, field);
     if (value.compareTo(BigDecimal.ZERO) <= 0) {
@@ -1025,6 +1085,7 @@ public class InMemoryInquiryRepository {
     seedDispatchScoreRules();
     seedMessageCenter();
     seedH5Home();
+    seedH5InquiryStep1Drafts();
   }
 
   private void seedMerchantLeads(InquiryEntity inquiry1, InquiryEntity inquiry2) {
@@ -1467,6 +1528,24 @@ public class InMemoryInquiryRepository {
                     "14",
                     "/merchant/lead/manage?merchantId=S001")),
             LocalDateTime.now().minusMinutes(20)));
+  }
+
+  private void seedH5InquiryStep1Drafts() {
+    LocalDateTime now = LocalDateTime.now().minusMinutes(15);
+    InquiryH5InquiryStep1DraftEntity draft =
+        new InquiryH5InquiryStep1DraftEntity(
+            "H5DRAFT20260418001",
+            "REBAR",
+            "HRB400E Φ20*12m",
+            "唐山",
+            "120",
+            "YES",
+            "13800138000",
+            "现货优先，当日可装车",
+            "STEP1_SAVED",
+            now.minusMinutes(4),
+            now);
+    h5InquiryStep1DraftStore.put(draft.getDraftId(), draft);
   }
 
   private String maskPhone(String phone) {
