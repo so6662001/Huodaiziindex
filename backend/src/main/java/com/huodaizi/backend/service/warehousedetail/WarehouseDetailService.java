@@ -123,8 +123,8 @@ public class WarehouseDetailService {
         entity.getRelatedId(),
         entity.getTitle(),
         entity.getCity(),
-        entity.getWarehouseType(),
         entity.getQuote(),
+        entity.getWarehouseType(),
         entity.getLink());
   }
 
@@ -135,11 +135,13 @@ public class WarehouseDetailService {
 
   private WarehouseDetailContactDTO toContact(WarehouseDetailEntity entity, boolean showFullPhone) {
     String phone = entity.getContactPhone();
+    String contactName = entity.getContactName();
     if (!showFullPhone) {
       phone = maskPhone(phone);
+      contactName = maskName(contactName);
     }
     return new WarehouseDetailContactDTO(
-        entity.getContactName(), phone, entity.getServiceStatus(), entity.getDescription());
+        contactName, phone, entity.getServiceStatus(), entity.getDescription());
   }
 
   private WarehouseDetailAdminItemDTO toAdminItem(WarehouseDetailEntity entity) {
@@ -187,5 +189,18 @@ public class WarehouseDetailService {
       return phone == null ? "-" : phone;
     }
     return phone.substring(0, 3) + "****" + phone.substring(phone.length() - 4);
+  }
+
+  private String maskName(String name) {
+    if (name == null || name.isBlank()) {
+      return "-";
+    }
+    if (name.length() <= 1) {
+      return "*";
+    }
+    if (name.length() == 2) {
+      return name.substring(0, 1) + "*";
+    }
+    return name.substring(0, 1) + "**";
   }
 }
