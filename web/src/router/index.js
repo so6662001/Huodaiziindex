@@ -30,6 +30,7 @@ import A06DispatchStrategyConfigPage from '../pages/A06DispatchStrategyConfigPag
 import A07PlanPricingManagePage from '../pages/A07PlanPricingManagePage.vue'
 import A08RiskAlertCenterPage from '../pages/A08RiskAlertCenterPage.vue'
 import N01LoginRegisterPage from '../pages/N01LoginRegisterPage.vue'
+import N02IdentitySelectPage from '../pages/N02IdentitySelectPage.vue'
 import InquiryMerchantLeadManagePage from '../pages/InquiryMerchantLeadManagePage.vue'
 import InquiryQuoteWorkbenchPage from '../pages/InquiryQuoteWorkbenchPage.vue'
 import SiteAdLeadMinePage from '../pages/SiteAdLeadMinePage.vue'
@@ -194,6 +195,14 @@ const routes = [
     component: N01LoginRegisterPage,
     meta: {
       title: 'PC-N01登录注册_货袋子账号中心'
+    }
+  },
+  {
+    path: '/account/identity-select',
+    name: 'n02IdentitySelect',
+    component: N02IdentitySelectPage,
+    meta: {
+      title: 'PC-N02身份选择_货袋子账号中心'
     }
   },
   {

@@ -7,6 +7,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.util.Base64;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
@@ -42,7 +43,7 @@ public class InMemoryAuthRepository {
             hashPassword(registration.password()),
             companyName,
             contactName,
-            "MERCHANT",
+            "BUYER",
             "ACTIVE",
             LocalDateTime.now(),
             LocalDateTime.now());
@@ -75,6 +76,8 @@ public class InMemoryAuthRepository {
             token,
             user.getUserId(),
             user.getAccount(),
+            user.getRole(),
+            user.getRole(),
             defaultText(channel, "PC"),
             now.plusDays(7),
             now,
@@ -119,6 +122,32 @@ public class InMemoryAuthRepository {
     return session;
   }
 
+  public SessionEntity switchIdentity(String token, String identityCode) {
+    SessionEntity session = requireSession(token);
+    String normalized = normalizeRole(identityCode);
+    AuthUserEntity user = userStore.get(session.getAccount());
+    if (user == null || !user.getIdentityCodes().contains(normalized)) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "当前账号不支持该身份");
+    }
+    SessionEntity updated =
+        new SessionEntity(
+            session.getToken(),
+            session.getUserId(),
+            session.getAccount(),
+            session.getDefaultRoleCode(),
+            normalized,
+            session.getChannel(),
+            session.getExpireAt(),
+            session.getCreatedAt(),
+            LocalDateTime.now());
+    sessionStore.put(updated.getToken(), updated);
+    return updated;
+  }
+
+  public List<String> identityCodes() {
+    return List.of("BUYER", "SUPPLIER", "OPERATOR");
+  }
+
   public void logout(String token) {
     sessionStore.remove(defaultText(token, ""));
   }
@@ -137,6 +166,14 @@ public class InMemoryAuthRepository {
       throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "mobile 必须为11位手机号");
     }
     return normalized;
+  }
+
+  private String normalizeRole(String roleCode) {
+    String normalized = defaultText(roleCode, "").trim().toUpperCase(Locale.ROOT);
+    return switch (normalized) {
+      case "BUYER", "SUPPLIER", "OPERATOR" -> normalized;
+      default -> throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "roleCode 仅支持 BUYER/SUPPLIER/OPERATOR");
+    };
   }
 
   private String hashPassword(String password) {
@@ -180,7 +217,7 @@ public class InMemoryAuthRepository {
             hashPassword("Demo@123456"),
             "演示钢贸有限公司",
             "演示账号",
-            "MERCHANT",
+            "BUYER",
             "ACTIVE",
             LocalDateTime.now().minusDays(3),
             LocalDateTime.now().minusDays(1));
@@ -191,6 +228,8 @@ public class InMemoryAuthRepository {
     private final String token;
     private final String userId;
     private final String account;
+    private final String defaultRoleCode;
+    private final String activeIdentityCode;
     private final String channel;
     private final LocalDateTime expireAt;
     private final LocalDateTime createdAt;
@@ -200,6 +239,8 @@ public class InMemoryAuthRepository {
         String token,
         String userId,
         String account,
+        String defaultRoleCode,
+        String activeIdentityCode,
         String channel,
         LocalDateTime expireAt,
         LocalDateTime createdAt,
@@ -207,6 +248,8 @@ public class InMemoryAuthRepository {
       this.token = token;
       this.userId = userId;
       this.account = account;
+      this.defaultRoleCode = defaultRoleCode;
+      this.activeIdentityCode = activeIdentityCode;
       this.channel = channel;
       this.expireAt = expireAt;
       this.createdAt = createdAt;
@@ -223,6 +266,14 @@ public class InMemoryAuthRepository {
 
     public String getAccount() {
       return account;
+    }
+
+    public String getDefaultRoleCode() {
+      return defaultRoleCode;
+    }
+
+    public String getActiveIdentityCode() {
+      return activeIdentityCode;
     }
 
     public String getChannel() {

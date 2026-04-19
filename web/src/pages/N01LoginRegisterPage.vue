@@ -74,7 +74,8 @@ async function login() {
       throw new Error(json.message || `登录失败(${resp.status})`)
     }
     setSession(json.data)
-    successMsg.value = '登录成功，已建立会话'
+    successMsg.value = '登录成功，正在进入身份选择'
+    router.push('/account/identity-select')
   } catch (error) {
     errorMsg.value = error.message || '登录失败'
   } finally {
@@ -108,7 +109,8 @@ async function register() {
       throw new Error(json.message || `注册失败(${resp.status})`)
     }
     setSession(json.data)
-    successMsg.value = '注册成功，已自动登录'
+    successMsg.value = '注册成功，正在进入身份选择'
+    router.push('/account/identity-select')
   } catch (error) {
     errorMsg.value = error.message || '注册失败'
   } finally {

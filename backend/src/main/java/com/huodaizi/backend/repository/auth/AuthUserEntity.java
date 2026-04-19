@@ -1,6 +1,7 @@
 package com.huodaizi.backend.repository.auth;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class AuthUserEntity {
   private final String userId;
@@ -77,6 +78,10 @@ public class AuthUserEntity {
 
   public String getRole() {
     return role;
+  }
+
+  public List<String> getIdentityCodes() {
+    return List.of("BUYER", "SUPPLIER", "OPERATOR");
   }
 
   public String getStatus() {
