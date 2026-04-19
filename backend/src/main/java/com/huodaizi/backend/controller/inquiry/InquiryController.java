@@ -13,6 +13,12 @@ import com.huodaizi.backend.dto.inquiry.InquiryPickupOrderDetailResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryPickupOrderListRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryPickupOrderListResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryPickupOrderStatusUpdateRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryReconcileOrderCreateRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryReconcileOrderCreateResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryReconcileOrderDetailResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryReconcileOrderListRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryReconcileOrderListResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryReconcileOrderStatusUpdateRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryListRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryListResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryMerchantLeadDetailResponse;
@@ -102,6 +108,32 @@ public class InquiryController {
       @PathVariable("pickupOrderId") String pickupOrderId,
       @Valid @RequestBody InquiryPickupOrderStatusUpdateRequest request) {
     return ApiResponse.success(service.pickupOrderUpdateStatus(pickupOrderId, request));
+  }
+
+  @PostMapping("/reconcile-orders")
+  public ApiResponse<InquiryReconcileOrderCreateResponse> createReconcileOrder(
+      @Valid @RequestBody InquiryReconcileOrderCreateRequest request) {
+    return ApiResponse.success(service.createReconcileOrder(request));
+  }
+
+  @GetMapping("/reconcile-orders")
+  public ApiResponse<InquiryReconcileOrderListResponse> listReconcileOrders(
+      @Valid @ModelAttribute InquiryReconcileOrderListRequest request) {
+    return ApiResponse.success(service.listReconcileOrders(request));
+  }
+
+  @GetMapping("/reconcile-orders/{reconcileOrderId}")
+  public ApiResponse<InquiryReconcileOrderDetailResponse> reconcileOrderDetail(
+      @PathVariable("reconcileOrderId") String reconcileOrderId,
+      @Valid @ModelAttribute InquiryReconcileOrderListRequest request) {
+    return ApiResponse.success(service.reconcileOrderDetail(reconcileOrderId, request));
+  }
+
+  @PutMapping("/reconcile-orders/{reconcileOrderId}/status")
+  public ApiResponse<InquiryReconcileOrderDetailResponse> reconcileOrderUpdateStatus(
+      @PathVariable("reconcileOrderId") String reconcileOrderId,
+      @Valid @RequestBody InquiryReconcileOrderStatusUpdateRequest request) {
+    return ApiResponse.success(service.reconcileOrderUpdateStatus(reconcileOrderId, request));
   }
 
   @GetMapping("/success")

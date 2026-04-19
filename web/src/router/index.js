@@ -5,6 +5,7 @@ import InquirySuccessPage from '../pages/InquirySuccessPage.vue'
 import InquiryQuoteComparePage from '../pages/InquiryQuoteComparePage.vue'
 import InquiryDealConfirmPage from '../pages/InquiryDealConfirmPage.vue'
 import InquiryPickupPassPage from '../pages/InquiryPickupPassPage.vue'
+import InquiryReconcilePassPage from '../pages/InquiryReconcilePassPage.vue'
 import InquiryMerchantLeadManagePage from '../pages/InquiryMerchantLeadManagePage.vue'
 import InquiryQuoteWorkbenchPage from '../pages/InquiryQuoteWorkbenchPage.vue'
 import SiteAdLeadMinePage from '../pages/SiteAdLeadMinePage.vue'
@@ -57,6 +58,14 @@ const routes = [
     component: InquiryPickupPassPage,
     meta: {
       title: 'P08提货通_提货单协同页-货袋子'
+    }
+  },
+  {
+    path: '/inquiry/reconcile/pass',
+    name: 'inquiryReconcilePass',
+    component: InquiryReconcilePassPage,
+    meta: {
+      title: 'P09对账通_往来对账协同页-货袋子'
     }
   },
   {

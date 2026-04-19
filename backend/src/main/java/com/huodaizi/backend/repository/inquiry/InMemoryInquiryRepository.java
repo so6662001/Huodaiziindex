@@ -14,6 +14,10 @@ import com.huodaizi.backend.dto.inquiry.InquiryPickupOrderCreateRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryPickupOrderListRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryPickupOrderStatus;
 import com.huodaizi.backend.dto.inquiry.InquiryPickupOrderStatusUpdateRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryReconcileOrderCreateRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryReconcileOrderListRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryReconcileOrderStatus;
+import com.huodaizi.backend.dto.inquiry.InquiryReconcileOrderStatusUpdateRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchBatchUpdateRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchOverviewRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchTaskRequest;
@@ -36,10 +40,13 @@ public class InMemoryInquiryRepository {
 
   private final AtomicLong seq = new AtomicLong(20260418000L);
   private final AtomicLong pickupSeq = new AtomicLong(20260418000L);
+  private final AtomicLong reconcileSeq = new AtomicLong(20260418000L);
   private final ConcurrentMap<String, InquiryEntity> store = new ConcurrentHashMap<>();
   private final ConcurrentMap<String, List<InquiryQuoteCompareEntity>> quoteStore = new ConcurrentHashMap<>();
   private final ConcurrentMap<String, InquiryMerchantLeadEntity> merchantLeadStore = new ConcurrentHashMap<>();
   private final ConcurrentMap<String, InquiryPickupOrderEntity> pickupOrderStore = new ConcurrentHashMap<>();
+  private final ConcurrentMap<String, InquiryReconcileOrderEntity> reconcileOrderStore =
+      new ConcurrentHashMap<>();
 
   public InMemoryInquiryRepository() {
     seed();
@@ -354,6 +361,99 @@ public class InMemoryInquiryRepository {
     return entity;
   }
 
+  public InquiryReconcileOrderEntity createReconcileOrder(InquiryReconcileOrderCreateRequest request) {
+    InquiryPickupOrderEntity pickup =
+        getPickupOrderById(request.pickupOrderId().trim(), request.contactMobile().trim());
+    String reconcileId = "RC" + reconcileSeq.incrementAndGet();
+    String reconcileNo = "RC-" + NO_FMT.format(LocalDateTime.now()) + "-" + reconcileId;
+    BigDecimal invoice = parseMoney("1", "invoiceAmount");
+    BigDecimal deduction = BigDecimal.ZERO;
+    BigDecimal receivable = invoice.subtract(deduction).max(BigDecimal.ZERO);
+    BigDecimal paid = BigDecimal.ZERO;
+    BigDecimal outstanding = receivable.subtract(paid).max(BigDecimal.ZERO);
+    LocalDateTime now = LocalDateTime.now();
+    InquiryReconcileOrderEntity entity =
+        new InquiryReconcileOrderEntity(
+            reconcileId,
+            reconcileNo,
+            pickup.getPickupId(),
+            pickup.getPickupNo(),
+            pickup.getInquiryId(),
+            pickup.getInquiryNo(),
+            pickup.getSpecText() + " / " + pickup.getQuantityTon() + "吨",
+            pickup.getQuoteId(),
+            pickup.getSupplierId(),
+            pickup.getSupplierName(),
+            pickup.getBuyerCompany(),
+            pickup.getBuyerPhone(),
+            maskPhone(pickup.getBuyerPhone()),
+            normalizeMonthOrFallback(request.statementMonth()),
+            defaultText(request.dueDate(), LocalDate.now().plusDays(30).toString()),
+            toMoney(invoice),
+            toMoney(deduction),
+            toMoney(receivable),
+            toMoney(paid),
+            toMoney(outstanding),
+            defaultText(request.remark(), "-"),
+            InquiryReconcileOrderStatus.CREATED,
+            now,
+            now);
+    reconcileOrderStore.put(reconcileId, entity);
+    return entity;
+  }
+
+  public List<InquiryReconcileOrderEntity> listReconcileOrders(InquiryReconcileOrderListRequest request) {
+    String phone = normalizePhoneOrNull(request.contactMobile());
+    InquiryReconcileOrderStatus status = normalizeReconcileStatusOrNull(request.status());
+    String keyword = normalize(request.keyword());
+    return reconcileOrderStore.values().stream()
+        .filter(item -> phone == null || normalizePhone(item.getContactMobile()).equals(phone))
+        .filter(item -> status == null || item.getStatus() == status)
+        .filter(
+            item ->
+                keyword == null
+                    || normalize(item.getReconcileNo()).contains(keyword)
+                    || normalize(item.getPickupOrderNo()).contains(keyword)
+                    || normalize(item.getSupplierName()).contains(keyword)
+                    || normalize(item.getGoodsSummary()).contains(keyword))
+        .sorted(Comparator.comparing(InquiryReconcileOrderEntity::getUpdatedAt, Comparator.reverseOrder()))
+        .toList();
+  }
+
+  public InquiryReconcileOrderEntity getReconcileOrderById(
+      String reconcileOrderId, String contactMobile) {
+    InquiryReconcileOrderEntity entity = requireReconcileOrder(reconcileOrderId);
+    String phone = normalizePhoneOrNull(contactMobile);
+    if (phone == null || !normalizePhone(entity.getContactMobile()).equals(phone)) {
+      throw new BaseException(ErrorCode.NOT_FOUND.getCode(), "对账单不存在");
+    }
+    return entity;
+  }
+
+  public InquiryReconcileOrderEntity updateReconcileOrderStatus(
+      String reconcileOrderId, InquiryReconcileOrderStatusUpdateRequest request) {
+    InquiryReconcileOrderEntity entity =
+        getReconcileOrderById(reconcileOrderId, request.contactMobile().trim());
+    InquiryReconcileOrderStatus status = normalizeReconcileStatus(request.status());
+    BigDecimal receivable = parseMoney(entity.getReceivableAmount(), "receivableAmount");
+    BigDecimal paid = parseMoneyOrDefault(entity.getPaidAmount(), BigDecimal.ZERO, "paidAmount");
+    if (request.paidAmount() != null && !request.paidAmount().isBlank()) {
+      paid = parseMoney(request.paidAmount(), "paidAmount");
+    } else if (status == InquiryReconcileOrderStatus.PAID) {
+      paid = receivable;
+    }
+    if (paid.compareTo(receivable) > 0) {
+      paid = receivable;
+    }
+    BigDecimal outstanding = receivable.subtract(paid).max(BigDecimal.ZERO);
+    entity.updateAmounts(toMoney(paid), toMoney(outstanding));
+    entity.setStatus(status);
+    if (request.remark() != null && !request.remark().isBlank()) {
+      entity.setLatestRemark(request.remark().trim());
+    }
+    return entity;
+  }
+
   private String defaultText(String text, String fallback) {
     return text == null || text.isBlank() ? fallback : text.trim();
   }
@@ -429,6 +529,27 @@ public class InMemoryInquiryRepository {
     }
   }
 
+  private InquiryReconcileOrderStatus normalizeReconcileStatusOrNull(String status) {
+    if (status == null || status.isBlank()) {
+      return null;
+    }
+    return normalizeReconcileStatus(status);
+  }
+
+  private InquiryReconcileOrderStatus normalizeReconcileStatus(String status) {
+    if (status == null || status.isBlank()) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "status 不能为空");
+    }
+    String normalized = status.trim().toUpperCase(Locale.ROOT);
+    try {
+      return InquiryReconcileOrderStatus.valueOf(normalized);
+    } catch (IllegalArgumentException ex) {
+      throw new BaseException(
+          ErrorCode.BAD_REQUEST.getCode(),
+          "status 仅支持 CREATED/INVOICE_PENDING/INVOICED/PARTIAL_PAID/PAID/CLOSED/DISPUTED");
+    }
+  }
+
   private InquiryMerchantLeadEntity requireMerchantLead(String leadId) {
     InquiryMerchantLeadEntity entity = merchantLeadStore.get(leadId);
     if (entity == null) {
@@ -441,6 +562,14 @@ public class InMemoryInquiryRepository {
     InquiryPickupOrderEntity entity = pickupOrderStore.get(pickupOrderId);
     if (entity == null) {
       throw new BaseException(ErrorCode.NOT_FOUND.getCode(), "提货单不存在");
+    }
+    return entity;
+  }
+
+  private InquiryReconcileOrderEntity requireReconcileOrder(String reconcileOrderId) {
+    InquiryReconcileOrderEntity entity = reconcileOrderStore.get(reconcileOrderId);
+    if (entity == null) {
+      throw new BaseException(ErrorCode.NOT_FOUND.getCode(), "对账单不存在");
     }
     return entity;
   }
@@ -567,6 +696,41 @@ public class InMemoryInquiryRepository {
       return "***";
     }
     return digits.substring(0, 3) + "****" + digits.substring(digits.length() - 4);
+  }
+
+  private String normalizeMonthOrFallback(String month) {
+    String trimmed = defaultText(month, "");
+    if (trimmed.matches("^\\d{4}-\\d{2}$")) {
+      return trimmed;
+    }
+    return LocalDate.now().toString().substring(0, 7);
+  }
+
+  private BigDecimal parseMoney(String text, String field) {
+    String normalized = defaultText(text, "");
+    if (normalized.isBlank()) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), field + " 不能为空");
+    }
+    try {
+      return new BigDecimal(normalized);
+    } catch (Exception ex) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), field + " 格式错误");
+    }
+  }
+
+  private BigDecimal parseMoneyOrDefault(String text, BigDecimal fallback, String field) {
+    if (text == null || text.isBlank()) {
+      return fallback;
+    }
+    try {
+      return new BigDecimal(text.trim());
+    } catch (Exception ex) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), field + " 格式错误");
+    }
+  }
+
+  private String toMoney(BigDecimal value) {
+    return value.stripTrailingZeros().toPlainString();
   }
 
   private String maskName(String name) {

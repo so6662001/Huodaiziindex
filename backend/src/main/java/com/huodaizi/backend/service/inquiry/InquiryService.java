@@ -27,6 +27,14 @@ import com.huodaizi.backend.dto.inquiry.InquiryPickupOrderListRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryPickupOrderListResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryPickupOrderStatus;
 import com.huodaizi.backend.dto.inquiry.InquiryPickupOrderStatusUpdateRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryReconcileOrderCreateRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryReconcileOrderCreateResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryReconcileOrderDetailResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryReconcileOrderItemDTO;
+import com.huodaizi.backend.dto.inquiry.InquiryReconcileOrderListRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryReconcileOrderListResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryReconcileOrderStatus;
+import com.huodaizi.backend.dto.inquiry.InquiryReconcileOrderStatusUpdateRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchBatchUpdateRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchOverviewRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchOverviewResponse;
@@ -40,6 +48,7 @@ import com.huodaizi.backend.repository.inquiry.InMemoryInquiryRepository;
 import com.huodaizi.backend.repository.inquiry.InquiryEntity;
 import com.huodaizi.backend.repository.inquiry.InquiryMerchantLeadEntity;
 import com.huodaizi.backend.repository.inquiry.InquiryPickupOrderEntity;
+import com.huodaizi.backend.repository.inquiry.InquiryReconcileOrderEntity;
 import com.huodaizi.backend.repository.inquiry.InquiryQuoteCompareEntity;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -258,6 +267,75 @@ public class InquiryService {
         request.remark() == null || request.remark().isBlank() ? entity.getRemark() : request.remark());
   }
 
+  public InquiryReconcileOrderCreateResponse createReconcileOrder(InquiryReconcileOrderCreateRequest request) {
+    if (!"MONTHLY".equalsIgnoreCase(request.settleType())) {
+      throw new com.huodaizi.backend.common.BaseException(
+          com.huodaizi.backend.common.ErrorCode.BAD_REQUEST.getCode(), "settleType 目前仅支持 MONTHLY");
+    }
+    InquiryReconcileOrderEntity entity = repository.createReconcileOrder(request);
+    return new InquiryReconcileOrderCreateResponse(
+        entity.getReconcileId(),
+        entity.getReconcileNo(),
+        entity.getPickupOrderId(),
+        entity.getStatus().name(),
+        "对账单已创建，等待开票与回款登记");
+  }
+
+  public InquiryReconcileOrderListResponse listReconcileOrders(InquiryReconcileOrderListRequest request) {
+    List<InquiryReconcileOrderEntity> all = repository.listReconcileOrders(request);
+    int page = request.safePage();
+    int pageSize = request.safePageSize();
+    int from = Math.max((page - 1) * pageSize, 0);
+    int to = Math.min(from + pageSize, all.size());
+    List<InquiryReconcileOrderEntity> paged = from >= all.size() ? List.of() : all.subList(from, to);
+    return new InquiryReconcileOrderListResponse(
+        paged.stream().map(this::toReconcileItem).toList(),
+        all.size(),
+        page,
+        pageSize,
+        countReconcileByStatus(all, InquiryReconcileOrderStatus.CREATED),
+        countReconcileByStatus(all, InquiryReconcileOrderStatus.INVOICE_PENDING),
+        countReconcileByStatus(all, InquiryReconcileOrderStatus.INVOICED),
+        countReconcileByStatus(all, InquiryReconcileOrderStatus.CONFIRMED),
+        countReconcileByStatus(all, InquiryReconcileOrderStatus.PARTIAL_PAID),
+        countReconcileByStatus(all, InquiryReconcileOrderStatus.PAID),
+        countReconcileByStatus(all, InquiryReconcileOrderStatus.CLOSED),
+        countReconcileByStatus(all, InquiryReconcileOrderStatus.DISPUTED));
+  }
+
+  public InquiryReconcileOrderDetailResponse reconcileOrderDetail(
+      String reconcileOrderId, InquiryReconcileOrderListRequest request) {
+    InquiryReconcileOrderEntity entity =
+        repository.getReconcileOrderById(reconcileOrderId, request.contactMobile());
+    return new InquiryReconcileOrderDetailResponse(
+        toReconcileItem(entity),
+        entity.getLatestRemark(),
+        entity.getInvoiceAmount(),
+        entity.getReceivableAmount(),
+        entity.getPaidAmount(),
+        entity.getOutstandingAmount(),
+        entity.getDueDate(),
+        statusToInvoiceStatus(entity.getStatus()));
+  }
+
+  public InquiryReconcileOrderDetailResponse reconcileOrderUpdateStatus(
+      String reconcileOrderId, InquiryReconcileOrderStatusUpdateRequest request) {
+    if (request.status() == null || request.status().isBlank()) {
+      throw new com.huodaizi.backend.common.BaseException(
+          com.huodaizi.backend.common.ErrorCode.BAD_REQUEST.getCode(), "status 不能为空");
+    }
+    InquiryReconcileOrderEntity entity = repository.updateReconcileOrderStatus(reconcileOrderId, request);
+    return new InquiryReconcileOrderDetailResponse(
+        toReconcileItem(entity),
+        request.remark() == null || request.remark().isBlank() ? entity.getLatestRemark() : request.remark(),
+        entity.getInvoiceAmount(),
+        entity.getReceivableAmount(),
+        entity.getPaidAmount(),
+        entity.getOutstandingAmount(),
+        entity.getDueDate(),
+        statusToInvoiceStatus(entity.getStatus()));
+  }
+
   private InquiryItemDTO toItem(InquiryEntity entity) {
     return new InquiryItemDTO(
         entity.getId(),
@@ -466,6 +544,31 @@ public class InquiryService {
         entity.getUpdatedAt().toString());
   }
 
+  private InquiryReconcileOrderItemDTO toReconcileItem(InquiryReconcileOrderEntity entity) {
+    return new InquiryReconcileOrderItemDTO(
+        entity.getReconcileId(),
+        entity.getReconcileNo(),
+        entity.getPickupOrderId(),
+        entity.getPickupOrderNo(),
+        entity.getInquiryId(),
+        entity.getInquiryNo(),
+        entity.getQuoteId(),
+        entity.getSupplierId(),
+        entity.getSupplierName(),
+        entity.getBuyerCompany(),
+        entity.getContactMobileMasked(),
+        entity.getGoodsSummary(),
+        entity.getReceivableAmount(),
+        entity.getPaidAmount(),
+        entity.getOutstandingAmount(),
+        statusToInvoiceStatus(entity.getStatus()),
+        entity.getDueDate(),
+        entity.getStatus().name(),
+        reconcileStatusText(entity.getStatus()),
+        entity.getCreatedAt().toString(),
+        entity.getUpdatedAt().toString());
+  }
+
   private InquiryQuoteWorkbenchTaskItemDTO toWorkbenchTaskItem(InquiryMerchantLeadEntity entity) {
     return new InquiryQuoteWorkbenchTaskItemDTO(
         entity.getId(),
@@ -494,6 +597,11 @@ public class InquiryService {
     return (int) items.stream().filter(item -> item.getStatus() == status).count();
   }
 
+  private int countReconcileByStatus(
+      List<InquiryReconcileOrderEntity> items, InquiryReconcileOrderStatus status) {
+    return (int) items.stream().filter(item -> item.getStatus() == status).count();
+  }
+
   private String pickupStatusText(InquiryPickupOrderStatus status) {
     return switch (status) {
       case CREATED -> "待确认";
@@ -502,6 +610,27 @@ public class InquiryService {
       case SIGNED -> "已签收";
       case COMPLETED -> "已完成";
       case CANCELLED -> "已取消";
+    };
+  }
+
+  private String reconcileStatusText(InquiryReconcileOrderStatus status) {
+    return switch (status) {
+      case CREATED -> "已创建";
+      case INVOICE_PENDING -> "待开票";
+      case INVOICED -> "已开票";
+      case CONFIRMED -> "已确认";
+      case PARTIAL_PAID -> "部分回款";
+      case PAID -> "已回款";
+      case CLOSED -> "已关闭";
+      case DISPUTED -> "争议中";
+    };
+  }
+
+  private String statusToInvoiceStatus(InquiryReconcileOrderStatus status) {
+    return switch (status) {
+      case CREATED, INVOICE_PENDING -> "UNISSUED";
+      case INVOICED, CONFIRMED, PARTIAL_PAID, PAID, CLOSED -> "ISSUED";
+      case DISPUTED -> "DISPUTED";
     };
   }
 

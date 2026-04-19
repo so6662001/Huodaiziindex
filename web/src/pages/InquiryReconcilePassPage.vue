@@ -1,9 +1,8 @@
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 
 const route = useRoute()
-const router = useRouter()
 
 const loading = ref(false)
 const creating = ref(false)
@@ -27,17 +26,12 @@ const filters = reactive({
 })
 
 const createForm = reactive({
-  inquiryId: '',
-  quoteId: '',
+  pickupOrderId: '',
   contactMobile: '',
-  buyerCompany: '',
-  buyerContact: '',
-  pickupSite: '',
-  pickupDate: '',
-  pickupVehicleNo: '',
-  pickupDriverName: '',
-  pickupDriverPhone: '',
-  agreedProtocol: true,
+  statementMonth: '',
+  dueDate: '',
+  invoiceAmount: '',
+  deductionAmount: '',
   remark: ''
 })
 
@@ -51,25 +45,18 @@ const statusForm = reactive({
 const totalPages = computed(() => Math.max(Math.ceil(pager.total / pager.pageSize), 1))
 const canCreate = computed(() => {
   return (
-    createForm.inquiryId.trim() &&
-    createForm.quoteId.trim() &&
+    createForm.pickupOrderId.trim() &&
     /^1\d{10}$/.test(createForm.contactMobile.trim()) &&
-    createForm.pickupSite.trim() &&
-    createForm.pickupDate.trim() &&
-    createForm.pickupVehicleNo.trim() &&
-    createForm.pickupDriverName.trim() &&
-    /^1\d{10}$/.test(createForm.pickupDriverPhone.trim()) &&
-    createForm.agreedProtocol
+    /^\d{4}-\d{2}$/.test(createForm.statementMonth.trim()) &&
+    createForm.invoiceAmount.trim()
   )
 })
 const canQuery = computed(() => /^1\d{10}$/.test(filters.contactMobile.trim()))
 
 function fillFromQuery() {
-  const inquiryId = String(route.query.inquiryId || '').trim()
-  const quoteId = String(route.query.quoteId || '').trim()
+  const pickupOrderId = String(route.query.pickupOrderId || '').trim()
   const contactMobile = String(route.query.contactMobile || '').trim()
-  if (inquiryId) createForm.inquiryId = inquiryId
-  if (quoteId) createForm.quoteId = quoteId
+  if (pickupOrderId) createForm.pickupOrderId = pickupOrderId
   if (contactMobile) {
     createForm.contactMobile = contactMobile
     filters.contactMobile = contactMobile
@@ -88,10 +75,10 @@ async function loadList() {
     if (filters.keyword.trim()) params.set('keyword', filters.keyword.trim())
     params.set('page', String(pager.page))
     params.set('pageSize', String(pager.pageSize))
-    const resp = await fetch(`/api/v1/inquiries/pickup-orders?${params.toString()}`)
+    const resp = await fetch(`/api/v1/inquiries/reconcile-orders?${params.toString()}`)
     const json = await resp.json()
     if (json.code !== '0') {
-      throw new Error(json.message || '加载提货单失败')
+      throw new Error(json.message || '加载对账单失败')
     }
     const data = json.data || {}
     list.value = data.items || []
@@ -99,7 +86,7 @@ async function loadList() {
     pager.page = Number(data.page || pager.page)
     pager.pageSize = Number(data.pageSize || pager.pageSize)
     if (selected.value) {
-      const hit = list.value.find((item) => item.pickupId === selected.value.pickupId)
+      const hit = list.value.find((item) => item.reconcileId === selected.value.order.reconcileId)
       if (!hit) selected.value = null
     }
   } catch (error) {
@@ -109,36 +96,31 @@ async function loadList() {
   }
 }
 
-async function createPickupOrder() {
+async function createReconcileOrder() {
   if (!canCreate.value || creating.value) return
   creating.value = true
   errorMsg.value = ''
   successMsg.value = ''
   try {
     const payload = {
-      inquiryId: createForm.inquiryId.trim(),
-      quoteId: createForm.quoteId.trim(),
+      pickupOrderId: createForm.pickupOrderId.trim(),
       contactMobile: createForm.contactMobile.trim(),
-      buyerCompany: createForm.buyerCompany.trim() || null,
-      buyerContact: createForm.buyerContact.trim() || null,
-      pickupSite: createForm.pickupSite.trim(),
-      pickupDate: createForm.pickupDate.trim(),
-      pickupVehicleNo: createForm.pickupVehicleNo.trim(),
-      pickupDriverName: createForm.pickupDriverName.trim(),
-      pickupDriverPhone: createForm.pickupDriverPhone.trim(),
-      agreedProtocol: createForm.agreedProtocol,
+      statementMonth: createForm.statementMonth.trim(),
+      dueDate: createForm.dueDate.trim() || null,
+      invoiceAmount: createForm.invoiceAmount.trim(),
+      deductionAmount: createForm.deductionAmount.trim() || null,
       remark: createForm.remark.trim() || null
     }
-    const resp = await fetch('/api/v1/inquiries/pickup-orders', {
+    const resp = await fetch('/api/v1/inquiries/reconcile-orders', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     })
     const json = await resp.json()
     if (json.code !== '0') {
-      throw new Error(json.message || '创建提货单失败')
+      throw new Error(json.message || '创建对账单失败')
     }
-    successMsg.value = json.data.message || '提货单创建成功'
+    successMsg.value = json.data.message || '对账单创建成功'
     filters.contactMobile = createForm.contactMobile.trim()
     statusForm.contactMobile = createForm.contactMobile.trim()
     pager.page = 1
@@ -151,15 +133,17 @@ async function createPickupOrder() {
 }
 
 async function viewDetail(item) {
-  if (!item?.pickupId || !filters.contactMobile.trim()) return
+  if (!item?.reconcileId || !filters.contactMobile.trim()) return
   errorMsg.value = ''
   try {
     const params = new URLSearchParams()
     params.set('contactMobile', filters.contactMobile.trim())
-    const resp = await fetch(`/api/v1/inquiries/pickup-orders/${encodeURIComponent(item.pickupId)}?${params.toString()}`)
+    const resp = await fetch(
+      `/api/v1/inquiries/reconcile-orders/${encodeURIComponent(item.reconcileId)}?${params.toString()}`
+    )
     const json = await resp.json()
     if (json.code !== '0') {
-      throw new Error(json.message || '加载详情失败')
+      throw new Error(json.message || '加载对账单详情失败')
     }
     selected.value = json.data || null
   } catch (error) {
@@ -168,7 +152,9 @@ async function viewDetail(item) {
 }
 
 async function updateStatus() {
-  if (!selected.value?.order?.pickupId || !/^1\d{10}$/.test(statusForm.contactMobile.trim()) || updating.value) return
+  if (!selected.value?.order?.reconcileId || !/^1\d{10}$/.test(statusForm.contactMobile.trim()) || updating.value) {
+    return
+  }
   updating.value = true
   errorMsg.value = ''
   successMsg.value = ''
@@ -180,7 +166,7 @@ async function updateStatus() {
       remark: statusForm.remark.trim() || null
     }
     const resp = await fetch(
-      `/api/v1/inquiries/pickup-orders/${encodeURIComponent(selected.value.order.pickupId)}/status`,
+      `/api/v1/inquiries/reconcile-orders/${encodeURIComponent(selected.value.order.reconcileId)}/status`,
       {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -189,10 +175,10 @@ async function updateStatus() {
     )
     const json = await resp.json()
     if (json.code !== '0') {
-      throw new Error(json.message || '更新状态失败')
+      throw new Error(json.message || '更新对账状态失败')
     }
     selected.value = json.data || null
-    successMsg.value = '状态更新成功'
+    successMsg.value = '对账状态更新成功'
     await loadList()
   } catch (error) {
     errorMsg.value = error.message || '系统繁忙，请稍后重试'
@@ -213,15 +199,6 @@ function nextPage() {
   loadList()
 }
 
-function goReconcile() {
-  const order = selected.value?.order
-  if (!order) return
-  const params = new URLSearchParams()
-  params.set('pickupOrderId', order.pickupId)
-  params.set('contactMobile', filters.contactMobile.trim() || statusForm.contactMobile.trim())
-  router.push(`/inquiry/reconcile/pass?${params.toString()}`)
-}
-
 onMounted(() => {
   fillFromQuery()
   if (canQuery.value) {
@@ -231,37 +208,29 @@ onMounted(() => {
 </script>
 
 <template>
-  <main class="pickup-page">
+  <main class="reconcile-page">
     <section class="card">
-      <h1>P08 提货通页面</h1>
-      <p class="desc">成交后创建提货单，跟踪提货状态，沉淀履约证据链。</p>
+      <h1>P09 对账通页面</h1>
+      <p class="desc">围绕提货单沉淀应收、回款和对账争议处理，形成交易闭环。</p>
     </section>
 
     <section class="card">
-      <h2>创建提货单</h2>
+      <h2>创建对账单</h2>
       <div class="grid">
-        <label>询价单ID<input v-model="createForm.inquiryId" placeholder="IQ..." /></label>
-        <label>报价ID<input v-model="createForm.quoteId" placeholder="IQ...-Q1" /></label>
-        <label>买方手机号<input v-model="createForm.contactMobile" placeholder="11位手机号" /></label>
-        <label>买方公司<input v-model="createForm.buyerCompany" placeholder="可选" /></label>
-        <label>买方联系人<input v-model="createForm.buyerContact" placeholder="可选" /></label>
-        <label>提货点<input v-model="createForm.pickupSite" placeholder="仓库地址" /></label>
-        <label>提货日期<input v-model="createForm.pickupDate" type="date" /></label>
-        <label>车牌号<input v-model="createForm.pickupVehicleNo" placeholder="冀A12345" /></label>
-        <label>司机姓名<input v-model="createForm.pickupDriverName" placeholder="张师傅" /></label>
-        <label>司机电话<input v-model="createForm.pickupDriverPhone" placeholder="11位手机号" /></label>
+        <label>提货单ID<input v-model="createForm.pickupOrderId" placeholder="PU..." /></label>
+        <label>手机号<input v-model="createForm.contactMobile" placeholder="11位手机号" /></label>
+        <label>账期月份<input v-model="createForm.statementMonth" placeholder="2026-04" /></label>
+        <label>到期日期<input v-model="createForm.dueDate" type="date" /></label>
+        <label>开票金额<input v-model="createForm.invoiceAmount" placeholder="如 421500" /></label>
+        <label>扣减金额<input v-model="createForm.deductionAmount" placeholder="可选，如 1500" /></label>
       </div>
-      <label class="checkbox">
-        <input v-model="createForm.agreedProtocol" type="checkbox" />
-        已同意提货服务协议
-      </label>
       <label>
         备注
-        <textarea v-model="createForm.remark" rows="2" placeholder="选填"></textarea>
+        <textarea v-model="createForm.remark" rows="2" placeholder="可选"></textarea>
       </label>
       <div class="actions">
-        <button class="btn primary" :disabled="!canCreate || creating" @click="createPickupOrder">
-          {{ creating ? '创建中...' : '创建提货单' }}
+        <button class="btn primary" :disabled="!canCreate || creating" @click="createReconcileOrder">
+          {{ creating ? '创建中...' : '创建对账单' }}
         </button>
       </div>
       <p v-if="errorMsg" class="error">{{ errorMsg }}</p>
@@ -269,22 +238,22 @@ onMounted(() => {
     </section>
 
     <section class="card">
-      <h2>提货单列表</h2>
+      <h2>对账单列表</h2>
       <div class="grid">
         <label>手机号<input v-model="filters.contactMobile" placeholder="11位手机号" /></label>
         <label>
           状态
           <select v-model="filters.status">
             <option value="">全部</option>
-            <option value="CREATED">待确认</option>
+            <option value="CREATED">已创建</option>
             <option value="CONFIRMED">已确认</option>
-            <option value="IN_TRANSIT">运输中</option>
-            <option value="SIGNED">已签收</option>
-            <option value="COMPLETED">已完成</option>
-            <option value="CANCELLED">已取消</option>
+            <option value="PARTIAL_PAID">部分回款</option>
+            <option value="PAID">已回款</option>
+            <option value="CLOSED">已结清</option>
+            <option value="DISPUTED">争议中</option>
           </select>
         </label>
-        <label>关键词<input v-model="filters.keyword" placeholder="提货单号/商家/规格" /></label>
+        <label>关键词<input v-model="filters.keyword" placeholder="对账单号/提货单号/商家" /></label>
       </div>
       <div class="actions">
         <button class="btn" :disabled="!canQuery || loading" @click="loadList">查询</button>
@@ -294,24 +263,28 @@ onMounted(() => {
         <table>
           <thead>
             <tr>
+              <th>对账单号</th>
               <th>提货单号</th>
               <th>商家</th>
               <th>货物</th>
-              <th>提货点</th>
-              <th>日期</th>
-              <th>车牌</th>
+              <th>应收总额</th>
+              <th>应收</th>
+              <th>已收</th>
+              <th>未收</th>
               <th>状态</th>
               <th>操作</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="item in list" :key="item.pickupId">
+            <tr v-for="item in list" :key="item.reconcileId">
+              <td>{{ item.reconcileNo }}</td>
               <td>{{ item.pickupNo }}</td>
               <td>{{ item.supplierName }}</td>
               <td>{{ item.goodsSummary }}</td>
-              <td>{{ item.pickupAddress }}</td>
-              <td>{{ item.pickupDate }}</td>
-              <td>{{ item.truckNo }}</td>
+              <td>{{ item.totalAmount }}</td>
+              <td>{{ item.receivableAmount }}</td>
+              <td>{{ item.paidAmount }}</td>
+              <td>{{ item.outstandingAmount }}</td>
               <td>{{ item.statusText }}</td>
               <td><button class="btn small" @click="viewDetail(item)">详情</button></td>
             </tr>
@@ -326,12 +299,15 @@ onMounted(() => {
     </section>
 
     <section class="card" v-if="selected?.order">
-      <h2>提货单详情</h2>
+      <h2>对账单详情</h2>
+      <p><strong>对账单号：</strong>{{ selected.order.reconcileNo }}</p>
       <p><strong>提货单号：</strong>{{ selected.order.pickupNo }}</p>
       <p><strong>商家：</strong>{{ selected.order.supplierName }}</p>
       <p><strong>货物：</strong>{{ selected.order.goodsSummary }}</p>
-      <p><strong>提货点：</strong>{{ selected.order.pickupAddress }}</p>
-      <p><strong>司机：</strong>{{ selected.order.driverName }}（{{ selected.order.driverPhoneMasked }}）</p>
+      <p>
+        <strong>金额：</strong>应收 {{ selected.order.receivableAmount }}，已收 {{ selected.order.paidAmount }}，未收
+        {{ selected.order.outstandingAmount }}
+      </p>
       <p><strong>当前状态：</strong>{{ selected.order.statusText }}</p>
 
       <h3>状态流转</h3>
@@ -340,24 +316,23 @@ onMounted(() => {
           状态
           <select v-model="statusForm.status">
             <option value="CONFIRMED">已确认</option>
-            <option value="IN_TRANSIT">运输中</option>
-            <option value="SIGNED">已签收</option>
-            <option value="COMPLETED">已完成</option>
-            <option value="CANCELLED">已取消</option>
+            <option value="PARTIAL_PAID">部分回款</option>
+            <option value="PAID">已回款</option>
+            <option value="CLOSED">已结清</option>
+            <option value="DISPUTED">争议中</option>
           </select>
         </label>
         <label>手机号<input v-model="statusForm.contactMobile" placeholder="11位手机号" /></label>
-        <label>操作人<input v-model="statusForm.operator" placeholder="选填" /></label>
+        <label>操作人<input v-model="statusForm.operator" placeholder="可选" /></label>
       </div>
       <label>
         备注
-        <textarea v-model="statusForm.remark" rows="2" placeholder="选填"></textarea>
+        <textarea v-model="statusForm.remark" rows="2" placeholder="可选"></textarea>
       </label>
       <div class="actions">
         <button class="btn primary" :disabled="updating" @click="updateStatus">
-          {{ updating ? '提交中...' : '更新状态' }}
+          {{ updating ? '提交中...' : '更新对账状态' }}
         </button>
-        <button class="btn" @click="goReconcile">进入对账通（P09）</button>
       </div>
       <ul class="logs">
         <li v-for="line in selected.operationLogs || []" :key="line">{{ line }}</li>
@@ -367,7 +342,7 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.pickup-page {
+.reconcile-page {
   max-width: 1120px;
   margin: 0 auto;
   padding: 20px 16px 36px;
@@ -400,12 +375,6 @@ textarea {
   border-radius: 8px;
   padding: 9px 10px;
   font: inherit;
-}
-.checkbox {
-  margin-top: 10px;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
 }
 .actions {
   display: flex;
