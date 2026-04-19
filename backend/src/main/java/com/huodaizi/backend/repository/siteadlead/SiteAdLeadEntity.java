@@ -7,10 +7,10 @@ import java.util.List;
 
 public class SiteAdLeadEntity {
   private final String id;
+  private final String leadNo;
   private String placementId;
   private String placementName;
   private String city;
-  private String channel;
   private String duration;
   private String budget;
   private String companyName;
@@ -27,10 +27,10 @@ public class SiteAdLeadEntity {
 
   public SiteAdLeadEntity(
       String id,
+      String leadNo,
       String placementId,
       String placementName,
       String city,
-      String channel,
       String duration,
       String budget,
       String companyName,
@@ -44,10 +44,10 @@ public class SiteAdLeadEntity {
       LocalDateTime createdAt,
       LocalDateTime updatedAt) {
     this.id = id;
+    this.leadNo = leadNo;
     this.placementId = placementId;
     this.placementName = placementName;
     this.city = city;
-    this.channel = channel;
     this.duration = duration;
     this.budget = budget;
     this.companyName = companyName;
@@ -66,6 +66,10 @@ public class SiteAdLeadEntity {
     return id;
   }
 
+  public String getLeadNo() {
+    return leadNo;
+  }
+
   public String getPlacementId() {
     return placementId;
   }
@@ -76,10 +80,6 @@ public class SiteAdLeadEntity {
 
   public String getCity() {
     return city;
-  }
-
-  public String getChannel() {
-    return channel;
   }
 
   public String getDuration() {
@@ -156,6 +156,9 @@ public class SiteAdLeadEntity {
 
   public void addFollow(SiteAdLeadFollowEntity followEntity) {
     this.followLogs.add(followEntity);
+    if (followEntity.getNextAction() != null && !followEntity.getNextAction().isBlank()) {
+      this.nextFollowAt = followEntity.getNextAction();
+    }
     this.updatedAt = LocalDateTime.now();
   }
 

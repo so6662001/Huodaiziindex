@@ -39,3 +39,18 @@ Base Path: `/api/admin/site-ad-lead`
 
 - 当前为 MVP 内存实现，重启后数据重置
 - 支持“提交 -> 我的投放单查看 -> 中台分配/跟进 -> 状态变化回流”的闭环联调
+
+## 中台鉴权（已启用）
+
+- 所有 `/api/admin/**` 接口默认开启静态 Token 鉴权。
+- 请求头需携带：`X-Admin-Token: change-this-admin-token`（可在配置中修改）。
+
+配置位置（`src/main/resources/application.yml`）：
+
+```yaml
+huodaizi:
+  admin:
+    auth:
+      enabled: true
+      token: change-this-admin-token
+```

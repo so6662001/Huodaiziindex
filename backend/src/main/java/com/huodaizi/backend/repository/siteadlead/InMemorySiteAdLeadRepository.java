@@ -48,12 +48,14 @@ public class InMemorySiteAdLeadRepository {
             request.contactName().trim(),
             request.contactPhone().trim(),
             defaultText(request.remark(), "-"),
-            SiteAdLeadStatus.SUBMITTED.name(),
+            SiteAdLeadStatus.SUBMITTED,
+            "",
+            "",
             "",
             LocalDateTime.now(),
             LocalDateTime.now());
     store.put(id, entity);
-    appendFollow(entity, "SYSTEM", "系统创建线索，待商务分配");
+    appendFollow(entity, "SYSTEM", "SUBMIT", "系统创建线索，待商务分配", null);
     return entity;
   }
 
@@ -105,9 +107,12 @@ public class InMemorySiteAdLeadRepository {
     if (owner.isEmpty()) {
       throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "ownerName 不能为空");
     }
-    entity.assignOwner(owner);
+    entity.setOwner(owner);
+    if (request.team() != null && !request.team().isBlank()) {
+      entity.setRemark(defaultText(entity.getRemark(), "-") + " | 归属团队:" + request.team().trim());
+    }
     entity.setStatus(SiteAdLeadStatus.ASSIGNED);
-    appendFollow(entity, owner, defaultText(request.comment(), "已分配跟进"));
+    appendFollow(entity, owner, "ASSIGN", defaultText(request.comment(), "已分配跟进"), null);
     return entity;
   }
 
@@ -115,8 +120,8 @@ public class InMemorySiteAdLeadRepository {
     SiteAdLeadEntity entity = requireById(id);
     String status = normalizeStatus(request.status());
     entity.setStatus(SiteAdLeadStatus.valueOf(status));
-    String operator = defaultText(request.operator(), "SYSTEM");
-    appendFollow(entity, operator, defaultText(request.comment(), "状态更新为 " + status));
+    String operator = defaultText(request.operatorName(), "SYSTEM");
+    appendFollow(entity, operator, "STATUS_CHANGE", defaultText(request.comment(), "状态更新为 " + status), null);
     return entity;
   }
 
@@ -127,7 +132,7 @@ public class InMemorySiteAdLeadRepository {
     if (content.isEmpty()) {
       throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "content 不能为空");
     }
-    appendFollow(entity, operator, content);
+    appendFollow(entity, operator, "FOLLOW_UP", content, request.nextAction());
     return entity;
   }
 
@@ -143,10 +148,17 @@ public class InMemorySiteAdLeadRepository {
     return entity;
   }
 
-  private void appendFollow(SiteAdLeadEntity entity, String operator, String content) {
+  private void appendFollow(
+      SiteAdLeadEntity entity, String operator, String action, String content, String nextAction) {
     SiteAdLeadFollowEntity follow =
         new SiteAdLeadFollowEntity(
-            "SALF" + followSeq.incrementAndGet(), defaultText(operator, "SYSTEM"), content, LocalDateTime.now());
+            "SALF" + followSeq.incrementAndGet(),
+            entity.getId(),
+            defaultText(operator, "SYSTEM"),
+            defaultText(action, "FOLLOW_UP"),
+            content,
+            defaultText(nextAction, ""),
+            LocalDateTime.now());
     entity.addFollow(follow);
   }
 
@@ -199,10 +211,10 @@ public class InMemorySiteAdLeadRepository {
                 true));
     adminAssign(
         a.getId(),
-        new SiteAdLeadAdminAssignRequest("李商务", "优先跟进，已安排电话沟通"));
+        new SiteAdLeadAdminAssignRequest("李商务", "华北组", "优先跟进，已安排电话沟通"));
     adminUpdateStatus(
         a.getId(),
-        new SiteAdLeadAdminUpdateRequest("李商务", "已电话沟通，准备报价方案", "CONTACTED"));
+        new SiteAdLeadAdminUpdateRequest("CONTACTED", "李商务", "已电话沟通，准备报价方案"));
 
     SiteAdLeadEntity b =
         submit(
@@ -219,6 +231,6 @@ public class InMemorySiteAdLeadRepository {
                 true));
     adminAssign(
         b.getId(),
-        new SiteAdLeadAdminAssignRequest("周商务", "客户要求本周内上线"));
+        new SiteAdLeadAdminAssignRequest("周商务", "华东组", "客户要求本周内上线"));
   }
 }

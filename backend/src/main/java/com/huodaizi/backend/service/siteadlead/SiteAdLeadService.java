@@ -37,13 +37,12 @@ public class SiteAdLeadService {
         lead.getLeadNo(),
         lead.getPlacementId(),
         lead.getPlacementName(),
-        "已提交，商务顾问将尽快联系",
         lead.getStatus().name(),
-        lead.getUpdatedAt().toString());
+        "已提交，商务顾问将尽快联系");
   }
 
   public SiteAdLeadMineResponse mine(SiteAdLeadMineRequest request) {
-    List<SiteAdLeadEntity> mine = repository.mine(request.contactPhone(), request.keyword());
+    List<SiteAdLeadEntity> mine = repository.mine(request);
     List<SiteAdLeadItemDTO> items = mine.stream().map(this::toItem).toList();
     int page = request.safePage();
     int pageSize = request.safePageSize();
@@ -53,9 +52,9 @@ public class SiteAdLeadService {
     return new SiteAdLeadMineResponse(
         request.contactPhone(),
         paged,
-        items.size(),
         page,
         pageSize,
+        items.size(),
         countByStatus(mine, SiteAdLeadStatus.SUBMITTED),
         countByStatus(mine, SiteAdLeadStatus.ASSIGNED),
         countByStatus(mine, SiteAdLeadStatus.CONTACTED),
@@ -106,6 +105,13 @@ public class SiteAdLeadService {
     return toItem(repository.getById(id));
   }
 
+  public List<SiteAdLeadFollowLogDTO> adminFollowLogs(String id) {
+    return repository.getById(id).getFollowLogs().stream()
+        .sorted((a, b) -> b.getCreatedAt().compareTo(a.getCreatedAt()))
+        .map(this::toFollow)
+        .toList();
+  }
+
   private SiteAdLeadItemDTO toItem(SiteAdLeadEntity item) {
     return new SiteAdLeadItemDTO(
         item.getId(),
@@ -133,11 +139,8 @@ public class SiteAdLeadService {
 
   private SiteAdLeadFollowLogDTO toFollow(SiteAdLeadFollowEntity item) {
     return new SiteAdLeadFollowLogDTO(
-        item.getId(),
-        item.getLeadId(),
-        item.getOperator(),
-        item.getAction(),
         item.getContent(),
+        item.getOperator(),
         item.getCreatedAt().toString());
   }
 
