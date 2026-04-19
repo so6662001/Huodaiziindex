@@ -27,6 +27,7 @@ import A03QuoteEfficiencyPage from '../pages/A03QuoteEfficiencyPage.vue'
 import A04PickupMonitorPage from '../pages/A04PickupMonitorPage.vue'
 import A05ReconcileMonitorPage from '../pages/A05ReconcileMonitorPage.vue'
 import A06DispatchStrategyConfigPage from '../pages/A06DispatchStrategyConfigPage.vue'
+import A07PlanPricingManagePage from '../pages/A07PlanPricingManagePage.vue'
 import InquiryMerchantLeadManagePage from '../pages/InquiryMerchantLeadManagePage.vue'
 import InquiryQuoteWorkbenchPage from '../pages/InquiryQuoteWorkbenchPage.vue'
 import SiteAdLeadMinePage from '../pages/SiteAdLeadMinePage.vue'
@@ -167,6 +168,14 @@ const routes = [
     component: A06DispatchStrategyConfigPage,
     meta: {
       title: 'A06分发策略配置页_管理端分发规则配置-货袋子'
+    }
+  },
+  {
+    path: '/admin/plan-pricing/a07',
+    name: 'a07PlanPricingManage',
+    component: A07PlanPricingManagePage,
+    meta: {
+      title: 'A07套餐与定价管理_管理端套餐定价配置-货袋子'
     }
   },
   {

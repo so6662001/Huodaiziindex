@@ -140,6 +140,10 @@ public class InMemoryInquiryRepository {
     return List.copyOf(merchantSubscriptionStore.values());
   }
 
+  public List<InquirySubscriptionPlanEntity> allSubscriptionPlans() {
+    return List.copyOf(subscriptionPlanStore.values());
+  }
+
   public List<InquiryEntity> listMine(InquiryListRequest request) {
     String phone = normalizePhoneOrNull(request.contactMobile());
     String keyword = normalize(request.keyword());
@@ -312,12 +316,19 @@ public class InMemoryInquiryRepository {
         .toList();
   }
 
+  public InquirySubscriptionPlanEntity getSubscriptionPlanByCode(String planCode) {
+    return requireSubscriptionPlan(planCode);
+  }
+
   public InquiryMerchantSubscriptionEntity createSubscription(InquirySubscriptionCreateRequest request) {
     String merchantId = defaultText(request.merchantId(), "").trim();
     if (merchantId.isEmpty()) {
       throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "merchantId 不能为空");
     }
     InquirySubscriptionPlanEntity plan = requireSubscriptionPlan(request.planCode());
+    if (!plan.isEnabled()) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "套餐已停用，暂不可开通");
+    }
     LocalDateTime now = LocalDateTime.now();
     String subscriptionId = "SUB" + subscriptionSeq.incrementAndGet();
     String status = "ACTIVE";
@@ -441,6 +452,10 @@ public class InMemoryInquiryRepository {
 
   public void saveDispatchScoreRule(InquiryDispatchScoreRuleEntity entity) {
     dispatchRuleStore.put(entity.getSceneCode().trim().toUpperCase(Locale.ROOT), entity);
+  }
+
+  public void saveSubscriptionPlan(InquirySubscriptionPlanEntity entity) {
+    subscriptionPlanStore.put(entity.getPlanId(), entity);
   }
 
   public List<InquiryMessageCenterEntity> listMessageCenter(InquiryMessageCenterListRequest request) {
