@@ -125,6 +125,9 @@ Base Path: `/api/admin/buy`
 - `DELETE /{id}`
   - 删除记录
 
+> 安全要求：所有 `/api/admin/**` 接口必须携带请求头  
+> `X-Admin-Token: <token>`
+
 ## 返回结构
 
 统一返回：
@@ -169,6 +172,13 @@ Base Path: `/api/admin/buy`
 ```bash
 cd backend
 mvn spring-boot:run
+```
+
+本地调试可使用默认 token：
+
+```bash
+curl -H "X-Admin-Token: change-this-admin-token" \
+  http://127.0.0.1:8080/api/admin/buy
 ```
 
 ## 后续建议（下一阶段）
