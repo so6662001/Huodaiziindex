@@ -1,0 +1,158 @@
+:root {
+  font-family: "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+  color: #2f2f2f;
+  background: #f7f8fa;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #f7f8fa;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.app-shell {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 22px 16px 36px;
+}
+
+.page-title {
+  margin-bottom: 14px;
+}
+
+.page-title h1 {
+  margin: 0 0 8px;
+  font-size: 28px;
+}
+
+.page-title p {
+  margin: 0;
+  color: #666;
+}
+
+.card {
+  background: #fff;
+  border: 1px solid #ececec;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 14px;
+}
+
+.toolbar {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.toolbar input,
+.toolbar select,
+.toolbar button {
+  height: 36px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 0 10px;
+}
+
+.toolbar .primary {
+  background: #f57c00;
+  border-color: #f57c00;
+  color: #fff;
+}
+
+.lead-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.lead-item {
+  border-top: 1px dashed #ececec;
+  padding: 12px 0;
+}
+
+.lead-item:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.lead-item h3 {
+  margin: 0 0 6px;
+  font-size: 18px;
+}
+
+.lead-item p {
+  margin: 0 0 4px;
+  color: #555;
+}
+
+.status-tag {
+  display: inline-flex;
+  border-radius: 16px;
+  padding: 3px 10px;
+  font-size: 12px;
+  color: #fff;
+  background: #8e8e8e;
+}
+
+.status-tag.SUBMITTED {
+  background: #f57c00;
+}
+
+.status-tag.CONTACTED {
+  background: #1d6fd8;
+}
+
+.status-tag.PROPOSAL_SENT {
+  background: #6f42c1;
+}
+
+.status-tag.ASSIGNED {
+  background: #00796b;
+}
+
+.status-tag.CONVERTED {
+  background: #2e7d32;
+}
+
+.status-tag.CLOSED {
+  background: #b42318;
+}
+
+.pager {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-top: 12px;
+}
+
+.pager button {
+  height: 34px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 0 10px;
+}
+
+.error {
+  color: #b42318;
+}
+
+.muted {
+  color: #888;
+}
+
+@media (max-width: 900px) {
+  .toolbar {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+}
