@@ -145,6 +145,10 @@ function goH5MemberPage() {
   router.push('/h5/member?merchantId=S001')
 }
 
+function goA01DashboardPage() {
+  router.push('/admin/dashboard/a01')
+}
+
 function onSearch() {
   if (!keyword.value.trim()) {
     return
@@ -333,6 +337,7 @@ function onSearch() {
         <button class="btn" @click="goH5PickupOrderPage">H5提货单</button>
         <button class="btn" @click="goH5ReconcileOrderPage">H5对账单</button>
         <button class="btn" @click="goH5MemberPage">H5我的会员</button>
+        <button class="btn" @click="goA01DashboardPage">A01经营总看板</button>
         <button class="btn" @click="goSubscriptionPage">套餐与订阅</button>
         <button class="btn" @click="goBillingPage">计费与账单</button>
         <button class="btn primary" @click="goInquiry">立即体验AI询价</button>

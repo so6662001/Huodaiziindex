@@ -21,6 +21,7 @@ import H5QuickQuotePage from '../pages/H5QuickQuotePage.vue'
 import H5PickupOrderPage from '../pages/H5PickupOrderPage.vue'
 import H5ReconcileOrderPage from '../pages/H5ReconcileOrderPage.vue'
 import H5MemberPage from '../pages/H5MemberPage.vue'
+import A01DashboardPage from '../pages/A01DashboardPage.vue'
 import InquiryMerchantLeadManagePage from '../pages/InquiryMerchantLeadManagePage.vue'
 import InquiryQuoteWorkbenchPage from '../pages/InquiryQuoteWorkbenchPage.vue'
 import SiteAdLeadMinePage from '../pages/SiteAdLeadMinePage.vue'
@@ -113,6 +114,14 @@ const routes = [
     component: H5MemberPage,
     meta: {
       title: 'H10 H5我的会员_移动端会员中心-货袋子'
+    }
+  },
+  {
+    path: '/admin/dashboard/a01',
+    name: 'a01Dashboard',
+    component: A01DashboardPage,
+    meta: {
+      title: 'A01经营总看板_管理端经营总览-货袋子'
     }
   },
   {

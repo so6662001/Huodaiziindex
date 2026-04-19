@@ -108,6 +108,34 @@ public class InMemoryInquiryRepository {
     return entity;
   }
 
+  public List<InquiryEntity> allInquiries() {
+    return List.copyOf(store.values());
+  }
+
+  public List<InquiryQuoteCompareEntity> allQuotes() {
+    return quoteStore.values().stream().flatMap(List::stream).toList();
+  }
+
+  public List<InquiryMerchantLeadEntity> allMerchantLeads() {
+    return List.copyOf(merchantLeadStore.values());
+  }
+
+  public List<InquiryPickupOrderEntity> allPickupOrders() {
+    return List.copyOf(pickupOrderStore.values());
+  }
+
+  public List<InquiryReconcileOrderEntity> allReconcileOrders() {
+    return List.copyOf(reconcileOrderStore.values());
+  }
+
+  public List<InquiryBillingOrderEntity> allBillingOrders() {
+    return List.copyOf(billingOrderStore.values());
+  }
+
+  public List<InquiryMerchantSubscriptionEntity> allSubscriptions() {
+    return List.copyOf(merchantSubscriptionStore.values());
+  }
+
   public List<InquiryEntity> listMine(InquiryListRequest request) {
     String phone = normalizePhoneOrNull(request.contactMobile());
     String keyword = normalize(request.keyword());

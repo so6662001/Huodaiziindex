@@ -131,6 +131,12 @@ public class InMemorySiteAdLeadRepository {
     return requireById(id);
   }
 
+  public List<SiteAdLeadEntity> allLeads() {
+    return store.values().stream()
+        .sorted(Comparator.comparing(SiteAdLeadEntity::getUpdatedAt, Comparator.reverseOrder()))
+        .toList();
+  }
+
   private SiteAdLeadEntity requireById(String id) {
     SiteAdLeadEntity entity = store.get(id);
     if (entity == null) {

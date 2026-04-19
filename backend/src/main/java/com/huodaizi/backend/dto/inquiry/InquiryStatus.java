@@ -4,5 +4,9 @@ public enum InquiryStatus {
   OPEN,
   QUOTING,
   DEAL_DONE,
-  CLOSED
+  CLOSED;
+
+  public boolean isClosedLike() {
+    return this == DEAL_DONE || this == CLOSED;
+  }
 }
