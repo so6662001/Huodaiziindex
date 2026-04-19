@@ -14,6 +14,8 @@ import com.huodaizi.backend.dto.inquiry.InquiryMerchantCreditScoreRequest;
 import com.huodaizi.backend.dto.inquiry.InquirySubscriptionCreateRequest;
 import com.huodaizi.backend.dto.inquiry.InquirySubscriptionMineRequest;
 import com.huodaizi.backend.dto.inquiry.InquirySubscriptionPlanListRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryBillingOrderListRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryBillingOrderPaymentRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryPickupOrderCreateRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryPickupOrderListRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryPickupOrderStatus;
@@ -47,6 +49,7 @@ public class InMemoryInquiryRepository {
   private final AtomicLong pickupSeq = new AtomicLong(20260418000L);
   private final AtomicLong reconcileSeq = new AtomicLong(20260418000L);
   private final AtomicLong subscriptionSeq = new AtomicLong(20260418000L);
+  private final AtomicLong billingSeq = new AtomicLong(20260418000L);
   private final ConcurrentMap<String, InquiryEntity> store = new ConcurrentHashMap<>();
   private final ConcurrentMap<String, List<InquiryQuoteCompareEntity>> quoteStore = new ConcurrentHashMap<>();
   private final ConcurrentMap<String, InquiryMerchantLeadEntity> merchantLeadStore = new ConcurrentHashMap<>();
@@ -56,6 +59,7 @@ public class InMemoryInquiryRepository {
       new ConcurrentHashMap<>();
   private final ConcurrentMap<String, InquiryMerchantSubscriptionEntity> merchantSubscriptionStore =
       new ConcurrentHashMap<>();
+  private final ConcurrentMap<String, InquiryBillingOrderEntity> billingOrderStore = new ConcurrentHashMap<>();
   private final ConcurrentMap<String, InquiryPickupOrderEntity> pickupOrderStore = new ConcurrentHashMap<>();
   private final ConcurrentMap<String, InquiryReconcileOrderEntity> reconcileOrderStore =
       new ConcurrentHashMap<>();
@@ -269,6 +273,7 @@ public class InMemoryInquiryRepository {
             now,
             now);
     merchantSubscriptionStore.put(subscriptionId, entity);
+    createBillingOrderForSubscription(entity, now, defaultText(request.operator(), "系统"));
     return entity;
   }
 
@@ -281,6 +286,73 @@ public class InMemoryInquiryRepository {
         .filter(item -> item.getMerchantId().equalsIgnoreCase(merchantId))
         .sorted(Comparator.comparing(InquiryMerchantSubscriptionEntity::getCreatedAt, Comparator.reverseOrder()))
         .toList();
+  }
+
+  public List<InquiryBillingOrderEntity> listBillingOrders(InquiryBillingOrderListRequest request) {
+    String merchantId = defaultText(request.merchantId(), "").trim();
+    if (merchantId.isEmpty()) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "merchantId 不能为空");
+    }
+    String status = normalizeBillingStatusOrNull(request.status());
+    String keyword = normalize(request.keyword());
+    return billingOrderStore.values().stream()
+        .filter(item -> item.getMerchantId().equalsIgnoreCase(merchantId))
+        .filter(item -> status == null || item.getStatus().equalsIgnoreCase(status))
+        .filter(
+            item ->
+                keyword == null
+                    || normalize(item.getBillNo()).contains(keyword)
+                    || normalize(item.getSubscriptionNo()).contains(keyword)
+                    || normalize(item.getPlanName()).contains(keyword)
+                    || normalize(item.getPeriodStart()).contains(keyword)
+                    || normalize(item.getPeriodEnd()).contains(keyword))
+        .sorted(Comparator.comparing(InquiryBillingOrderEntity::getUpdatedAt, Comparator.reverseOrder()))
+        .toList();
+  }
+
+  public InquiryBillingOrderEntity getBillingOrderById(
+      String billId, InquiryBillingOrderListRequest request) {
+    String merchantId = defaultText(request.merchantId(), "").trim();
+    if (merchantId.isEmpty()) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "merchantId 不能为空");
+    }
+    InquiryBillingOrderEntity entity = requireBillingOrder(billId);
+    if (!entity.getMerchantId().equalsIgnoreCase(merchantId)) {
+      throw new BaseException(ErrorCode.NOT_FOUND.getCode(), "账单不存在");
+    }
+    return entity;
+  }
+
+  public InquiryBillingOrderEntity payBillingOrder(
+      String billId, InquiryBillingOrderPaymentRequest request) {
+    String merchantId = defaultText(request.merchantId(), "").trim();
+    if (merchantId.isEmpty()) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "merchantId 不能为空");
+    }
+    InquiryBillingOrderEntity entity = requireBillingOrder(billId);
+    if (!entity.getMerchantId().equalsIgnoreCase(merchantId)) {
+      throw new BaseException(ErrorCode.NOT_FOUND.getCode(), "账单不存在");
+    }
+    BigDecimal payAmount = parsePositiveMoney(request.payAmount(), "payAmount");
+    BigDecimal total = parseMoney(entity.getAmountYuan(), "amountYuan");
+    BigDecimal paid = parseMoneyOrDefault(entity.getPaidAmountYuan(), BigDecimal.ZERO, "paidAmountYuan");
+    BigDecimal paidAfter = paid.add(payAmount);
+    if (paidAfter.compareTo(total) > 0) {
+      paidAfter = total;
+    }
+    BigDecimal unpaidAfter = total.subtract(paidAfter).max(BigDecimal.ZERO);
+    String status = unpaidAfter.compareTo(BigDecimal.ZERO) == 0 ? "PAID" : "PARTIAL_PAID";
+    String remark =
+        List.of(
+                defaultText(request.payChannel(), ""),
+                defaultText(request.operator(), ""),
+                defaultText(request.remark(), ""))
+            .stream()
+            .filter(item -> !item.isBlank())
+            .collect(Collectors.joining(" | "));
+    entity.registerPayment(
+        status, toMoney(paidAfter), toMoney(unpaidAfter), LocalDateTime.now().toString(), remark);
+    return entity;
   }
 
   public List<InquiryMerchantLeadEntity> workbenchTasks(InquiryQuoteWorkbenchTaskRequest request) {
@@ -674,6 +746,81 @@ public class InMemoryInquiryRepository {
     return entity;
   }
 
+  private InquiryBillingOrderEntity requireBillingOrder(String billId) {
+    InquiryBillingOrderEntity entity = billingOrderStore.get(defaultText(billId, "").trim());
+    if (entity == null) {
+      throw new BaseException(ErrorCode.NOT_FOUND.getCode(), "账单不存在");
+    }
+    return entity;
+  }
+
+  private String normalizeBillingStatusOrNull(String status) {
+    if (status == null || status.isBlank()) {
+      return null;
+    }
+    return normalizeBillingStatus(status);
+  }
+
+  private String normalizeBillingStatus(String status) {
+    String normalized = defaultText(status, "").trim().toUpperCase(Locale.ROOT);
+    return switch (normalized) {
+      case "UNPAID", "PARTIAL_PAID", "PAID", "OVERDUE" -> normalized;
+      default ->
+          throw new BaseException(
+              ErrorCode.BAD_REQUEST.getCode(),
+              "status 仅支持 UNPAID/PARTIAL_PAID/PAID/OVERDUE");
+    };
+  }
+
+  private BigDecimal parsePositiveMoney(String text, String field) {
+    BigDecimal value = parseMoney(text, field);
+    if (value.compareTo(BigDecimal.ZERO) <= 0) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), field + " 必须大于0");
+    }
+    return value;
+  }
+
+  private void createBillingOrderForSubscription(
+      InquiryMerchantSubscriptionEntity subscription, LocalDateTime now, String operator) {
+    String billId = "BL" + billingSeq.incrementAndGet();
+    String billNo = "BILL-" + NO_FMT.format(now) + "-" + billId;
+    LocalDate issueDate = now.toLocalDate();
+    boolean yearly = "YEARLY".equalsIgnoreCase(subscription.getBillingCycle());
+    LocalDate periodStart = issueDate.withDayOfMonth(1);
+    LocalDate periodEnd = yearly ? periodStart.plusYears(1).minusDays(1) : periodStart.plusMonths(1).minusDays(1);
+    BigDecimal amount = parseMoney(subscription.getAmountYuan(), "amountYuan");
+    BigDecimal taxAmount = amount.multiply(new BigDecimal("0.13"));
+    BigDecimal netAmount = amount.subtract(taxAmount).max(BigDecimal.ZERO);
+    InquiryBillingOrderEntity entity =
+        new InquiryBillingOrderEntity(
+            billId,
+            billNo,
+            subscription.getMerchantId(),
+            subscription.getMerchantName(),
+            subscription.getSubscriptionId(),
+            subscription.getSubscriptionNo(),
+            subscription.getPlanCode(),
+            subscription.getPlanName(),
+            periodStart.toString(),
+            periodEnd.toString(),
+            issueDate.toString(),
+            toMoney(amount),
+            "0",
+            toMoney(amount),
+            "UNPAID",
+            issueDate.plusDays(15).toString(),
+            "BANK_TRANSFER",
+            "ISSUED",
+            "13%",
+            toMoney(taxAmount),
+            toMoney(netAmount),
+            "",
+            defaultText(operator, "系统创建"),
+            now,
+            now);
+    billingOrderStore.put(entity.getBillId(), entity);
+  }
+
   private boolean shouldTreatAsTimeout(InquiryMerchantLeadEntity item) {
     return item.getStatus() == InquiryMerchantLeadStatus.NEW
         || item.getStatus() == InquiryMerchantLeadStatus.CONTACTED;
@@ -709,6 +856,7 @@ public class InMemoryInquiryRepository {
     seedMerchantCreditScores();
     seedSubscriptionPlans();
     seedMerchantSubscriptions();
+    seedBillingOrders();
   }
 
   private void seedMerchantLeads(InquiryEntity inquiry1, InquiryEntity inquiry2) {
@@ -935,6 +1083,18 @@ public class InMemoryInquiryRepository {
             List.of("提货通", "对账通", "信用评分"),
             now.minusDays(7),
             now.minusDays(1)));
+  }
+
+  private void seedBillingOrders() {
+    merchantSubscriptionStore.values().forEach(
+        subscription -> {
+          boolean exists =
+              billingOrderStore.values().stream()
+                  .anyMatch(item -> item.getSubscriptionId().equals(subscription.getSubscriptionId()));
+          if (!exists) {
+            createBillingOrderForSubscription(subscription, subscription.getCreatedAt().plusHours(1), "系统初始化");
+          }
+        });
   }
 
   private String maskPhone(String phone) {

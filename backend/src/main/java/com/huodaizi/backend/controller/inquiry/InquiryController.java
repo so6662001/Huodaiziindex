@@ -19,6 +19,11 @@ import com.huodaizi.backend.dto.inquiry.InquiryReconcileOrderDetailResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryReconcileOrderListRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryReconcileOrderListResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryReconcileOrderStatusUpdateRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryBillingOrderDetailResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryBillingOrderListRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryBillingOrderListResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryBillingOrderPaymentRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryBillingOrderPaymentResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryListRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryListResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryMerchantLeadDetailResponse;
@@ -177,6 +182,26 @@ public class InquiryController {
   public ApiResponse<InquirySubscriptionMineResponse> mySubscriptions(
       @Valid @ModelAttribute InquirySubscriptionMineRequest request) {
     return ApiResponse.success(service.subscriptionMine(request));
+  }
+
+  @GetMapping("/merchant/billing/orders")
+  public ApiResponse<InquiryBillingOrderListResponse> billingOrders(
+      @Valid @ModelAttribute InquiryBillingOrderListRequest request) {
+    return ApiResponse.success(service.billingOrders(request));
+  }
+
+  @GetMapping("/merchant/billing/orders/{billingOrderId}")
+  public ApiResponse<InquiryBillingOrderDetailResponse> billingOrderDetail(
+      @PathVariable("billingOrderId") String billingOrderId,
+      @Valid @ModelAttribute InquiryBillingOrderListRequest request) {
+    return ApiResponse.success(service.billingOrderDetail(billingOrderId, request));
+  }
+
+  @PutMapping("/merchant/billing/orders/{billingOrderId}/pay")
+  public ApiResponse<InquiryBillingOrderPaymentResponse> billingOrderPay(
+      @PathVariable("billingOrderId") String billingOrderId,
+      @Valid @RequestBody InquiryBillingOrderPaymentRequest request) {
+    return ApiResponse.success(service.billingOrderPay(billingOrderId, request));
   }
 
   @GetMapping("/merchant/leads/{leadId}")

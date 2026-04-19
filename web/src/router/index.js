@@ -8,6 +8,7 @@ import InquiryPickupPassPage from '../pages/InquiryPickupPassPage.vue'
 import InquiryReconcilePassPage from '../pages/InquiryReconcilePassPage.vue'
 import InquiryMerchantCreditScorePage from '../pages/InquiryMerchantCreditScorePage.vue'
 import InquirySubscriptionPage from '../pages/InquirySubscriptionPage.vue'
+import InquiryBillingPage from '../pages/InquiryBillingPage.vue'
 import InquiryMerchantLeadManagePage from '../pages/InquiryMerchantLeadManagePage.vue'
 import InquiryQuoteWorkbenchPage from '../pages/InquiryQuoteWorkbenchPage.vue'
 import SiteAdLeadMinePage from '../pages/SiteAdLeadMinePage.vue'
@@ -84,6 +85,14 @@ const routes = [
     component: InquirySubscriptionPage,
     meta: {
       title: 'P11套餐与订阅页_商家SaaS订阅中心-货袋子'
+    }
+  },
+  {
+    path: '/merchant/billing',
+    name: 'merchantBilling',
+    component: InquiryBillingPage,
+    meta: {
+      title: 'P12计费与账单页_账单管理与回款登记-货袋子'
     }
   },
   {

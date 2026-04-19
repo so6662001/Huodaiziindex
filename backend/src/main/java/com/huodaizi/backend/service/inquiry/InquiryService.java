@@ -48,6 +48,12 @@ import com.huodaizi.backend.dto.inquiry.InquiryReconcileOrderListRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryReconcileOrderListResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryReconcileOrderStatus;
 import com.huodaizi.backend.dto.inquiry.InquiryReconcileOrderStatusUpdateRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryBillingOrderListRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryBillingOrderItemDTO;
+import com.huodaizi.backend.dto.inquiry.InquiryBillingOrderListResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryBillingOrderDetailResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryBillingOrderPaymentRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryBillingOrderPaymentResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchBatchUpdateRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchOverviewRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchOverviewResponse;
@@ -66,6 +72,8 @@ import com.huodaizi.backend.repository.inquiry.InquiryPickupOrderEntity;
 import com.huodaizi.backend.repository.inquiry.InquiryReconcileOrderEntity;
 import com.huodaizi.backend.repository.inquiry.InquiryQuoteCompareEntity;
 import com.huodaizi.backend.repository.inquiry.InquirySubscriptionPlanEntity;
+import com.huodaizi.backend.repository.inquiry.InquiryBillingOrderEntity;
+import java.math.BigDecimal;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
@@ -477,6 +485,69 @@ public class InquiryService {
         expiredCount);
   }
 
+  public InquiryBillingOrderListResponse billingOrders(InquiryBillingOrderListRequest request) {
+    List<InquiryBillingOrderEntity> all = repository.listBillingOrders(request);
+    int page = request.safePage();
+    int pageSize = request.safePageSize();
+    int from = Math.max((page - 1) * pageSize, 0);
+    int to = Math.min(from + pageSize, all.size());
+    List<InquiryBillingOrderEntity> paged = from >= all.size() ? List.of() : all.subList(from, to);
+    int unpaidCount = (int) all.stream().filter(item -> "UNPAID".equalsIgnoreCase(item.getStatus())).count();
+    int partialPaidCount =
+        (int) all.stream().filter(item -> "PARTIAL_PAID".equalsIgnoreCase(item.getStatus())).count();
+    int paidCount = (int) all.stream().filter(item -> "PAID".equalsIgnoreCase(item.getStatus())).count();
+    java.math.BigDecimal totalReceivable =
+        all.stream()
+            .map(item -> new java.math.BigDecimal(item.getAmountYuan()))
+            .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
+    java.math.BigDecimal totalPaid =
+        all.stream()
+            .map(item -> new java.math.BigDecimal(item.getPaidAmountYuan()))
+            .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
+    java.math.BigDecimal totalOutstanding = totalReceivable.subtract(totalPaid).max(java.math.BigDecimal.ZERO);
+    return new InquiryBillingOrderListResponse(
+        request.merchantId().trim(),
+        paged.stream().map(this::toBillingItem).toList(),
+        all.size(),
+        page,
+        pageSize,
+        unpaidCount,
+        partialPaidCount,
+        paidCount,
+        toMoney(totalReceivable),
+        toMoney(totalPaid),
+        toMoney(totalOutstanding));
+  }
+
+  public InquiryBillingOrderDetailResponse billingOrderDetail(
+      String billId, InquiryBillingOrderListRequest request) {
+    InquiryBillingOrderEntity entity = repository.getBillingOrderById(billId, request);
+    java.math.BigDecimal amount = new java.math.BigDecimal(entity.getAmountYuan());
+    java.math.BigDecimal taxRate = new java.math.BigDecimal("0.13");
+    java.math.BigDecimal taxAmount = amount.multiply(taxRate);
+    java.math.BigDecimal netAmount = amount.subtract(taxAmount).max(java.math.BigDecimal.ZERO);
+    return new InquiryBillingOrderDetailResponse(
+        toBillingItem(entity),
+        "套餐账单（" + entity.getPlanName() + "）",
+        entity.getAmountYuan(),
+        "13%",
+        toMoney(taxAmount),
+        toMoney(netAmount),
+        entity.getLatestRemark());
+  }
+
+  public InquiryBillingOrderPaymentResponse billingOrderPay(
+      String billId, InquiryBillingOrderPaymentRequest request) {
+    InquiryBillingOrderEntity entity = repository.payBillingOrder(billId, request);
+    return new InquiryBillingOrderPaymentResponse(
+        entity.getBillId(),
+        entity.getBillNo(),
+        entity.getStatus(),
+        entity.getPaidAmountYuan(),
+        entity.getUpdatedAt().toString(),
+        "回款登记成功，当前状态：" + billingStatusText(entity.getStatus()));
+  }
+
   public InquiryMerchantLeadDetailResponse merchantLeadDetail(
       String leadId, InquiryMerchantLeadListRequest request) {
     InquiryMerchantLeadEntity lead = repository.merchantLeadDetail(leadId, request.merchantId());
@@ -736,6 +807,30 @@ public class InquiryService {
         entity.getUpdatedAt().toString());
   }
 
+  private InquiryBillingOrderItemDTO toBillingItem(InquiryBillingOrderEntity entity) {
+    return new InquiryBillingOrderItemDTO(
+        entity.getBillId(),
+        entity.getBillNo(),
+        entity.getMerchantId(),
+        entity.getSubscriptionId(),
+        entity.getSubscriptionNo(),
+        entity.getPlanCode(),
+        entity.getPlanName(),
+        entity.getPeriodStart(),
+        entity.getPeriodEnd(),
+        entity.getIssueDate(),
+        entity.getDueDate(),
+        entity.getAmountYuan(),
+        entity.getPaidAmountYuan(),
+        entity.getUnpaidAmountYuan(),
+        entity.getStatus(),
+        billingStatusText(entity.getStatus()),
+        "BANK_TRANSFER",
+        "ISSUED",
+        entity.getCreatedAt().toString(),
+        entity.getUpdatedAt().toString());
+  }
+
   private String subscriptionStatusText(String status) {
     if (status == null || status.isBlank()) {
       return "未知";
@@ -761,6 +856,24 @@ public class InquiryService {
       return "PRO";
     }
     return "STANDARD";
+  }
+
+  private String billingStatusText(String status) {
+    if (status == null || status.isBlank()) {
+      return "未知";
+    }
+    String normalized = status.trim().toUpperCase(java.util.Locale.ROOT);
+    return switch (normalized) {
+      case "UNPAID" -> "待支付";
+      case "PARTIAL_PAID" -> "部分支付";
+      case "PAID" -> "已支付";
+      case "OVERDUE" -> "已逾期";
+      default -> normalized;
+    };
+  }
+
+  private String toMoney(BigDecimal value) {
+    return value.stripTrailingZeros().toPlainString();
   }
 
   private int countMerchantByStatus(List<InquiryMerchantLeadEntity> items, InquiryMerchantLeadStatus status) {
