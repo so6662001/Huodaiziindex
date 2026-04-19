@@ -153,6 +153,10 @@ function goA02LeadOpsPage() {
   router.push('/admin/lead-ops/a02')
 }
 
+function goA03QuoteEfficiencyPage() {
+  router.push('/admin/quote-efficiency/a03?merchantId=S001')
+}
+
 function onSearch() {
   if (!keyword.value.trim()) {
     return
@@ -343,6 +347,7 @@ function onSearch() {
         <button class="btn" @click="goH5MemberPage">H5我的会员</button>
         <button class="btn" @click="goA01DashboardPage">A01经营总看板</button>
         <button class="btn" @click="goA02LeadOpsPage">A02线索运营中心</button>
+        <button class="btn" @click="goA03QuoteEfficiencyPage">A03报价效率中心</button>
         <button class="btn" @click="goSubscriptionPage">套餐与订阅</button>
         <button class="btn" @click="goBillingPage">计费与账单</button>
         <button class="btn primary" @click="goInquiry">立即体验AI询价</button>

@@ -23,6 +23,7 @@ import H5ReconcileOrderPage from '../pages/H5ReconcileOrderPage.vue'
 import H5MemberPage from '../pages/H5MemberPage.vue'
 import A01DashboardPage from '../pages/A01DashboardPage.vue'
 import A02LeadOpsPage from '../pages/A02LeadOpsPage.vue'
+import A03QuoteEfficiencyPage from '../pages/A03QuoteEfficiencyPage.vue'
 import InquiryMerchantLeadManagePage from '../pages/InquiryMerchantLeadManagePage.vue'
 import InquiryQuoteWorkbenchPage from '../pages/InquiryQuoteWorkbenchPage.vue'
 import SiteAdLeadMinePage from '../pages/SiteAdLeadMinePage.vue'
@@ -131,6 +132,14 @@ const routes = [
     component: A02LeadOpsPage,
     meta: {
       title: 'A02线索运营中心_管理端线索运营协同-货袋子'
+    }
+  },
+  {
+    path: '/admin/quote-efficiency/a03',
+    name: 'a03QuoteEfficiency',
+    component: A03QuoteEfficiencyPage,
+    meta: {
+      title: 'A03报价效率中心_管理端报价效率协同-货袋子'
     }
   },
   {
