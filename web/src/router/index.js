@@ -24,6 +24,7 @@ import H5MemberPage from '../pages/H5MemberPage.vue'
 import A01DashboardPage from '../pages/A01DashboardPage.vue'
 import A02LeadOpsPage from '../pages/A02LeadOpsPage.vue'
 import A03QuoteEfficiencyPage from '../pages/A03QuoteEfficiencyPage.vue'
+import A04PickupMonitorPage from '../pages/A04PickupMonitorPage.vue'
 import InquiryMerchantLeadManagePage from '../pages/InquiryMerchantLeadManagePage.vue'
 import InquiryQuoteWorkbenchPage from '../pages/InquiryQuoteWorkbenchPage.vue'
 import SiteAdLeadMinePage from '../pages/SiteAdLeadMinePage.vue'
@@ -140,6 +141,14 @@ const routes = [
     component: A03QuoteEfficiencyPage,
     meta: {
       title: 'A03报价效率中心_管理端报价效率协同-货袋子'
+    }
+  },
+  {
+    path: '/admin/pickup-monitor/a04',
+    name: 'a04PickupMonitor',
+    component: A04PickupMonitorPage,
+    meta: {
+      title: 'A04提货监控中心_管理端提货履约监控-货袋子'
     }
   },
   {
