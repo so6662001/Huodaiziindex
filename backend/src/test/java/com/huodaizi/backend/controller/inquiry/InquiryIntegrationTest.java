@@ -98,4 +98,23 @@ class InquiryIntegrationTest {
         .andExpect(status().isBadRequest())
         .andExpect(jsonPath("$.code").value("BAD_REQUEST"));
   }
+
+  @Test
+  void inquirySuccessShouldReturnSummary() throws Exception {
+    MvcResult result =
+        mockMvc
+            .perform(
+                get("/api/v1/inquiries/success")
+                    .param("inquiryId", "IQ20260418001")
+                    .param("contactMobile", "13800138000"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.code").value("0"))
+            .andReturn();
+
+    Map<?, ?> body = objectMapper.readValue(result.getResponse().getContentAsString(), Map.class);
+    Map<?, ?> data = (Map<?, ?>) body.get("data");
+    assertThat(String.valueOf(data.get("inquiryId"))).isEqualTo("IQ20260418001");
+    assertThat(String.valueOf(data.get("inquiryNo"))).startsWith("INQ-");
+    assertThat(String.valueOf(data.get("inquiryStatus"))).isNotBlank();
+  }
 }

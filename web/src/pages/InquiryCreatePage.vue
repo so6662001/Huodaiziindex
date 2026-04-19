@@ -1,5 +1,8 @@
 <script setup>
 import { computed, reactive, ref } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 const loading = ref(false)
 const errorMsg = ref('')
 const successMsg = ref('')
@@ -70,6 +73,11 @@ async function submitInquiry() {
       throw new Error(json.message || '提交询价失败')
     }
     successMsg.value = `${json.data.message}（询价单号：${json.data.inquiryNo}）`
+    router.push(
+      `/inquiry/success?inquiryId=${encodeURIComponent(json.data.inquiryId)}&contactMobile=${encodeURIComponent(
+        form.contactMobile.trim()
+      )}`
+    )
   } catch (error) {
     errorMsg.value = error.message || '系统繁忙，请稍后重试'
   } finally {

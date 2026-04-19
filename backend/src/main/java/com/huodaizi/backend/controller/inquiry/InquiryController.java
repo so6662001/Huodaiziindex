@@ -5,6 +5,10 @@ import com.huodaizi.backend.dto.inquiry.InquiryCreateRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryCreateResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryListRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryListResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryQuoteCompareRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryQuoteCompareResponse;
+import com.huodaizi.backend.dto.inquiry.InquirySuccessRequest;
+import com.huodaizi.backend.dto.inquiry.InquirySuccessResponse;
 import com.huodaizi.backend.service.inquiry.InquiryService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,5 +36,15 @@ public class InquiryController {
   @GetMapping
   public ApiResponse<InquiryListResponse> list(@Valid @ModelAttribute InquiryListRequest request) {
     return ApiResponse.success(service.list(request));
+  }
+
+  @GetMapping("/compare")
+  public ApiResponse<InquiryQuoteCompareResponse> compare(@Valid @ModelAttribute InquiryQuoteCompareRequest request) {
+    return ApiResponse.success(service.compareQuotes(request));
+  }
+
+  @GetMapping("/success")
+  public ApiResponse<InquirySuccessResponse> success(@Valid @ModelAttribute InquirySuccessRequest request) {
+    return ApiResponse.success(service.success(request));
   }
 }

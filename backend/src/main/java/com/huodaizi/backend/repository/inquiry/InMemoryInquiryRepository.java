@@ -3,6 +3,8 @@ package com.huodaizi.backend.repository.inquiry;
 import com.huodaizi.backend.common.BaseException;
 import com.huodaizi.backend.common.ErrorCode;
 import com.huodaizi.backend.dto.inquiry.InquiryCreateRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryQuoteCompareRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryQuoteSortBy;
 import com.huodaizi.backend.dto.inquiry.InquiryListRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryStatus;
 import java.math.BigDecimal;
@@ -23,6 +25,7 @@ public class InMemoryInquiryRepository {
 
   private final AtomicLong seq = new AtomicLong(20260418000L);
   private final ConcurrentMap<String, InquiryEntity> store = new ConcurrentHashMap<>();
+  private final ConcurrentMap<String, List<InquiryQuoteCompareEntity>> quoteStore = new ConcurrentHashMap<>();
 
   public InMemoryInquiryRepository() {
     seed();
@@ -48,6 +51,7 @@ public class InMemoryInquiryRepository {
             LocalDateTime.now(),
             LocalDateTime.now());
     store.put(id, entity);
+    quoteStore.put(id, mockQuoteRows(id));
     return entity;
   }
 
@@ -65,6 +69,43 @@ public class InMemoryInquiryRepository {
                     || normalize(item.getSpecText()).contains(keyword)
                     || normalize(item.getDeliveryCity()).contains(keyword))
         .sorted(Comparator.comparing(InquiryEntity::getUpdatedAt, Comparator.reverseOrder()))
+        .toList();
+  }
+
+  public List<InquiryQuoteCompareEntity> listQuoteCompareItems(InquiryQuoteCompareRequest request) {
+    // ensure inquiry exists first
+    getById(request.inquiryId());
+
+    List<InquiryQuoteCompareEntity> quoteRows = quoteStore.getOrDefault(request.inquiryId(), List.of());
+    String deliveryCycle = normalize(request.deliveryCycle());
+    String invoiceType = normalize(request.invoiceType());
+    InquiryQuoteSortBy sortBy = InquiryQuoteSortBy.fromOrDefault(request.sortBy());
+
+    Comparator<InquiryQuoteCompareEntity> comparator =
+        switch (sortBy) {
+          case TOTAL_PRICE ->
+              Comparator.comparing(
+                  row -> new BigDecimal(defaultText(row.getTotalAmount(), "0")));
+          case UNIT_PRICE ->
+              Comparator.comparing(
+                  row -> new BigDecimal(defaultText(row.getPricePerTon(), "0")));
+          case DELIVERY_HOURS ->
+              Comparator.comparing(
+                  row -> new BigDecimal(defaultText(row.getDeliveryDays(), "0")));
+          case RESPONSE_MINUTES ->
+              Comparator.comparing(
+                  row -> new BigDecimal(defaultText(row.getResponseMinutes(), "0")));
+          case SUPPLIER_SCORE ->
+              Comparator.comparing(
+                      (InquiryQuoteCompareEntity row) ->
+                          new BigDecimal(defaultText(row.getServiceScore(), "0")))
+                  .reversed();
+        };
+
+    return quoteRows.stream()
+        .filter(row -> deliveryCycle == null || normalize(row.getDeliveryDays()).equals(deliveryCycle))
+        .filter(row -> invoiceType == null || normalize(row.getCanInvoice()).equals(invoiceType))
+        .sorted(comparator)
         .toList();
   }
 
@@ -110,7 +151,8 @@ public class InMemoryInquiryRepository {
   }
 
   private void seed() {
-    create(
+    InquiryEntity inquiry1 =
+        create(
         new InquiryCreateRequest(
             "REBAR",
             "HRB400E Φ20*12m",
@@ -120,7 +162,10 @@ public class InMemoryInquiryRepository {
             "YES",
             "13800138000",
             "用于工程项目一期"));
-    create(
+    inquiry1.setQuoteSupplierCount(3);
+
+    InquiryEntity inquiry2 =
+        create(
         new InquiryCreateRequest(
             "HOT_ROLL",
             "Q235B 3.0*1500*C",
@@ -130,5 +175,67 @@ public class InMemoryInquiryRepository {
             "ANY",
             "13900139000",
             "需要可开票"));
+    inquiry2.setQuoteSupplierCount(2);
+  }
+
+  private List<InquiryQuoteCompareEntity> mockQuoteRows(String inquiryId) {
+    return List.of(
+        new InquiryQuoteCompareEntity(
+            inquiryId,
+            inquiryId + "-Q1",
+            "S001",
+            "唐山弘达钢贸",
+            "A",
+            "3520",
+            "422400",
+            "含税到厂",
+            "月结15天",
+            "1",
+            "唐山",
+            "7",
+            "98",
+            "5",
+            "YES",
+            "YES",
+            "当日16点前可装车，支持电子回单",
+            LocalDateTime.now().minusHours(1)),
+        new InquiryQuoteCompareEntity(
+            inquiryId,
+            inquiryId + "-Q2",
+            "S002",
+            "无锡铭泰供应链",
+            "A",
+            "3490",
+            "418800",
+            "含税到厂",
+            "月结30天",
+            "2",
+            "无锡",
+            "12",
+            "94",
+            "4",
+            "YES",
+            "YES",
+            "支持月结客户，需提前锁货",
+            LocalDateTime.now().minusHours(2)),
+        new InquiryQuoteCompareEntity(
+            inquiryId,
+            inquiryId + "-Q3",
+            "S003",
+            "郑州鑫诚贸易",
+            "B",
+            "3470",
+            "416400",
+            "不含税出库",
+            "现款现货",
+            "3",
+            "郑州",
+            "20",
+            "90",
+            "3",
+            "NO",
+            "NO",
+            "低价方案，不含票据",
+            LocalDateTime.now().minusHours(3)));
   }
 }

@@ -1,6 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomePage from '../pages/HomePage.vue'
 import InquiryCreatePage from '../pages/InquiryCreatePage.vue'
+import InquirySuccessPage from '../pages/InquirySuccessPage.vue'
+import InquiryQuoteComparePage from '../pages/InquiryQuoteComparePage.vue'
 import SiteAdLeadMinePage from '../pages/SiteAdLeadMinePage.vue'
 import SiteAdLeadSubmitDemoPage from '../pages/SiteAdLeadSubmitDemoPage.vue'
 
@@ -19,6 +21,22 @@ const routes = [
     component: InquiryCreatePage,
     meta: {
       title: 'AI询价_3步快速找货-货袋子'
+    }
+  },
+  {
+    path: '/inquiry/success',
+    name: 'inquirySuccess',
+    component: InquirySuccessPage,
+    meta: {
+      title: '询价提交成功-货袋子'
+    }
+  },
+  {
+    path: '/inquiry/compare',
+    name: 'inquiryCompare',
+    component: InquiryQuoteComparePage,
+    meta: {
+      title: '报价对比_买家决策台-货袋子'
     }
   },
   {
