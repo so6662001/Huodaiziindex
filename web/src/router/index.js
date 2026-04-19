@@ -28,6 +28,7 @@ import A04PickupMonitorPage from '../pages/A04PickupMonitorPage.vue'
 import A05ReconcileMonitorPage from '../pages/A05ReconcileMonitorPage.vue'
 import A06DispatchStrategyConfigPage from '../pages/A06DispatchStrategyConfigPage.vue'
 import A07PlanPricingManagePage from '../pages/A07PlanPricingManagePage.vue'
+import A08RiskAlertCenterPage from '../pages/A08RiskAlertCenterPage.vue'
 import InquiryMerchantLeadManagePage from '../pages/InquiryMerchantLeadManagePage.vue'
 import InquiryQuoteWorkbenchPage from '../pages/InquiryQuoteWorkbenchPage.vue'
 import SiteAdLeadMinePage from '../pages/SiteAdLeadMinePage.vue'
@@ -176,6 +177,14 @@ const routes = [
     component: A07PlanPricingManagePage,
     meta: {
       title: 'A07套餐与定价管理_管理端套餐定价配置-货袋子'
+    }
+  },
+  {
+    path: '/admin/risk-alert/a08',
+    name: 'a08RiskAlertCenter',
+    component: A08RiskAlertCenterPage,
+    meta: {
+      title: 'A08风险预警中心_管理端全链路风险处置-货袋子'
     }
   },
   {

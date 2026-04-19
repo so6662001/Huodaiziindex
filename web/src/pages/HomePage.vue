@@ -173,6 +173,10 @@ function goA07PlanPricingPage() {
   router.push('/admin/plan-pricing/a07')
 }
 
+function goA08RiskAlertPage() {
+  router.push('/admin/risk-alert/a08')
+}
+
 function onSearch() {
   if (!keyword.value.trim()) {
     return
@@ -368,6 +372,7 @@ function onSearch() {
         <button class="btn" @click="goA05ReconcileMonitorPage">A05对账监控中心</button>
         <button class="btn" @click="goA06DispatchStrategyPage">A06分发策略配置</button>
         <button class="btn" @click="goA07PlanPricingPage">A07套餐与定价管理</button>
+        <button class="btn" @click="goA08RiskAlertPage">A08风险预警中心</button>
         <button class="btn" @click="goSubscriptionPage">套餐与订阅</button>
         <button class="btn" @click="goBillingPage">计费与账单</button>
         <button class="btn primary" @click="goInquiry">立即体验AI询价</button>
