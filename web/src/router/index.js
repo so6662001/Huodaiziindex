@@ -17,6 +17,7 @@ import H5InquiryStep2Page from '../pages/H5InquiryStep2Page.vue'
 import H5InquiryStep3Page from '../pages/H5InquiryStep3Page.vue'
 import H5QuoteComparePage from '../pages/H5QuoteComparePage.vue'
 import H5MerchantLeadPage from '../pages/H5MerchantLeadPage.vue'
+import H5QuickQuotePage from '../pages/H5QuickQuotePage.vue'
 import InquiryMerchantLeadManagePage from '../pages/InquiryMerchantLeadManagePage.vue'
 import InquiryQuoteWorkbenchPage from '../pages/InquiryQuoteWorkbenchPage.vue'
 import SiteAdLeadMinePage from '../pages/SiteAdLeadMinePage.vue'
@@ -77,6 +78,14 @@ const routes = [
     component: H5MerchantLeadPage,
     meta: {
       title: 'H06 H5我的线索_商家移动端线索管理-货袋子'
+    }
+  },
+  {
+    path: '/h5/quick-quote',
+    name: 'h5QuickQuote',
+    component: H5QuickQuotePage,
+    meta: {
+      title: 'H07 H5快捷报价_商家移动端快速报价-货袋子'
     }
   },
   {

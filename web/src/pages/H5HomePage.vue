@@ -71,6 +71,10 @@ function goto(url) {
     router.push('/h5/merchant/leads?merchantId=S001')
     return
   }
+  if (url.includes('/h5/quick-quote') || url.includes('/quick-quote')) {
+    router.push('/h5/quick-quote?merchantId=S001')
+    return
+  }
   router.push(url)
 }
 

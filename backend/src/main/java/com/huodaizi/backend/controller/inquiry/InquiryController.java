@@ -46,6 +46,8 @@ import com.huodaizi.backend.dto.inquiry.InquiryH5InquiryStep3Request;
 import com.huodaizi.backend.dto.inquiry.InquiryH5InquiryStep3Response;
 import com.huodaizi.backend.dto.inquiry.InquiryH5QuoteCompareRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryH5QuoteCompareResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryH5QuickQuoteInitRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryH5QuickQuoteInitResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryH5MerchantLeadRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryH5MerchantLeadResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryH5MerchantLeadQuickQuoteRequest;
@@ -283,6 +285,19 @@ public class InquiryController {
   public ApiResponse<InquiryH5MerchantLeadResponse> h5MerchantLeads(
       @Valid @ModelAttribute InquiryH5MerchantLeadRequest request) {
     return ApiResponse.success(service.h5MerchantLeads(request));
+  }
+
+  @GetMapping("/h5/quick-quote/init")
+  public ApiResponse<InquiryH5QuickQuoteInitResponse> h5QuickQuoteInit(
+      @Valid @ModelAttribute InquiryH5QuickQuoteInitRequest request) {
+    return ApiResponse.success(service.h5QuickQuoteInit(request));
+  }
+
+  @PostMapping("/h5/quick-quote/{leadId}/submit")
+  public ApiResponse<InquiryH5MerchantLeadQuickQuoteResponse> h5QuickQuoteSubmit(
+      @PathVariable("leadId") String leadId,
+      @Valid @RequestBody InquiryH5MerchantLeadQuickQuoteRequest request) {
+    return ApiResponse.success(service.h5QuickQuoteSubmit(leadId, request));
   }
 
   @PostMapping("/h5/merchant/leads/{leadId}/quick-quote")

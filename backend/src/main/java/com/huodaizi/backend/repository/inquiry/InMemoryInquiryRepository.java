@@ -461,6 +461,8 @@ public class InMemoryInquiryRepository {
             new InquiryH5HomeEntity.QuickNavEntity(
                 "NAV001", "AI询价", "3步快速找货", "inquiry", "/h5/inquiry/step1", "HOT"),
             new InquiryH5HomeEntity.QuickNavEntity(
+                "NAV007", "快捷报价", "线索一键报价", "quick-quote", "/h5/quick-quote?merchantId=S001", ""),
+            new InquiryH5HomeEntity.QuickNavEntity(
                 "NAV002", "现货大厅", "热门规格现货", "spot", "/", ""),
             new InquiryH5HomeEntity.QuickNavEntity(
                 "NAV003", "报价对比", "多商家智能比较", "compare", "/inquiry/compare", ""),

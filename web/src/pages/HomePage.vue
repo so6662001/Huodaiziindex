@@ -129,6 +129,10 @@ function goH5InquiryStep1Page() {
   router.push('/h5/inquiry/step1?city=唐山')
 }
 
+function goH5QuickQuotePage() {
+  router.push('/h5/quick-quote?merchantId=S001')
+}
+
 function onSearch() {
   if (!keyword.value.trim()) {
     return
@@ -313,6 +317,7 @@ function onSearch() {
         <button class="btn" @click="goMessageCenterPage">消息中心</button>
         <button class="btn" @click="goH5HomePage">H5首页</button>
         <button class="btn" @click="goH5InquiryStep1Page">H5询价Step1</button>
+        <button class="btn" @click="goH5QuickQuotePage">H5快捷报价</button>
         <button class="btn" @click="goSubscriptionPage">套餐与订阅</button>
         <button class="btn" @click="goBillingPage">计费与账单</button>
         <button class="btn primary" @click="goInquiry">立即体验AI询价</button>

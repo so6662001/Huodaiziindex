@@ -92,6 +92,8 @@ import com.huodaizi.backend.dto.inquiry.InquiryH5MerchantLeadQuickStatusRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryH5MerchantLeadQuickStatusResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryH5MerchantLeadRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryH5MerchantLeadResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryH5QuickQuoteInitRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryH5QuickQuoteInitResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchBatchUpdateRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchOverviewRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchOverviewResponse;
@@ -923,6 +925,16 @@ public class InquiryService {
 
   public InquiryH5MerchantLeadQuickQuoteResponse h5MerchantLeadQuickQuote(
       String leadId, InquiryH5MerchantLeadQuickQuoteRequest request) {
+    return quickQuoteByLead(leadId, request, "h5-merchant-lead");
+  }
+
+  public InquiryH5MerchantLeadQuickQuoteResponse h5QuickQuoteSubmit(
+      String leadId, InquiryH5MerchantLeadQuickQuoteRequest request) {
+    return quickQuoteByLead(leadId, request, "h5-quick-quote");
+  }
+
+  private InquiryH5MerchantLeadQuickQuoteResponse quickQuoteByLead(
+      String leadId, InquiryH5MerchantLeadQuickQuoteRequest request, String source) {
     InquiryMerchantLeadEntity lead = repository.merchantLeadDetail(leadId, request.merchantId());
     java.math.BigDecimal qty = new java.math.BigDecimal(lead.getDemandQtyTon());
     java.math.BigDecimal unitPrice = new java.math.BigDecimal(request.unitPrice().trim());
@@ -946,7 +958,7 @@ public class InquiryService {
                     : request.paymentTerm().trim(),
                 "YES",
                 quoteRemark,
-                "h5-merchant-lead"));
+                source));
     return new InquiryH5MerchantLeadQuickQuoteResponse(
         updated.leadId(),
         updated.status(),
@@ -971,6 +983,41 @@ public class InquiryService {
         updated.status(),
         updated.latestFollow(),
         "线索状态已更新");
+  }
+
+  public InquiryH5QuickQuoteInitResponse h5QuickQuoteInit(InquiryH5QuickQuoteInitRequest request) {
+    InquiryMerchantLeadEntity lead = repository.merchantLeadDetail(request.leadId(), request.merchantId());
+    java.math.BigDecimal suggestedPrice = new java.math.BigDecimal("3500");
+    if ("Q235B 3.0*1500*C".equalsIgnoreCase(lead.getSpecText())) {
+      suggestedPrice = new java.math.BigDecimal("3490");
+    }
+    if ("中厚板".equalsIgnoreCase(lead.getSpecText())) {
+      suggestedPrice = new java.math.BigDecimal("3890");
+    }
+    java.math.BigDecimal unitPrice =
+        (lead.getUnitPrice() == null || lead.getUnitPrice().isBlank())
+            ? suggestedPrice
+            : new java.math.BigDecimal(lead.getUnitPrice());
+    String suggestedDeliveryDays =
+        lead.getDeliveryDays() == null || lead.getDeliveryDays().isBlank()
+            ? "1"
+            : lead.getDeliveryDays();
+    String paymentTerm =
+        lead.getPaymentTerm() == null || lead.getPaymentTerm().isBlank() ? "月结15天" : lead.getPaymentTerm();
+    return new InquiryH5QuickQuoteInitResponse(
+        request.merchantId().trim(),
+        lead.getId(),
+        lead.getInquiryId(),
+        lead.getInquiryNo(),
+        lead.getSpecText(),
+        lead.getDemandQtyTon(),
+        lead.getDeliveryCity(),
+        lead.getInvoiceNeed(),
+        lead.getStatus().name(),
+        unitPrice.stripTrailingZeros().toPlainString(),
+        suggestedDeliveryDays,
+        paymentTerm,
+        "建议在10分钟内完成报价并电话回访，提升线索转化");
   }
 
   public InquiryMerchantLeadDetailResponse merchantLeadDetail(
