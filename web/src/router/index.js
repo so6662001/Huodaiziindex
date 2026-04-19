@@ -1,11 +1,16 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import HomePage from '../pages/HomePage.vue'
 import SiteAdLeadMinePage from '../pages/SiteAdLeadMinePage.vue'
 import SiteAdLeadSubmitDemoPage from '../pages/SiteAdLeadSubmitDemoPage.vue'
 
 const routes = [
   {
     path: '/',
-    redirect: '/site/ad/mine'
+    name: 'home',
+    component: HomePage,
+    meta: {
+      title: '货袋子钢铁交易平台_找货更快卖货更稳'
+    }
   },
   {
     path: '/site/ad/mine',
