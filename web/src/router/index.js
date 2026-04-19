@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomePage from '../pages/HomePage.vue'
+import InquiryCreatePage from '../pages/InquiryCreatePage.vue'
 import SiteAdLeadMinePage from '../pages/SiteAdLeadMinePage.vue'
 import SiteAdLeadSubmitDemoPage from '../pages/SiteAdLeadSubmitDemoPage.vue'
 
@@ -10,6 +11,14 @@ const routes = [
     component: HomePage,
     meta: {
       title: '货袋子钢铁交易平台_找货更快卖货更稳'
+    }
+  },
+  {
+    path: '/inquiry/create',
+    name: 'inquiryCreate',
+    component: InquiryCreatePage,
+    meta: {
+      title: 'AI询价_3步快速找货-货袋子'
     }
   },
   {

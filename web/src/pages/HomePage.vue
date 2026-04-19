@@ -90,7 +90,7 @@ const kpiViews = [
 ]
 
 function goInquiry() {
-  router.push('/site/ad/submit')
+  router.push('/inquiry/create')
 }
 
 function goWorkbench() {
