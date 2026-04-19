@@ -34,6 +34,7 @@ public class InMemoryFreightDemandRepository {
     String destination = normalize(request.destinationCity());
     String goods = normalize(request.goodsCategory());
     String vehicle = normalize(request.vehicleType());
+    String timeliness = normalize(request.timeliness());
     String keyword = normalize(request.keyword());
     String invoiceNeed = normalize(request.invoiceNeed());
     String loadingNeed = normalize(request.loadingNeed());
@@ -43,6 +44,7 @@ public class InMemoryFreightDemandRepository {
         .filter(item -> destination.isBlank() || normalize(item.getDestinationCity()).contains(destination))
         .filter(item -> goods.isBlank() || normalize(item.getGoodsCategory()).contains(goods))
         .filter(item -> vehicle.isBlank() || normalize(item.getVehicleType()).contains(vehicle))
+        .filter(item -> timeliness.isBlank() || normalize(item.getTimeliness()).contains(timeliness))
         .filter(item -> invoiceNeed.isBlank() || matchNeed(item.isNeedInvoice(), invoiceNeed))
         .filter(item -> loadingNeed.isBlank() || matchNeed(item.isNeedLoading(), loadingNeed))
         .filter(
@@ -169,9 +171,10 @@ public class InMemoryFreightDemandRepository {
   }
 
   private boolean matchNeed(boolean value, String filter) {
+    String normalized = normalize(filter);
     return switch (filter) {
-      case "yes", "true", "1", "需要", "需" -> value;
-      case "no", "false", "0", "不需要", "无需" -> !value;
+      case "yes", "true", "1", "需要", "需", "需开票", "需装卸协同" -> value;
+      case "no", "false", "0", "不需要", "无需", "不开票", "仅运输" -> !value;
       default -> true;
     };
   }
