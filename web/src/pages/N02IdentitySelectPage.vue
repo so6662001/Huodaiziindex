@@ -88,6 +88,10 @@ function goCertification() {
   router.push('/account/enterprise-certification')
 }
 
+function goOnboardingProgress() {
+  router.push('/account/onboarding-progress')
+}
+
 function goTarget(identityCode) {
   if (identityCode === 'BUYER') {
     router.push('/inquiry/create')
@@ -164,6 +168,14 @@ onMounted(() => {
               @click="goCertification"
             >
               企业认证提交
+            </button>
+            <button
+              v-if="identity.identityCode === 'BUYER'"
+              class="btn"
+              :disabled="switching"
+              @click="goOnboardingProgress"
+            >
+              入驻审核进度
             </button>
             <button class="btn" :disabled="switching" @click="goTarget(identity.identityCode)">进入工作台</button>
           </div>

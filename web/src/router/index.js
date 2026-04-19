@@ -32,6 +32,7 @@ import A08RiskAlertCenterPage from '../pages/A08RiskAlertCenterPage.vue'
 import N01LoginRegisterPage from '../pages/N01LoginRegisterPage.vue'
 import N02IdentitySelectPage from '../pages/N02IdentitySelectPage.vue'
 import N03EnterpriseCertificationPage from '../pages/N03EnterpriseCertificationPage.vue'
+import N04OnboardingProgressPage from '../pages/N04OnboardingProgressPage.vue'
 import InquiryMerchantLeadManagePage from '../pages/InquiryMerchantLeadManagePage.vue'
 import InquiryQuoteWorkbenchPage from '../pages/InquiryQuoteWorkbenchPage.vue'
 import SiteAdLeadMinePage from '../pages/SiteAdLeadMinePage.vue'
@@ -212,6 +213,14 @@ const routes = [
     component: N03EnterpriseCertificationPage,
     meta: {
       title: 'PC-N03企业认证提交_货袋子账号中心'
+    }
+  },
+  {
+    path: '/account/onboarding-progress',
+    name: 'n04OnboardingProgress',
+    component: N04OnboardingProgressPage,
+    meta: {
+      title: 'PC-N04入驻审核进度_货袋子账号中心'
     }
   },
   {

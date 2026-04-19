@@ -6,6 +6,7 @@ import com.huodaizi.backend.dto.auth.AuthLoginResponse;
 import com.huodaizi.backend.dto.auth.AuthRegisterRequest;
 import com.huodaizi.backend.dto.auth.AuthRegisterResponse;
 import com.huodaizi.backend.dto.auth.AuthSessionResponse;
+import com.huodaizi.backend.dto.auth.N04OnboardingProgressResponse;
 import com.huodaizi.backend.dto.auth.N03EnterpriseCertificationDetailResponse;
 import com.huodaizi.backend.dto.auth.N03EnterpriseCertificationSubmitRequest;
 import com.huodaizi.backend.service.auth.AuthService;
@@ -54,6 +55,12 @@ public class AuthController {
       @RequestHeader(name = AUTH_HEADER, required = false) String token,
       @Valid @RequestBody N03EnterpriseCertificationSubmitRequest request) {
     return ApiResponse.success(service.submitEnterpriseCertification(token, request));
+  }
+
+  @GetMapping("/onboarding/progress")
+  public ApiResponse<N04OnboardingProgressResponse> onboardingProgress(
+      @RequestHeader(name = AUTH_HEADER, required = false) String token) {
+    return ApiResponse.success(service.onboardingProgress(token));
   }
 
   @PostMapping("/logout")

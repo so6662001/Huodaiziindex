@@ -9,6 +9,8 @@ import com.huodaizi.backend.dto.auth.AuthRegisterResponse;
 import com.huodaizi.backend.dto.auth.AuthSessionResponse;
 import com.huodaizi.backend.dto.auth.N03EnterpriseCertificationDetailResponse;
 import com.huodaizi.backend.dto.auth.N03EnterpriseCertificationSubmitRequest;
+import com.huodaizi.backend.dto.auth.N04OnboardingProgressNodeDTO;
+import com.huodaizi.backend.dto.auth.N04OnboardingProgressResponse;
 import com.huodaizi.backend.repository.auth.AuthUserEntity;
 import com.huodaizi.backend.repository.auth.EnterpriseCertificationDraft;
 import com.huodaizi.backend.repository.auth.EnterpriseCertificationEntity;
@@ -16,6 +18,7 @@ import com.huodaizi.backend.repository.auth.InMemoryAuthRepository;
 import com.huodaizi.backend.repository.auth.InMemoryAuthRepository.AuthRegistration;
 import com.huodaizi.backend.repository.auth.InMemoryAuthRepository.SessionEntity;
 import java.time.LocalDateTime;
+import java.util.List;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -150,6 +153,92 @@ public class AuthService {
     return toCertificationDetail(entity);
   }
 
+  public N04OnboardingProgressResponse onboardingProgress(String token) {
+    AuthUserEntity user =
+        repository
+            .findUserByToken(token)
+            .orElseThrow(() -> new BaseException(ErrorCode.UNAUTHORIZED.getCode(), "登录态无效"));
+    EnterpriseCertificationEntity cert = repository.findCertificationByToken(token).orElse(null);
+
+    String certificationStatus = cert == null ? "UNSUBMITTED" : cert.getStatus();
+    String currentStepCode = currentStepCodeByStatus(certificationStatus);
+    int progressPercent = progressPercentByStatus(certificationStatus);
+
+    String submittedAt = cert == null ? null : toText(cert.getSubmittedAt());
+    String reviewFinishedAt = ("APPROVED".equalsIgnoreCase(certificationStatus)
+            || "REJECTED".equalsIgnoreCase(certificationStatus))
+        ? toText(cert == null ? null : cert.getUpdatedAt())
+        : null;
+
+    List<N04OnboardingProgressNodeDTO> nodes =
+        List.of(
+            new N04OnboardingProgressNodeDTO(
+                "CERT_SUBMIT",
+                "提交企业认证",
+                "请填写企业资质与对公账户信息后提交",
+                "UNSUBMITTED".equalsIgnoreCase(certificationStatus) ? "PENDING" : "COMPLETED",
+                "UNSUBMITTED".equalsIgnoreCase(certificationStatus) ? "待提交" : "已提交",
+                "商家",
+                submittedAt,
+                submittedAt,
+                "UNSUBMITTED".equalsIgnoreCase(certificationStatus) ? "等待提交资料" : "资料已提交"),
+            new N04OnboardingProgressNodeDTO(
+                "REVIEW",
+                "平台审核中",
+                "平台将在1-2个工作日内完成审核",
+                reviewStatusByCertificationStatus(certificationStatus),
+                reviewStatusTextByCertificationStatus(certificationStatus),
+                "审核专员",
+                submittedAt,
+                reviewFinishedAt,
+                "REJECTED".equalsIgnoreCase(certificationStatus)
+                    ? "资料需补充后重提"
+                    : "审核流程正常"),
+            new N04OnboardingProgressNodeDTO(
+                "ONBOARDING",
+                "入驻完成",
+                "审核通过后即可开通完整入驻能力",
+                "APPROVED".equalsIgnoreCase(certificationStatus) ? "COMPLETED" : "PENDING",
+                "APPROVED".equalsIgnoreCase(certificationStatus) ? "已完成" : "待完成",
+                "系统",
+                "APPROVED".equalsIgnoreCase(certificationStatus) ? reviewFinishedAt : null,
+                "APPROVED".equalsIgnoreCase(certificationStatus) ? reviewFinishedAt : null,
+                "APPROVED".equalsIgnoreCase(certificationStatus) ? "已开通" : "等待审核结果"));
+
+    String statusText =
+        switch (certificationStatus) {
+          case "UNSUBMITTED" -> "待提交";
+          case "PENDING_REVIEW" -> "审核中";
+          case "REJECTED" -> "已驳回";
+          case "APPROVED" -> "已通过";
+          default -> "处理中";
+        };
+
+    String currentStepName = stepNameByCode(currentStepCode);
+
+    String rejectReason =
+        "REJECTED".equalsIgnoreCase(certificationStatus)
+            ? "证照信息不清晰或关键字段缺失，请补充后重新提交"
+            : null;
+
+    String expectedFinishAt = estimateFinishAt(certificationStatus, cert);
+    return new N04OnboardingProgressResponse(
+        cert == null ? null : cert.getCertificationId(),
+        user.getUserId(),
+        user.getAccount(),
+        user.getCompanyName(),
+        certificationStatus,
+        statusText,
+        progressPercent,
+        currentStepCode,
+        currentStepName,
+        expectedFinishAt,
+        nodes,
+        submittedAt,
+        cert == null ? null : toText(cert.getUpdatedAt()),
+        rejectReason);
+  }
+
   private N03EnterpriseCertificationDetailResponse toCertificationDetail(
       EnterpriseCertificationEntity entity) {
     return new N03EnterpriseCertificationDetailResponse(
@@ -222,5 +311,69 @@ public class AuthService {
 
   private String toText(LocalDateTime time) {
     return time == null || time.equals(LocalDateTime.MIN) ? null : time.toString();
+  }
+
+  private String currentStepCodeByStatus(String certificationStatus) {
+    return switch (certificationStatus) {
+      case "UNSUBMITTED" -> "CERT_SUBMIT";
+      case "PENDING_REVIEW", "REJECTED" -> "REVIEW";
+      case "APPROVED" -> "ONBOARDING";
+      default -> "CERT_SUBMIT";
+    };
+  }
+
+  private int progressPercentByStatus(String certificationStatus) {
+    return switch (certificationStatus) {
+      case "UNSUBMITTED" -> 10;
+      case "PENDING_REVIEW" -> 55;
+      case "REJECTED" -> 40;
+      case "APPROVED" -> 100;
+      default -> 0;
+    };
+  }
+
+  private String reviewStatusByCertificationStatus(String certificationStatus) {
+    return switch (certificationStatus) {
+      case "UNSUBMITTED" -> "PENDING";
+      case "PENDING_REVIEW" -> "IN_PROGRESS";
+      case "REJECTED", "APPROVED" -> "COMPLETED";
+      default -> "PENDING";
+    };
+  }
+
+  private String reviewStatusTextByCertificationStatus(String certificationStatus) {
+    return switch (certificationStatus) {
+      case "UNSUBMITTED" -> "待开始";
+      case "PENDING_REVIEW" -> "进行中";
+      case "REJECTED" -> "已驳回";
+      case "APPROVED" -> "已通过";
+      default -> "待开始";
+    };
+  }
+
+  private String stepNameByCode(String stepCode) {
+    return switch (stepCode) {
+      case "CERT_SUBMIT" -> "提交企业认证";
+      case "REVIEW" -> "平台审核中";
+      case "ONBOARDING" -> "入驻完成";
+      default -> "提交企业认证";
+    };
+  }
+
+  private String estimateFinishAt(String certificationStatus, EnterpriseCertificationEntity cert) {
+    if ("UNSUBMITTED".equalsIgnoreCase(certificationStatus)) {
+      return null;
+    }
+    if ("PENDING_REVIEW".equalsIgnoreCase(certificationStatus)) {
+      LocalDateTime base = cert == null ? LocalDateTime.now() : cert.getSubmittedAt();
+      if (base == null) {
+        base = LocalDateTime.now();
+      }
+      return toText(base.plusDays(2));
+    }
+    if ("APPROVED".equalsIgnoreCase(certificationStatus) || "REJECTED".equalsIgnoreCase(certificationStatus)) {
+      return cert == null ? null : toText(cert.getUpdatedAt());
+    }
+    return null;
   }
 }

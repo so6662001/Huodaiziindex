@@ -145,6 +145,10 @@ function goIdentitySelect() {
   router.push('/account/identity-select')
 }
 
+function goOnboardingProgress() {
+  router.push('/account/onboarding-progress')
+}
+
 function goHome() {
   router.push('/')
 }
@@ -161,6 +165,7 @@ onMounted(() => {
       <p>提交营业执照、法人证件与对公账户信息，完成企业资质认证。</p>
       <div class="hero-actions">
         <button class="btn" @click="goIdentitySelect">返回身份选择</button>
+        <button class="btn" @click="goOnboardingProgress">查看入驻审核进度</button>
         <button class="btn" @click="goHome">返回首页</button>
       </div>
     </section>
