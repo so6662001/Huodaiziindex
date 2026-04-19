@@ -1,0 +1,136 @@
+{
+  "meta": {
+    "started_at": "2026-04-19T07:55:15.460176+00:00",
+    "base_url": "http://127.0.0.1:18080",
+    "requests_per_scenario": 400,
+    "concurrency": 20,
+    "timeout_seconds": 10.0
+  },
+  "scenarios": [
+    {
+      "name": "public_mine_read",
+      "method": "GET",
+      "url": "http://127.0.0.1:18080/api/v1/site-ad-lead/mine?contactPhone=13800138000&page=1&pageSize=10",
+      "requests": 400,
+      "concurrency": 20,
+      "duration_seconds": 0.724,
+      "throughput_rps": 552.5,
+      "success_count": 400,
+      "error_count": 0,
+      "error_rate": 0.0,
+      "status_distribution": {
+        "200": 400
+      },
+      "latency_ms": {
+        "min": 2.04,
+        "avg": 34.642,
+        "p50": 16.932,
+        "p90": 28.279,
+        "p95": 57.082,
+        "p99": 393.177,
+        "max": 430.403,
+        "stddev": 77.945
+      }
+    },
+    {
+      "name": "public_submit_write",
+      "method": "POST",
+      "url": "http://127.0.0.1:18080/api/v1/site-ad-lead/submit",
+      "requests": 400,
+      "concurrency": 20,
+      "duration_seconds": 0.1327,
+      "throughput_rps": 3013.71,
+      "success_count": 400,
+      "error_count": 0,
+      "error_rate": 0.0,
+      "status_distribution": {
+        "200": 400
+      },
+      "latency_ms": {
+        "min": 0.968,
+        "avg": 5.878,
+        "p50": 5.514,
+        "p90": 9.569,
+        "p95": 10.473,
+        "p99": 12.741,
+        "max": 15.134,
+        "stddev": 2.574
+      }
+    },
+    {
+      "name": "admin_list_authorized",
+      "method": "GET",
+      "url": "http://127.0.0.1:18080/api/admin/site-ad-lead?page=1&pageSize=10",
+      "requests": 400,
+      "concurrency": 20,
+      "duration_seconds": 0.2286,
+      "throughput_rps": 1749.8,
+      "success_count": 400,
+      "error_count": 0,
+      "error_rate": 0.0,
+      "status_distribution": {
+        "200": 400
+      },
+      "latency_ms": {
+        "min": 1.659,
+        "avg": 10.071,
+        "p50": 8.88,
+        "p90": 17.508,
+        "p95": 21.632,
+        "p99": 26.368,
+        "max": 28.064,
+        "stddev": 5.359
+      }
+    },
+    {
+      "name": "admin_list_unauthorized",
+      "method": "GET",
+      "url": "http://127.0.0.1:18080/api/admin/site-ad-lead?page=1&pageSize=10",
+      "requests": 400,
+      "concurrency": 20,
+      "duration_seconds": 0.1167,
+      "throughput_rps": 3427.62,
+      "success_count": 0,
+      "error_count": 400,
+      "error_rate": 1.0,
+      "status_distribution": {
+        "401": 400
+      },
+      "latency_ms": {
+        "min": 0.82,
+        "avg": 5.067,
+        "p50": 4.728,
+        "p90": 8.489,
+        "p95": 10.089,
+        "p99": 11.421,
+        "max": 13.782,
+        "stddev": 2.48
+      }
+    },
+    {
+      "name": "admin_assign_authorized",
+      "method": "PUT",
+      "url": "http://127.0.0.1:18080/api/admin/site-ad-lead/SAL20260418001/assign",
+      "requests": 400,
+      "concurrency": 20,
+      "duration_seconds": 0.3639,
+      "throughput_rps": 1099.07,
+      "success_count": 400,
+      "error_count": 0,
+      "error_rate": 0.0,
+      "status_distribution": {
+        "200": 400
+      },
+      "latency_ms": {
+        "min": 1.708,
+        "avg": 17.369,
+        "p50": 17.087,
+        "p90": 24.61,
+        "p95": 27.837,
+        "p99": 32.778,
+        "max": 37.577,
+        "stddev": 5.714
+      }
+    }
+  ]
+}
