@@ -82,6 +82,7 @@ public class InMemoryFreightDetailRepository {
                   "-",
                   "-",
                   "-",
+                  "-",
                   defaultText(request.link(), "#"),
                   status,
                   request.pinned() != null && request.pinned(),
@@ -100,11 +101,12 @@ public class InMemoryFreightDetailRepository {
                   "-",
                   "-",
                   "-",
+                  defaultText(request.serviceTags(), request.content()),
+                  defaultText(request.description(), "-"),
                   "-",
                   "-",
                   "-",
                   "-",
-                  defaultText(request.content(), request.title()),
                   defaultText(request.link(), "#"),
                   status,
                   request.pinned() != null && request.pinned(),
@@ -116,7 +118,7 @@ public class InMemoryFreightDetailRepository {
                   freightId,
                   section,
                   request.title(),
-                  "-",
+                  defaultText(request.provider(), "-"),
                   defaultText(request.route(), "-"),
                   "-",
                   "-",
@@ -124,8 +126,9 @@ public class InMemoryFreightDetailRepository {
                   defaultText(request.timeliness(), "-"),
                   defaultText(request.quote(), "-"),
                   "-",
-                  "-",
+                  defaultText(request.description(), "-"),
                   defaultText(request.relatedId(), "-"),
+                  "-",
                   "-",
                   "-",
                   defaultText(request.link(), "#"),
@@ -147,8 +150,9 @@ public class InMemoryFreightDetailRepository {
                   "-",
                   "-",
                   "-",
-                  "-",
+                  defaultText(request.description(), "-"),
                   defaultText(request.relatedId(), "-"),
+                  "-",
                   "-",
                   "-",
                   defaultText(request.link(), "#"),
@@ -172,8 +176,9 @@ public class InMemoryFreightDetailRepository {
                   "-",
                   defaultText(request.description(), "-"),
                   "-",
-                  defaultText(request.provider(), "-"),
-                  defaultText(request.content(), "-"),
+                  defaultText(request.contactName(), request.provider()),
+                  defaultText(request.contactPhone(), request.content()),
+                  defaultText(request.serviceStatus(), "-"),
                   defaultText(request.link(), "#"),
                   status,
                   request.pinned() != null && request.pinned(),
@@ -194,6 +199,7 @@ public class InMemoryFreightDetailRepository {
                   "-",
                   "-",
                   defaultText(request.description(), "-"),
+                  "-",
                   "-",
                   "-",
                   "-",
@@ -358,9 +364,19 @@ public class InMemoryFreightDetailRepository {
         freightId,
         FreightDetailSectionType.MAIN,
         provider,
+        provider,
         route,
-        vehicle + "|" + loadRange + "|" + frequency + "|" + timeliness + "|" + quote,
+        vehicle,
+        loadRange,
+        frequency,
+        timeliness,
+        quote,
+        "可回单,支持夜装,北材南下稳定班次",
         desc,
+        "-",
+        "-",
+        "-",
+        "-",
         "/logistics/freight/" + freightId,
         pinned,
         minusMinutes);
@@ -372,9 +388,19 @@ public class InMemoryFreightDetailRepository {
         "FD" + freightId.substring(1) + "1" + order,
         freightId,
         FreightDetailSectionType.SERVICE_TAG,
+        "服务能力-" + order,
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
         tag,
-        order,
-        tag,
+        "-",
+        "-",
+        "-",
+        "-",
         "-",
         "#",
         pinned,
@@ -389,13 +415,24 @@ public class InMemoryFreightDetailRepository {
       String link,
       boolean pinned,
       long minusMinutes) {
+    String[] parsed = parseSubtitle(subtitle);
     addSeed(
         "FD" + freightId.substring(1) + "2" + relatedId.substring(relatedId.length() - 2),
         freightId,
         FreightDetailSectionType.RELATED_LINE,
         title,
-        subtitle,
+        title,
+        extractRoute(title),
+        "-",
+        "-",
+        "-",
+        parsed[0],
+        parsed[1],
+        "-",
+        "-",
         relatedId,
+        "-",
+        "-",
         "-",
         link,
         pinned,
@@ -415,7 +452,17 @@ public class InMemoryFreightDetailRepository {
         FreightDetailSectionType.RELATED_DEMAND,
         title,
         "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
         demandId,
+        "-",
+        "-",
         "-",
         link,
         pinned,
@@ -433,10 +480,20 @@ public class InMemoryFreightDetailRepository {
         "FD" + freightId.substring(1) + "401",
         freightId,
         FreightDetailSectionType.CONTACT,
+        "联系方式",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "登录后可查看完整联系方式并发起在线沟通。",
+        "-",
         contactName,
         contactPhone,
         serviceStatus,
-        "登录后可查看完整联系方式并发起在线沟通。",
         "#",
         pinned,
         minusMinutes);
@@ -450,7 +507,17 @@ public class InMemoryFreightDetailRepository {
         FreightDetailSectionType.AD,
         title,
         "广告",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
         content,
+        "-",
+        "-",
+        "-",
         "-",
         link,
         pinned,
@@ -474,6 +541,7 @@ public class InMemoryFreightDetailRepository {
       String relatedId,
       String contactName,
       String contactPhone,
+      String serviceStatus,
       String link,
       boolean pinned,
       long minusMinutes) {
@@ -496,11 +564,34 @@ public class InMemoryFreightDetailRepository {
             relatedId,
             contactName,
             contactPhone,
+            serviceStatus,
             link,
             STATUS_ONLINE,
             pinned,
             LocalDateTime.now().minusMinutes(minusMinutes));
     store.put(id, entity);
+  }
+
+  private String[] parseSubtitle(String subtitle) {
+    if (subtitle == null || subtitle.isBlank()) {
+      return new String[] {"-", "-"};
+    }
+    String[] parts = subtitle.split("·");
+    if (parts.length < 2) {
+      return new String[] {subtitle.trim(), "-"};
+    }
+    return new String[] {parts[0].trim(), parts[1].trim()};
+  }
+
+  private String extractRoute(String title) {
+    if (title == null || title.isBlank()) {
+      return "-";
+    }
+    int idx = title.indexOf("·");
+    if (idx < 0 || idx + 1 >= title.length()) {
+      return title.trim();
+    }
+    return title.substring(idx + 1).trim();
   }
 
   private long parseNumericId(String id) {

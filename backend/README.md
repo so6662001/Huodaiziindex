@@ -81,6 +81,21 @@ Base Path: `/api/admin/freight-detail/{id}/{section}`
   - 中台字段与交互流程确认
   - 后续接 DB/MyBatis/JPA 前的 API 冻结
 
+## 中台鉴权（已启用）
+
+- 所有 `/api/admin/**` 接口默认开启静态 Token 鉴权。
+- 请求头需携带：`X-Admin-Token: change-this-admin-token`（可在配置中修改）。
+
+配置位置（`src/main/resources/application.yml`）：
+
+```yaml
+huodaizi:
+  admin:
+    auth:
+      enabled: true
+      token: change-this-admin-token
+```
+
 ## 启动方式
 
 环境需求：

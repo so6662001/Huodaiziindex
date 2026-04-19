@@ -103,16 +103,18 @@ public class FreightDetailService {
   private FreightDetailMainDTO toMain(FreightDetailEntity entity) {
     return new FreightDetailMainDTO(
         entity.getFreightId(),
-        entity.getTitle(),
-        entity.getProvider(),
+        firstMeaningful(entity.getProvider(), entity.getTitle()),
         entity.getRoute(),
         entity.getVehicle(),
         entity.getLoadRange(),
         entity.getFrequency(),
         entity.getTimeliness(),
         entity.getQuote(),
+        entity.getDescription(),
         parseTags(entity.getServiceTags()),
-        entity.getDescription());
+        entity.getStatus(),
+        entity.isPinned(),
+        entity.getUpdatedAt().toString());
   }
 
   private FreightDetailRelatedLineDTO toRelatedLine(FreightDetailEntity entity) {
@@ -132,32 +134,27 @@ public class FreightDetailService {
 
   private FreightDetailContactDTO toContact(FreightDetailEntity entity, boolean showFullPhone) {
     String phone = entity.getContactPhone();
+    String contactName = entity.getContactName();
     if (!showFullPhone) {
       phone = maskPhone(phone);
+      contactName = maskName(contactName);
     }
     return new FreightDetailContactDTO(
-        entity.getContactName(), phone, entity.getServiceStatus(), entity.getDescription());
+        contactName, phone, entity.getServiceStatus(), entity.getDescription());
   }
 
   private FreightDetailAdminItemDTO toAdminItem(FreightDetailEntity entity) {
+    String subtitle = subtitleOf(entity);
+    String value = valueOf(entity);
+    String extra = extraOf(entity);
     return new FreightDetailAdminItemDTO(
         entity.getId(),
         entity.getFreightId(),
         entity.getSectionType().name(),
         entity.getTitle(),
-        entity.getProvider(),
-        entity.getRoute(),
-        entity.getVehicle(),
-        entity.getLoadRange(),
-        entity.getFrequency(),
-        entity.getTimeliness(),
-        entity.getQuote(),
-        entity.getServiceTags(),
-        entity.getDescription(),
-        entity.getRelatedId(),
-        entity.getContactName(),
-        entity.getContactPhone(),
-        entity.getServiceStatus(),
+        subtitle,
+        value,
+        extra,
         entity.getLink(),
         entity.getStatus(),
         entity.isPinned(),
@@ -183,5 +180,60 @@ public class FreightDetailService {
       return phone == null ? "-" : phone;
     }
     return phone.substring(0, 3) + "****" + phone.substring(phone.length() - 4);
+  }
+
+  private String maskName(String name) {
+    if (name == null || name.isBlank()) {
+      return "-";
+    }
+    if (name.length() <= 1) {
+      return "*";
+    }
+    if (name.length() == 2) {
+      return name.substring(0, 1) + "*";
+    }
+    return name.substring(0, 1) + "**";
+  }
+
+  private String subtitleOf(FreightDetailEntity entity) {
+    return switch (entity.getSectionType()) {
+      case MAIN -> firstMeaningful(entity.getRoute(), entity.getProvider());
+      case SERVICE_TAG -> "服务标签";
+      case RELATED_LINE -> firstMeaningful(entity.getRoute(), entity.getProvider());
+      case RELATED_DEMAND -> firstMeaningful(entity.getRelatedId(), "-");
+      case CONTACT -> firstMeaningful(entity.getContactName(), "-");
+      case AD -> firstMeaningful(entity.getProvider(), "-");
+    };
+  }
+
+  private String valueOf(FreightDetailEntity entity) {
+    return switch (entity.getSectionType()) {
+      case MAIN -> firstMeaningful(entity.getQuote(), "-");
+      case SERVICE_TAG -> firstMeaningful(entity.getContactPhone(), entity.getTitle());
+      case RELATED_LINE -> firstMeaningful(entity.getQuote(), "-");
+      case RELATED_DEMAND -> firstMeaningful(entity.getTitle(), "-");
+      case CONTACT -> firstMeaningful(entity.getContactPhone(), "-");
+      case AD -> firstMeaningful(entity.getDescription(), "-");
+    };
+  }
+
+  private String extraOf(FreightDetailEntity entity) {
+    return switch (entity.getSectionType()) {
+      case MAIN ->
+          firstMeaningful(
+              entity.getVehicle() + " / " + entity.getLoadRange() + " / " + entity.getTimeliness(), "-");
+      case SERVICE_TAG -> firstMeaningful(entity.getDescription(), "-");
+      case RELATED_LINE -> firstMeaningful(entity.getTimeliness(), "-");
+      case RELATED_DEMAND -> firstMeaningful(entity.getLink(), "-");
+      case CONTACT -> firstMeaningful(entity.getServiceStatus(), "-");
+      case AD -> firstMeaningful(entity.getTitle(), "-");
+    };
+  }
+
+  private String firstMeaningful(String primary, String fallback) {
+    if (primary == null || primary.isBlank()) {
+      return fallback;
+    }
+    return primary;
   }
 }
