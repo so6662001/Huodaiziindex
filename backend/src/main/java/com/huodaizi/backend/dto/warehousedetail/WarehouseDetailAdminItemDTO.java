@@ -1,0 +1,25 @@
+package com.huodaizi.backend.dto.warehousedetail;
+
+public record WarehouseDetailAdminItemDTO(
+    String id,
+    String warehouseId,
+    String section,
+    String title,
+    String city,
+    String type,
+    String capacity,
+    String throughput,
+    String capability,
+    String quote,
+    String address,
+    String workTime,
+    String serviceTags,
+    String description,
+    String relatedId,
+    String contactName,
+    String contactPhone,
+    String serviceStatus,
+    String link,
+    String status,
+    boolean pinned,
+    String updatedAt) {}
