@@ -62,7 +62,8 @@ public class LogisticsAdminController {
       @PathVariable("id") String id,
       @Valid @RequestBody LogisticsSectionUpdateRequest request) {
     if (request.pinned() == null) {
-      throw new IllegalArgumentException("pinned 不能为空");
+      throw new com.huodaizi.backend.common.BaseException(
+          com.huodaizi.backend.common.ErrorCode.BAD_REQUEST.getCode(), "pinned 不能为空");
     }
     return ApiResponse.success(logisticsService.adminPin(section, id, request.pinned()));
   }

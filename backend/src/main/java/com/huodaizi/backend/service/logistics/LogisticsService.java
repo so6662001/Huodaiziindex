@@ -39,14 +39,15 @@ public class LogisticsService {
   }
 
   public LogisticsSearchResponse search(LogisticsSearchRequest request) {
-    List<LogisticsSectionEntity> all = repository.search(request);
+    List<LogisticsSectionEntity> all =
+        repository.search(request.city(), request.type(), request.keyword());
     int page = request.safePage();
     int pageSize = request.safePageSize();
     int from = Math.max((page - 1) * pageSize, 0);
     int to = Math.min(from + pageSize, all.size());
     List<LogisticsSectionEntity> paged = from >= all.size() ? List.of() : all.subList(from, to);
     List<LogisticsSearchResultDTO> items = paged.stream().map(this::toSearchResult).toList();
-    return new LogisticsSearchResponse(items, all.size(), page, pageSize);
+    return new LogisticsSearchResponse(items, all.size());
   }
 
   public List<LogisticsSectionEntity> adminList(LogisticsSectionType section) {
@@ -65,14 +66,14 @@ public class LogisticsService {
 
   public LogisticsSectionEntity adminChangeStatus(
       LogisticsSectionType section, String id, String status) {
-    return repository.updateStatus(section, id, status);
+    return repository.changeStatus(section, id, status);
   }
 
   public LogisticsSectionEntity adminPin(LogisticsSectionType section, String id, Boolean pinned) {
     if (pinned == null) {
       throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "pinned 不能为空");
     }
-    return repository.updatePin(section, id, pinned);
+    return repository.pin(section, id, pinned);
   }
 
   public void adminDelete(LogisticsSectionType section, String id) {
@@ -101,10 +102,7 @@ public class LogisticsService {
                     e.getTitle(),
                     e.getCity(),
                     e.getSubtitle(),
-                    e.getValue(),
-                    e.getStatus(),
-                    e.isPinned(),
-                    e.getUpdatedAt().toString()))
+                    e.getValue()))
         .toList();
   }
 
@@ -117,9 +115,7 @@ public class LogisticsService {
                     e.getTitle(),
                     e.getSubtitle(),
                     valueOrFallback(e.getExtra(), "-"),
-                    e.getValue(),
-                    e.getStatus(),
-                    e.isPinned()))
+                    e.getValue()))
         .toList();
   }
 
@@ -131,7 +127,8 @@ public class LogisticsService {
                     e.getId(),
                     e.getTitle(),
                     "STORAGE",
-                    e.getStatus()))
+                    e.getCity(),
+                    e.getLink()))
         .toList();
   }
 
@@ -143,7 +140,8 @@ public class LogisticsService {
                     e.getId(),
                     e.getTitle(),
                     "TRANSPORT",
-                    e.getStatus()))
+                    e.getCity(),
+                    e.getLink()))
         .toList();
   }
 
@@ -154,17 +152,16 @@ public class LogisticsService {
   }
 
   private LogisticsWarehouseCardDTO getAdSlot() {
-    LogisticsSectionEntity ad = repository.listByType(LogisticsSectionType.AD_SLOT, true).stream().findFirst()
-        .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND.getCode(), "广告位数据为空"));
+    LogisticsSectionEntity ad =
+        repository.listByType(LogisticsSectionType.AD_SLOT, true).stream()
+            .findFirst()
+            .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND.getCode(), "广告位数据为空"));
     return new LogisticsWarehouseCardDTO(
         ad.getId(),
         ad.getTitle(),
         ad.getCity(),
         ad.getSubtitle(),
-        ad.getValue(),
-        ad.getStatus(),
-        ad.isPinned(),
-        ad.getUpdatedAt().toString());
+        ad.getValue());
   }
 
   private LogisticsSearchResultDTO toSearchResult(LogisticsSectionEntity entity) {
@@ -173,7 +170,9 @@ public class LogisticsService {
         entity.getType().name(),
         entity.getTitle(),
         entity.getCity(),
-        entity.getSubtitle(),
+        valueOrFallback(entity.getSubtitle(), entity.getContent()),
+        valueOrFallback(entity.getValue(), "-"),
+        valueOrFallback(entity.getLink(), "#"),
         entity.getStatus(),
         entity.getUpdatedAt().toString());
   }

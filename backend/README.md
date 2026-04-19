@@ -228,6 +228,9 @@ Base Path: `/api/v1/freight`
 
 Base Path: `/api/admin/freight`
 
+> 安全要求：所有 `/api/admin/**` 接口必须携带请求头  
+> `X-Admin-Token: <token>`
+
 - `GET /`
   - 中台车线列表（含上架/下架记录）
 - `POST /`

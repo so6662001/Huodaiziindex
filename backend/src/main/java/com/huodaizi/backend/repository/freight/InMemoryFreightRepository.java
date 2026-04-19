@@ -56,7 +56,7 @@ public class InMemoryFreightRepository {
                 vehicleType.isBlank()
                     || "全部车型".equals(vehicleType)
                     || normalize(item.getVehicleType()).contains(vehicleType))
-        .filter(item -> matchTimeliness(item.getTimeliness(), timeliness))
+        .filter(item -> matchTimeliness(toTimelinessText(item.getTimelinessHours()), timeliness))
         .filter(
             item ->
                 returnTruck.isBlank()
@@ -103,8 +103,8 @@ public class InMemoryFreightRepository {
             request.loadRange(),
             request.frequency(),
             request.timelinessHours(),
-            request.price(),
             request.returnTruck() != null && request.returnTruck(),
+            request.price(),
             defaultText(request.contactName(), "未公开"),
             maskPhone(request.contactPhone()),
             STATUS_ONLINE,
@@ -130,8 +130,8 @@ public class InMemoryFreightRepository {
         request.loadRange(),
         request.frequency(),
         request.timelinessHours(),
-        request.price(),
         request.returnTruck(),
+        request.price(),
         request.contactName(),
         maskedPhone,
         normalizedStatus,
@@ -228,6 +228,13 @@ public class InMemoryFreightRepository {
     }
   }
 
+  private String toTimelinessText(Integer hours) {
+    if (hours == null || hours <= 0) {
+      return "";
+    }
+    return hours + "小时";
+  }
+
   private void seed() {
     addSeed(
         "F20260418001",
@@ -322,8 +329,8 @@ public class InMemoryFreightRepository {
             loadRange,
             frequency,
             timelinessHours,
-            price,
             returnTruck,
+            price,
             contactName,
             maskPhone(contactPhone),
             status,

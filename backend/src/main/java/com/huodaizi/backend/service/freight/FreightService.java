@@ -82,7 +82,7 @@ public class FreightService {
         entity.getVehicleType(),
         entity.getLoadRange(),
         entity.getFrequency(),
-        entity.getTimeliness(),
+        entity.getTimelinessHours() == null ? "-" : entity.getTimelinessHours() + "小时",
         entity.isReturnTruck() ? "有回程车" : "无回程车",
         entity.getPrice(),
         entity.getContactPhone(),
