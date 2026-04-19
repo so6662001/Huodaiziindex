@@ -54,6 +54,12 @@ import com.huodaizi.backend.dto.inquiry.InquiryBillingOrderListResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryBillingOrderDetailResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryBillingOrderPaymentRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryBillingOrderPaymentResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryDispatchScoreRuleBonusItemDTO;
+import com.huodaizi.backend.dto.inquiry.InquiryDispatchScoreRuleCaseItemDTO;
+import com.huodaizi.backend.dto.inquiry.InquiryDispatchScoreRuleDimensionDTO;
+import com.huodaizi.backend.dto.inquiry.InquiryDispatchScoreRulePenaltyItemDTO;
+import com.huodaizi.backend.dto.inquiry.InquiryDispatchScoreRuleRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryDispatchScoreRuleResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchBatchUpdateRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchOverviewRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchOverviewResponse;
@@ -73,6 +79,7 @@ import com.huodaizi.backend.repository.inquiry.InquiryReconcileOrderEntity;
 import com.huodaizi.backend.repository.inquiry.InquiryQuoteCompareEntity;
 import com.huodaizi.backend.repository.inquiry.InquirySubscriptionPlanEntity;
 import com.huodaizi.backend.repository.inquiry.InquiryBillingOrderEntity;
+import com.huodaizi.backend.repository.inquiry.InquiryDispatchScoreRuleEntity;
 import java.math.BigDecimal;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -548,6 +555,57 @@ public class InquiryService {
         "回款登记成功，当前状态：" + billingStatusText(entity.getStatus()));
   }
 
+  public InquiryDispatchScoreRuleResponse dispatchScoreRules(InquiryDispatchScoreRuleRequest request) {
+    InquiryDispatchScoreRuleEntity entity = repository.dispatchScoreRule(request);
+    return new InquiryDispatchScoreRuleResponse(
+        "-",
+        entity.getRuleVersion(),
+        entity.getSceneName(),
+        "0-100",
+        entity.getScoreFormula(),
+        "按公开维度计算，平台每周滚动更新，付费因素仅做小幅加成",
+        entity.getDimensions().stream()
+            .map(
+                item ->
+                    new InquiryDispatchScoreRuleDimensionDTO(
+                        item.code(),
+                        item.name(),
+                        item.weight(),
+                        item.desc(),
+                        item.scoreMethod(),
+                        item.dataSource()))
+            .toList(),
+        entity.getBonuses().stream()
+            .map(
+                item ->
+                    new InquiryDispatchScoreRuleBonusItemDTO(
+                        item.code(),
+                        item.name(),
+                        "BONUS",
+                        parseScoreImpact(item.scoreChange()),
+                        item.trigger(),
+                        item.cap()))
+            .toList(),
+        entity.getPenalties().stream()
+            .map(
+                item ->
+                    new InquiryDispatchScoreRulePenaltyItemDTO(
+                        item.code(), item.name(), item.scoreChange(), item.trigger(), item.recovery()))
+            .toList(),
+        entity.getCases().stream()
+            .map(
+                item ->
+                    new InquiryDispatchScoreRuleCaseItemDTO(
+                        item.merchantName(),
+                        "线索分发",
+                        item.score(),
+                        item.score(),
+                        item.level(),
+                        item.explanation()))
+            .toList(),
+        entity.getUpdatedAt().toString());
+  }
+
   public InquiryMerchantLeadDetailResponse merchantLeadDetail(
       String leadId, InquiryMerchantLeadListRequest request) {
     InquiryMerchantLeadEntity lead = repository.merchantLeadDetail(leadId, request.merchantId());
@@ -870,6 +928,18 @@ public class InquiryService {
       case "OVERDUE" -> "已逾期";
       default -> normalized;
     };
+  }
+
+  private int parseScoreImpact(String scoreChange) {
+    if (scoreChange == null || scoreChange.isBlank()) {
+      return 0;
+    }
+    String normalized = scoreChange.replace("+", "").trim();
+    try {
+      return Integer.parseInt(normalized);
+    } catch (NumberFormatException ex) {
+      return 0;
+    }
   }
 
   private String toMoney(BigDecimal value) {

@@ -9,6 +9,7 @@ import InquiryReconcilePassPage from '../pages/InquiryReconcilePassPage.vue'
 import InquiryMerchantCreditScorePage from '../pages/InquiryMerchantCreditScorePage.vue'
 import InquirySubscriptionPage from '../pages/InquirySubscriptionPage.vue'
 import InquiryBillingPage from '../pages/InquiryBillingPage.vue'
+import InquiryDispatchScoreRulePage from '../pages/InquiryDispatchScoreRulePage.vue'
 import InquiryMerchantLeadManagePage from '../pages/InquiryMerchantLeadManagePage.vue'
 import InquiryQuoteWorkbenchPage from '../pages/InquiryQuoteWorkbenchPage.vue'
 import SiteAdLeadMinePage from '../pages/SiteAdLeadMinePage.vue'
@@ -93,6 +94,14 @@ const routes = [
     component: InquiryBillingPage,
     meta: {
       title: 'P12计费与账单页_账单管理与回款登记-货袋子'
+    }
+  },
+  {
+    path: '/dispatch/score-rules',
+    name: 'dispatchScoreRules',
+    component: InquiryDispatchScoreRulePage,
+    meta: {
+      title: 'P13分发评分规则公开页_公开透明规则说明-货袋子'
     }
   },
   {

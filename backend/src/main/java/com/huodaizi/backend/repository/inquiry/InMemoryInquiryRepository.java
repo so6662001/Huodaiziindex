@@ -27,6 +27,7 @@ import com.huodaizi.backend.dto.inquiry.InquiryReconcileOrderStatusUpdateRequest
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchBatchUpdateRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchOverviewRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchTaskRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryDispatchScoreRuleRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryStatus;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -60,6 +61,8 @@ public class InMemoryInquiryRepository {
   private final ConcurrentMap<String, InquiryMerchantSubscriptionEntity> merchantSubscriptionStore =
       new ConcurrentHashMap<>();
   private final ConcurrentMap<String, InquiryBillingOrderEntity> billingOrderStore = new ConcurrentHashMap<>();
+  private final ConcurrentMap<String, InquiryDispatchScoreRuleEntity> dispatchRuleStore =
+      new ConcurrentHashMap<>();
   private final ConcurrentMap<String, InquiryPickupOrderEntity> pickupOrderStore = new ConcurrentHashMap<>();
   private final ConcurrentMap<String, InquiryReconcileOrderEntity> reconcileOrderStore =
       new ConcurrentHashMap<>();
@@ -352,6 +355,15 @@ public class InMemoryInquiryRepository {
             .collect(Collectors.joining(" | "));
     entity.registerPayment(
         status, toMoney(paidAfter), toMoney(unpaidAfter), LocalDateTime.now().toString(), remark);
+    return entity;
+  }
+
+  public InquiryDispatchScoreRuleEntity dispatchScoreRule(InquiryDispatchScoreRuleRequest request) {
+    String scene = defaultText(request.sceneCode(), "MERCHANT_LEAD").trim().toUpperCase(Locale.ROOT);
+    InquiryDispatchScoreRuleEntity entity = dispatchRuleStore.get(scene);
+    if (entity == null) {
+      throw new BaseException(ErrorCode.NOT_FOUND.getCode(), "分发评分规则不存在");
+    }
     return entity;
   }
 
@@ -857,6 +869,7 @@ public class InMemoryInquiryRepository {
     seedSubscriptionPlans();
     seedMerchantSubscriptions();
     seedBillingOrders();
+    seedDispatchScoreRules();
   }
 
   private void seedMerchantLeads(InquiryEntity inquiry1, InquiryEntity inquiry2) {
@@ -1095,6 +1108,67 @@ public class InMemoryInquiryRepository {
             createBillingOrderForSubscription(subscription, subscription.getCreatedAt().plusHours(1), "系统初始化");
           }
         });
+  }
+
+  private void seedDispatchScoreRules() {
+    dispatchRuleStore.put(
+        "MERCHANT_LEAD",
+        new InquiryDispatchScoreRuleEntity(
+            "MERCHANT_LEAD",
+            "线索分发评分规则",
+            "v2026.04",
+            "对全部商家公开评分维度与增减分标准，付费仅做小权重加成。",
+            "每周滚动更新",
+            "付费因素仅作为小权重加成",
+            List.of(
+                new InquiryDispatchScoreRuleEntity.DimensionEntity(
+                    "FULFILLMENT", "履约稳定性", 35, "按近90天按时交付率、拒单率综合评估", "正向", "最高权重，体现稳定履约能力"),
+                new InquiryDispatchScoreRuleEntity.DimensionEntity(
+                    "RESPONSE", "响应时效", 25, "按首次报价响应时长和客服响应时长评估", "正向", "鼓励分钟级响应"),
+                new InquiryDispatchScoreRuleEntity.DimensionEntity(
+                    "PRICE_COMP", "报价竞争力", 20, "对同规格询价的报价偏离中位值进行评估", "正向", "不过度奖励极端低价"),
+                new InquiryDispatchScoreRuleEntity.DimensionEntity(
+                    "DISPUTE", "纠纷率", 15, "按争议单占比和结案时长反向计分", "负向", "纠纷越多分数越低"),
+                new InquiryDispatchScoreRuleEntity.DimensionEntity(
+                    "DATA_QUALITY", "数据完整性", 5, "按提货单、回单、对账凭证完整度计分", "正向", "鼓励数据留痕")),
+            List.of(
+                new InquiryDispatchScoreRuleEntity.BonusEntity(
+                    "B01", "连续30天0纠纷", "+3", "自然月内新增订单无争议且无超时工单", "每月最多加1次"),
+                new InquiryDispatchScoreRuleEntity.BonusEntity(
+                    "B02", "T+1完成回单上传", "+2", "签收后1个工作日内上传完整回单", "每周最多加2次"),
+                new InquiryDispatchScoreRuleEntity.BonusEntity(
+                    "B03", "高峰时段极速响应", "+1", "工作日09:00-18:00平均响应≤8分钟", "按周滚动评估")),
+            List.of(
+                new InquiryDispatchScoreRuleEntity.PenaltyEntity(
+                    "P01", "超时未报价", "-5", "有效线索30分钟未响应或未报价", "同一线索仅扣一次"),
+                new InquiryDispatchScoreRuleEntity.PenaltyEntity(
+                    "P02", "履约违约", "-8", "确认成交后拒发货/无故延迟交付", "严重场景可触发冻结"),
+                new InquiryDispatchScoreRuleEntity.PenaltyEntity(
+                    "P03", "数据缺失", "-2", "提货单或对账凭证关键字段缺失", "按单扣分")),
+            List.of(
+                new InquiryDispatchScoreRuleEntity.CaseEntity(
+                    "S001",
+                    "唐山弘达钢贸",
+                    "91",
+                    "TOP 18%",
+                    "履约与响应领先，获得优先线索分发"),
+                new InquiryDispatchScoreRuleEntity.CaseEntity(
+                    "S002",
+                    "无锡铭泰供应链",
+                    "87",
+                    "TOP 27%",
+                    "纠纷率下降后分发量逐周提升"),
+                new InquiryDispatchScoreRuleEntity.CaseEntity(
+                    "S003",
+                    "郑州鑫诚贸易",
+                    "79",
+                    "TOP 46%",
+                    "因多次超时报价，分发优先级下降")),
+            List.of(
+                "平台公开维度、权重方向与典型增减分场景，确保分发规则透明。",
+                "付费服务不改变核心履约与风控权重，最多提供小幅加权。",
+                "若发现数据异常或申诉场景，平台将在核验后回溯修正。"),
+            LocalDateTime.now().minusHours(2)));
   }
 
   private String maskPhone(String phone) {

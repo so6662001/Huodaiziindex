@@ -24,6 +24,8 @@ import com.huodaizi.backend.dto.inquiry.InquiryBillingOrderListRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryBillingOrderListResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryBillingOrderPaymentRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryBillingOrderPaymentResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryDispatchScoreRuleRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryDispatchScoreRuleResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryListRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryListResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryMerchantLeadDetailResponse;
@@ -202,6 +204,12 @@ public class InquiryController {
       @PathVariable("billingOrderId") String billingOrderId,
       @Valid @RequestBody InquiryBillingOrderPaymentRequest request) {
     return ApiResponse.success(service.billingOrderPay(billingOrderId, request));
+  }
+
+  @GetMapping("/dispatch/score-rules")
+  public ApiResponse<InquiryDispatchScoreRuleResponse> dispatchScoreRules(
+      @Valid @ModelAttribute InquiryDispatchScoreRuleRequest request) {
+    return ApiResponse.success(service.dispatchScoreRules(request));
   }
 
   @GetMapping("/merchant/leads/{leadId}")
