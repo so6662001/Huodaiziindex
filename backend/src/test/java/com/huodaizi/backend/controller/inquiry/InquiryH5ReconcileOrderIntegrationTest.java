@@ -88,8 +88,8 @@ class InquiryH5ReconcileOrderIntegrationTest {
                 .param("contactMobile", "13800138000"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.code").value("0"))
-        .andExpect(jsonPath("$.data.reconcileId").value(reconcileId))
-        .andExpect(jsonPath("$.data.goodsSummary").isNotEmpty());
+        .andExpect(jsonPath("$.data.order.reconcileId").value(reconcileId))
+        .andExpect(jsonPath("$.data.order.goodsSummary").isNotEmpty());
 
     String quickStatusPayload =
         """

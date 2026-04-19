@@ -1141,7 +1141,7 @@ public class InquiryService {
     return new InquiryH5ReconcileOrderCreateResponse(
         created.reconcileId(),
         created.reconcileNo(),
-        created.pickupOrderId(),
+        created.pickupId(),
         created.status(),
         reconcileStatusText(InquiryReconcileOrderStatus.valueOf(created.status())),
         "/h5/reconcile-orders?contactMobile=" + request.contactMobile().trim(),
@@ -1212,7 +1212,6 @@ public class InquiryService {
         updated.order().reconcileId(),
         updated.order().status(),
         updated.order().statusText(),
-        updated.order().updatedAt(),
         "对账单状态已更新");
   }
 
