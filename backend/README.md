@@ -193,6 +193,9 @@ Base Path: `/api/v1/warehouse`
 
 Base Path: `/api/admin/warehouse`
 
+> 安全要求：所有 `/api/admin/**` 接口必须携带请求头  
+> `X-Admin-Token: <token>`
+
 - `GET /`
   - 中台仓库列表（含上架/下架记录）
 - `POST /`
@@ -240,6 +243,25 @@ Base Path: `/api/admin/warehouse`
   - P01 接口联调
   - 中台字段与交互流程确认
   - 后续接 DB/MyBatis/JPA 前的 API 冻结
+
+## 中台鉴权配置（审计后）
+
+`application.yml`：
+
+```yaml
+huodaizi:
+  admin:
+    auth:
+      enabled: true
+      token: change-this-admin-token
+```
+
+请求示例：
+
+```http
+GET /api/admin/warehouse
+X-Admin-Token: change-this-admin-token
+```
 
 ## 启动方式
 

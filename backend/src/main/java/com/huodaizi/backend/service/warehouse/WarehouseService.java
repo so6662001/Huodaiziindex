@@ -11,6 +11,7 @@ import com.huodaizi.backend.dto.warehouse.WarehousePublishRequest;
 import com.huodaizi.backend.repository.warehouse.InMemoryWarehouseRepository;
 import com.huodaizi.backend.repository.warehouse.WarehouseEntity;
 import java.util.List;
+import java.util.regex.Pattern;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -81,10 +82,22 @@ public class WarehouseService {
         entity.getCapacity(),
         entity.getThroughput(),
         entity.getCapability(),
-        entity.getCategories(),
+        parseCategories(entity.getCategories()),
         entity.getPrice(),
+        entity.getContactPhone(),
         entity.getStatus(),
         entity.isPinned(),
         entity.getUpdatedAt().toString());
+  }
+
+  private List<String> parseCategories(String categories) {
+    if (categories == null || categories.isBlank()) {
+      return List.of();
+    }
+    return Pattern.compile("[,，/|]")
+        .splitAsStream(categories)
+        .map(String::trim)
+        .filter(v -> !v.isBlank())
+        .toList();
   }
 }
