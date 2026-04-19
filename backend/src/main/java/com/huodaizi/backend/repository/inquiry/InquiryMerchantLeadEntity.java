@@ -25,6 +25,7 @@ public class InquiryMerchantLeadEntity {
   private String responseMinutes;
   private String paymentTerm;
   private String quoteRemark;
+  private String owner;
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
 
@@ -50,6 +51,7 @@ public class InquiryMerchantLeadEntity {
       String responseMinutes,
       String paymentTerm,
       String quoteRemark,
+      String owner,
       LocalDateTime createdAt,
       LocalDateTime updatedAt) {
     this.id = id;
@@ -75,6 +77,7 @@ public class InquiryMerchantLeadEntity {
     this.responseMinutes = responseMinutes;
     this.paymentTerm = paymentTerm;
     this.quoteRemark = quoteRemark;
+    this.owner = owner;
   }
 
   public String getId() {
@@ -165,6 +168,10 @@ public class InquiryMerchantLeadEntity {
     return quoteRemark;
   }
 
+  public String getOwner() {
+    return owner;
+  }
+
   public LocalDateTime getUpdatedAt() {
     return updatedAt;
   }
@@ -196,5 +203,12 @@ public class InquiryMerchantLeadEntity {
       this.quoteRemark = remark.trim();
     }
     this.updatedAt = LocalDateTime.now();
+  }
+
+  public void assignOwner(String owner) {
+    if (owner != null && !owner.isBlank()) {
+      this.owner = owner.trim();
+      this.updatedAt = LocalDateTime.now();
+    }
   }
 }

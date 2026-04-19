@@ -251,6 +251,41 @@ public class InMemoryInquiryRepository {
     return entity;
   }
 
+  public InquiryMerchantLeadEntity adminMerchantLeadAssign(
+      String leadId, String ownerName, String note, String operator) {
+    InquiryMerchantLeadEntity entity = requireMerchantLead(leadId);
+    String owner = defaultText(ownerName, "").trim();
+    if (owner.isEmpty()) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "ownerName 不能为空");
+    }
+    String assignNote = "A02分配[" + defaultText(operator, "SYSTEM").trim() + "] " + owner;
+    if (note != null && !note.isBlank()) {
+      assignNote = assignNote + " | " + note.trim();
+    }
+    entity.assignOwner(owner);
+    entity.updateStatus(
+        entity.getStatus() == InquiryMerchantLeadStatus.NEW ? InquiryMerchantLeadStatus.FOLLOWING : entity.getStatus(),
+        assignNote);
+    return entity;
+  }
+
+  public InquiryMerchantLeadEntity adminMerchantLeadFollow(
+      String leadId, String content, String nextActionAt, String operator) {
+    InquiryMerchantLeadEntity entity = requireMerchantLead(leadId);
+    String follow = defaultText(content, "").trim();
+    if (follow.isBlank()) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "content 不能为空");
+    }
+    String message = "A02跟进[" + defaultText(operator, "SYSTEM").trim() + "] " + follow;
+    if (nextActionAt != null && !nextActionAt.isBlank()) {
+      message = message + " -> " + nextActionAt.trim();
+    }
+    entity.updateStatus(
+        entity.getStatus() == InquiryMerchantLeadStatus.NEW ? InquiryMerchantLeadStatus.FOLLOWING : entity.getStatus(),
+        message);
+    return entity;
+  }
+
   public InquiryMerchantCreditScoreEntity merchantCreditScore(InquiryMerchantCreditScoreRequest request) {
     String merchantId = defaultText(request.merchantId(), "").trim();
     if (merchantId.isEmpty()) {
@@ -1250,6 +1285,7 @@ public class InMemoryInquiryRepository {
             "",
             "",
             "",
+            "系统分配",
             LocalDateTime.now().minusHours(5),
             LocalDateTime.now().minusHours(5));
     InquiryMerchantLeadEntity b =
@@ -1275,6 +1311,7 @@ public class InMemoryInquiryRepository {
             "",
             "",
             "",
+            "系统分配",
             LocalDateTime.now().minusHours(4),
             LocalDateTime.now().minusHours(2));
     b.updateQuote("3490", "418800", "2", "月结30天", "按期到厂");
@@ -1301,6 +1338,7 @@ public class InMemoryInquiryRepository {
             "",
             "",
             "",
+            "系统分配",
             LocalDateTime.now().minusHours(6),
             LocalDateTime.now().minusHours(3));
     merchantLeadStore.put(a.getId(), a);

@@ -80,7 +80,7 @@ public class InMemorySiteAdLeadRepository {
     String keyword = normalize(request.keyword());
     return store.values().stream()
         .filter(item -> status == null || item.getStatus() == status)
-        .filter(item -> phone == null || normalizePhone(item.getContactPhone()).contains(phone))
+        .filter(item -> phone == null || normalizePhone(item.getContactPhone()).startsWith(phone))
         .filter(
             item ->
                 keyword == null
@@ -124,6 +124,22 @@ public class InMemorySiteAdLeadRepository {
       throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "content 不能为空");
     }
     appendFollow(entity, operator, "FOLLOW_UP", content, request.nextAction());
+    return entity;
+  }
+
+  public SiteAdLeadEntity adminAppendFollow(
+      String id, String content, String nextAction, String operator, String action) {
+    SiteAdLeadEntity entity = requireById(id);
+    String normalizedContent = defaultText(content, "").trim();
+    if (normalizedContent.isEmpty()) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "content 不能为空");
+    }
+    appendFollow(
+        entity,
+        defaultText(operator, "SYSTEM"),
+        defaultText(action, "FOLLOW_UP"),
+        normalizedContent,
+        defaultText(nextAction, ""));
     return entity;
   }
 
