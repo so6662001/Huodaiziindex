@@ -1,6 +1,8 @@
 package com.huodaizi.backend.controller.logistics;
 
 import com.huodaizi.backend.common.ApiResponse;
+import com.huodaizi.backend.common.BaseException;
+import com.huodaizi.backend.common.ErrorCode;
 import com.huodaizi.backend.dto.logistics.LogisticsAdminCreateRequest;
 import com.huodaizi.backend.dto.logistics.LogisticsSectionUpdateRequest;
 import com.huodaizi.backend.repository.logistics.LogisticsSectionEntity;
@@ -62,7 +64,7 @@ public class LogisticsAdminController {
       @PathVariable("id") String id,
       @Valid @RequestBody LogisticsSectionUpdateRequest request) {
     if (request.pinned() == null) {
-      throw new IllegalArgumentException("pinned 不能为空");
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "pinned 不能为空");
     }
     return ApiResponse.success(logisticsService.adminPin(section, id, request.pinned()));
   }

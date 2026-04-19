@@ -149,6 +149,9 @@ Base Path: `/api/v1/logistics`
 
 Base Path: `/api/admin/logistics`
 
+> 安全要求：所有 `/api/admin/**` 接口必须携带请求头  
+> `X-Admin-Token: <token>`
+
 - `GET /{section}`
   - 按板块查询中台列表
 - `POST /{section}`
@@ -217,6 +220,21 @@ Base Path: `/api/admin/logistics`
 cd backend
 mvn spring-boot:run
 ```
+
+## 中台鉴权配置
+
+`application.yml`：
+
+```yaml
+huodaizi:
+  admin:
+    auth:
+      enabled: true
+      token: change-this-admin-token
+```
+
+- 默认启用中台鉴权
+- 请求中台接口需携带：`X-Admin-Token: change-this-admin-token`
 
 ## 后续建议（下一阶段）
 

@@ -7,6 +7,8 @@ public record AdminCreateRequest(
     @NotBlank(message = "name 不能为空")
     @Size(max = 120, message = "name 最大长度120")
     String name,
+    @Size(max = 120, message = "title 最大长度120")
+    String title,
     @NotBlank(message = "content 不能为空")
     @Size(max = 1000, message = "content 最大长度1000")
     String content,
