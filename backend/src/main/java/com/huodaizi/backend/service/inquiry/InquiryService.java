@@ -2,6 +2,10 @@ package com.huodaizi.backend.service.inquiry;
 
 import com.huodaizi.backend.dto.inquiry.InquiryCreateRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryCreateResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryDealConfirmPreviewRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryDealConfirmPreviewResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryDealConfirmSubmitRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryDealConfirmSubmitResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryItemDTO;
 import com.huodaizi.backend.dto.inquiry.InquiryListRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryListResponse;
@@ -127,6 +131,55 @@ public class InquiryService {
         quoteCount,
         nextSteps,
         "/inquiry/compare?inquiryId=" + inquiry.getId());
+  }
+
+  public InquiryDealConfirmPreviewResponse dealConfirmPreview(InquiryDealConfirmPreviewRequest request) {
+    InquiryEntity inquiry = repository.getById(request.inquiryId().trim());
+    if (!inquiry.getContactMobile().equals(request.contactMobile().trim())) {
+      throw new com.huodaizi.backend.common.BaseException(
+          com.huodaizi.backend.common.ErrorCode.NOT_FOUND.getCode(), "询价单不存在");
+    }
+    InquiryQuoteCompareEntity quote =
+        repository.getQuoteById(request.inquiryId().trim(), request.quoteId().trim());
+    return new InquiryDealConfirmPreviewResponse(
+        inquiry.getId(),
+        inquiry.getInquiryNo(),
+        quote.getQuoteId(),
+        quote.getSupplierId(),
+        quote.getSupplierName(),
+        inquiry.getSpecText(),
+        inquiry.getDemandQtyTon(),
+        inquiry.getDeliveryCity(),
+        quote.getPricePerTon(),
+        quote.getTotalAmount(),
+        quote.getPaymentTerm(),
+        quote.getDeliveryDays(),
+        inquiry.getExpectedDeliveryAt(),
+        inquiry.getInvoiceNeed(),
+        "确认后不可撤销，请核对价格、票据与交期");
+  }
+
+  public InquiryDealConfirmSubmitResponse dealConfirmSubmit(InquiryDealConfirmSubmitRequest request) {
+    InquiryQuoteCompareEntity quote =
+        repository.confirmDeal(
+            request.inquiryId().trim(),
+            request.quoteId().trim(),
+            request.contactMobile().trim(),
+            request.buyerCompany() == null ? "" : request.buyerCompany().trim(),
+            request.buyerContact() == null ? "" : request.buyerContact().trim(),
+            request.buyerPhone() == null ? "" : request.buyerPhone().trim(),
+            request.expectedSignDate() == null ? "" : request.expectedSignDate().trim(),
+            request.remark() == null ? "" : request.remark().trim());
+    InquiryEntity inquiry = repository.getById(request.inquiryId().trim());
+    return new InquiryDealConfirmSubmitResponse(
+        inquiry.getId(),
+        inquiry.getInquiryNo(),
+        quote.getQuoteId(),
+        inquiry.getStatus().name(),
+        quote.getSupplierId(),
+        quote.getSupplierName(),
+        quote.getTotalAmount(),
+        "成交确认成功，平台将推进履约交付");
   }
 
   private InquiryItemDTO toItem(InquiryEntity entity) {

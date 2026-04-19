@@ -1,8 +1,9 @@
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
 const route = useRoute()
+const router = useRouter()
 
 const loading = ref(false)
 const errorMsg = ref('')
@@ -23,7 +24,7 @@ const filters = reactive({
   contactMobile: '',
   deliveryCycle: '',
   invoiceType: '',
-  sortBy: 'LANDED_PRICE'
+  sortBy: 'TOTAL_PRICE'
 })
 
 const totalPages = computed(() => Math.max(Math.ceil(pager.total / pager.pageSize), 1))
@@ -47,7 +48,7 @@ async function queryCompare() {
     if (json.code !== '0') {
       throw new Error(json.message || '查询报价对比失败')
     }
-    list.value = json.data.items || []
+    list.value = json.data.quotes || []
     summary.inquiryNo = json.data.inquiryNo || ''
     summary.specText = json.data.specText || ''
     summary.demandQtyTon = json.data.demandQtyTon || ''
@@ -82,6 +83,17 @@ function quoteRate(item) {
   return `${unit.toFixed(2)} / 吨`
 }
 
+function goDealConfirm(item) {
+  if (!item?.quoteId || !filters.inquiryId.trim() || !filters.contactMobile.trim()) {
+    return
+  }
+  const params = new URLSearchParams()
+  params.set('inquiryId', filters.inquiryId.trim())
+  params.set('quoteId', item.quoteId)
+  params.set('contactMobile', filters.contactMobile.trim())
+  router.push(`/inquiry/deal/confirm?${params.toString()}`)
+}
+
 onMounted(() => {
   const inquiryId = String(route.query.inquiryId || '').trim()
   const contactMobile = String(route.query.contactMobile || '').trim()
@@ -114,11 +126,11 @@ onMounted(() => {
         <label>
           排序字段
           <select v-model="filters.sortBy">
-            <option value="LANDED_PRICE">到岸单价</option>
-            <option value="DELIVERY_DAYS">交付天数</option>
+            <option value="TOTAL_PRICE">总价</option>
+            <option value="UNIT_PRICE">单价</option>
+            <option value="DELIVERY_HOURS">交付天数</option>
             <option value="RESPONSE_MINUTES">响应时长</option>
             <option value="SUPPLIER_SCORE">商家评分</option>
-            <option value="QUOTE_TIME">报价时间</option>
           </select>
         </label>
         <label>
@@ -178,7 +190,7 @@ onMounted(() => {
               <td>
                 <div class="supplier">
                   <strong>{{ item.supplierName }}</strong>
-                  <span>{{ item.inventoryLocation }}</span>
+                  <span>{{ item.supplierCity }}</span>
                 </div>
               </td>
               <td>{{ item.supplierLevel }}</td>
@@ -192,6 +204,9 @@ onMounted(() => {
               <td>{{ item.canInvoice }}</td>
               <td>{{ item.canFreight }}</td>
               <td>{{ item.paymentTerm }}</td>
+              <td>
+                <button class="btn primary small" @click="goDealConfirm(item)">确认成交</button>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -266,6 +281,10 @@ select {
   border-color: #f57c00;
   background: #f57c00;
   color: #fff;
+}
+.btn.small {
+  padding: 6px 10px;
+  font-size: 12px;
 }
 .tip {
   color: #4b5563;

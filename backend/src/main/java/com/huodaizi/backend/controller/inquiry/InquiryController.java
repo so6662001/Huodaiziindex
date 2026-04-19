@@ -3,6 +3,10 @@ package com.huodaizi.backend.controller.inquiry;
 import com.huodaizi.backend.common.ApiResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryCreateRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryCreateResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryDealConfirmPreviewRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryDealConfirmPreviewResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryDealConfirmSubmitRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryDealConfirmSubmitResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryListRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryListResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryMerchantLeadDetailResponse;
@@ -54,6 +58,18 @@ public class InquiryController {
   @GetMapping("/compare")
   public ApiResponse<InquiryQuoteCompareResponse> compare(@Valid @ModelAttribute InquiryQuoteCompareRequest request) {
     return ApiResponse.success(service.compareQuotes(request));
+  }
+
+  @GetMapping("/deal/preview")
+  public ApiResponse<InquiryDealConfirmPreviewResponse> dealPreview(
+      @Valid @ModelAttribute InquiryDealConfirmPreviewRequest request) {
+    return ApiResponse.success(service.dealConfirmPreview(request));
+  }
+
+  @PostMapping("/deal/confirm")
+  public ApiResponse<InquiryDealConfirmSubmitResponse> dealConfirm(
+      @Valid @RequestBody InquiryDealConfirmSubmitRequest request) {
+    return ApiResponse.success(service.dealConfirmSubmit(request));
   }
 
   @GetMapping("/success")

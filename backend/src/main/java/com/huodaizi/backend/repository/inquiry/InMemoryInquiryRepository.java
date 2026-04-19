@@ -244,6 +244,33 @@ public class InMemoryInquiryRepository {
     return entity;
   }
 
+  public InquiryQuoteCompareEntity getQuoteById(String inquiryId, String quoteId) {
+    getById(inquiryId);
+    return quoteStore.getOrDefault(inquiryId, List.of()).stream()
+        .filter(item -> item.getQuoteId().equals(quoteId))
+        .findFirst()
+        .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND.getCode(), "报价不存在"));
+  }
+
+  public InquiryQuoteCompareEntity confirmDeal(
+      String inquiryId,
+      String quoteId,
+      String contactMobile,
+      String buyerCompany,
+      String buyerContact,
+      String buyerPhone,
+      String expectedSignAt,
+      String remark) {
+    InquiryEntity inquiry = getById(inquiryId);
+    String normalizedMobile = normalizePhone(contactMobile);
+    if (!normalizePhone(inquiry.getContactMobile()).equals(normalizedMobile)) {
+      throw new BaseException(ErrorCode.NOT_FOUND.getCode(), "询价单不存在");
+    }
+    InquiryQuoteCompareEntity quote = getQuoteById(inquiryId, quoteId);
+    inquiry.setStatus(InquiryStatus.DEAL_DONE);
+    return quote;
+  }
+
   private String defaultText(String text, String fallback) {
     return text == null || text.isBlank() ? fallback : text.trim();
   }
