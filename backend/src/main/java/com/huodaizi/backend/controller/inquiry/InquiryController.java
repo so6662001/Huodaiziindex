@@ -7,6 +7,12 @@ import com.huodaizi.backend.dto.inquiry.InquiryDealConfirmPreviewRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryDealConfirmPreviewResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryDealConfirmSubmitRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryDealConfirmSubmitResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryPickupOrderCreateRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryPickupOrderCreateResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryPickupOrderDetailResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryPickupOrderListRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryPickupOrderListResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryPickupOrderStatusUpdateRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryListRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryListResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryMerchantLeadDetailResponse;
@@ -70,6 +76,32 @@ public class InquiryController {
   public ApiResponse<InquiryDealConfirmSubmitResponse> dealConfirm(
       @Valid @RequestBody InquiryDealConfirmSubmitRequest request) {
     return ApiResponse.success(service.dealConfirmSubmit(request));
+  }
+
+  @PostMapping("/pickup-orders")
+  public ApiResponse<InquiryPickupOrderCreateResponse> createPickupOrder(
+      @Valid @RequestBody InquiryPickupOrderCreateRequest request) {
+    return ApiResponse.success(service.createPickupOrder(request));
+  }
+
+  @GetMapping("/pickup-orders")
+  public ApiResponse<InquiryPickupOrderListResponse> listPickupOrders(
+      @Valid @ModelAttribute InquiryPickupOrderListRequest request) {
+    return ApiResponse.success(service.listPickupOrders(request));
+  }
+
+  @GetMapping("/pickup-orders/{pickupOrderId}")
+  public ApiResponse<InquiryPickupOrderDetailResponse> pickupOrderDetail(
+      @PathVariable("pickupOrderId") String pickupOrderId,
+      @Valid @ModelAttribute InquiryPickupOrderListRequest request) {
+    return ApiResponse.success(service.pickupOrderDetail(pickupOrderId, request));
+  }
+
+  @PutMapping("/pickup-orders/{pickupOrderId}/status")
+  public ApiResponse<InquiryPickupOrderDetailResponse> pickupOrderUpdateStatus(
+      @PathVariable("pickupOrderId") String pickupOrderId,
+      @Valid @RequestBody InquiryPickupOrderStatusUpdateRequest request) {
+    return ApiResponse.success(service.pickupOrderUpdateStatus(pickupOrderId, request));
   }
 
   @GetMapping("/success")

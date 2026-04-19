@@ -10,6 +10,10 @@ import com.huodaizi.backend.dto.inquiry.InquiryMerchantLeadListRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryMerchantLeadQuoteRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryMerchantLeadStatus;
 import com.huodaizi.backend.dto.inquiry.InquiryMerchantLeadStatusUpdateRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryPickupOrderCreateRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryPickupOrderListRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryPickupOrderStatus;
+import com.huodaizi.backend.dto.inquiry.InquiryPickupOrderStatusUpdateRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchBatchUpdateRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchOverviewRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchTaskRequest;
@@ -31,9 +35,11 @@ public class InMemoryInquiryRepository {
   private static final DateTimeFormatter NO_FMT = DateTimeFormatter.ofPattern("yyyyMMdd");
 
   private final AtomicLong seq = new AtomicLong(20260418000L);
+  private final AtomicLong pickupSeq = new AtomicLong(20260418000L);
   private final ConcurrentMap<String, InquiryEntity> store = new ConcurrentHashMap<>();
   private final ConcurrentMap<String, List<InquiryQuoteCompareEntity>> quoteStore = new ConcurrentHashMap<>();
   private final ConcurrentMap<String, InquiryMerchantLeadEntity> merchantLeadStore = new ConcurrentHashMap<>();
+  private final ConcurrentMap<String, InquiryPickupOrderEntity> pickupOrderStore = new ConcurrentHashMap<>();
 
   public InMemoryInquiryRepository() {
     seed();
@@ -271,6 +277,83 @@ public class InMemoryInquiryRepository {
     return quote;
   }
 
+  public InquiryPickupOrderEntity createPickupOrder(InquiryPickupOrderCreateRequest request) {
+    String inquiryId = request.inquiryId().trim();
+    String quoteId = request.quoteId().trim();
+    String contactMobile = normalizePhone(request.contactMobile());
+
+    InquiryEntity inquiry = getById(inquiryId);
+    if (!normalizePhone(inquiry.getContactMobile()).equals(contactMobile)) {
+      throw new BaseException(ErrorCode.NOT_FOUND.getCode(), "询价单不存在");
+    }
+    InquiryQuoteCompareEntity quote = getQuoteById(inquiryId, quoteId);
+
+    String pickupId = "PU" + pickupSeq.incrementAndGet();
+    String pickupNo = "PU-" + NO_FMT.format(LocalDateTime.now()) + "-" + pickupId;
+    LocalDateTime now = LocalDateTime.now();
+    InquiryPickupOrderEntity entity =
+        new InquiryPickupOrderEntity(
+            pickupId,
+            pickupNo,
+            inquiry.getId(),
+            inquiry.getInquiryNo(),
+            quote.getQuoteId(),
+            quote.getSupplierId(),
+            quote.getSupplierName(),
+            defaultText(request.buyerCompany(), "买方公司"),
+            defaultText(request.buyerContact(), "采购经理"),
+            inquiry.getContactMobile(),
+            maskPhone(inquiry.getContactMobile()),
+            defaultText(request.pickupSite(), inquiry.getDeliveryCity() + "提货点"),
+            request.pickupDate().trim(),
+            request.pickupDriverName().trim(),
+            maskPhone(request.pickupDriverPhone()),
+            request.pickupVehicleNo().trim().toUpperCase(Locale.ROOT),
+            inquiry.getDemandQtyTon(),
+            inquiry.getSpecText(),
+            defaultText(request.remark(), "-"),
+            InquiryPickupOrderStatus.CREATED,
+            now,
+            now);
+    pickupOrderStore.put(pickupId, entity);
+    return entity;
+  }
+
+  public List<InquiryPickupOrderEntity> listPickupOrders(InquiryPickupOrderListRequest request) {
+    String phone = normalizePhoneOrNull(request.contactMobile());
+    InquiryPickupOrderStatus status = normalizePickupStatusOrNull(request.status());
+    String keyword = normalize(request.keyword());
+    return pickupOrderStore.values().stream()
+        .filter(item -> phone == null || normalizePhone(item.getBuyerPhone()).equals(phone))
+        .filter(item -> status == null || item.getStatus() == status)
+        .filter(
+            item ->
+                keyword == null
+                    || normalize(item.getPickupNo()).contains(keyword)
+                    || normalize(item.getInquiryNo()).contains(keyword)
+                    || normalize(item.getSupplierName()).contains(keyword)
+                    || normalize(item.getSpecText()).contains(keyword)
+                    || normalize(item.getPickupAddress()).contains(keyword))
+        .sorted(Comparator.comparing(InquiryPickupOrderEntity::getUpdatedAt, Comparator.reverseOrder()))
+        .toList();
+  }
+
+  public InquiryPickupOrderEntity getPickupOrderById(String pickupOrderId, String contactMobile) {
+    InquiryPickupOrderEntity entity = requirePickupOrder(pickupOrderId);
+    String phone = normalizePhoneOrNull(contactMobile);
+    if (phone == null || !normalizePhone(entity.getBuyerPhone()).equals(phone)) {
+      throw new BaseException(ErrorCode.NOT_FOUND.getCode(), "提货单不存在");
+    }
+    return entity;
+  }
+
+  public InquiryPickupOrderEntity updatePickupOrderStatus(
+      String pickupOrderId, InquiryPickupOrderStatusUpdateRequest request) {
+    InquiryPickupOrderEntity entity = getPickupOrderById(pickupOrderId, request.contactMobile());
+    entity.setStatus(normalizePickupStatus(request.status()));
+    return entity;
+  }
+
   private String defaultText(String text, String fallback) {
     return text == null || text.isBlank() ? fallback : text.trim();
   }
@@ -325,10 +408,39 @@ public class InMemoryInquiryRepository {
     }
   }
 
+  private InquiryPickupOrderStatus normalizePickupStatusOrNull(String status) {
+    if (status == null || status.isBlank()) {
+      return null;
+    }
+    return normalizePickupStatus(status);
+  }
+
+  private InquiryPickupOrderStatus normalizePickupStatus(String status) {
+    if (status == null || status.isBlank()) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "status 不能为空");
+    }
+    String normalized = status.trim().toUpperCase(Locale.ROOT);
+    try {
+      return InquiryPickupOrderStatus.valueOf(normalized);
+    } catch (IllegalArgumentException ex) {
+      throw new BaseException(
+          ErrorCode.BAD_REQUEST.getCode(),
+          "status 仅支持 CREATED/CONFIRMED/IN_TRANSIT/SIGNED/COMPLETED/CANCELLED");
+    }
+  }
+
   private InquiryMerchantLeadEntity requireMerchantLead(String leadId) {
     InquiryMerchantLeadEntity entity = merchantLeadStore.get(leadId);
     if (entity == null) {
       throw new BaseException(ErrorCode.NOT_FOUND.getCode(), "商家线索不存在");
+    }
+    return entity;
+  }
+
+  private InquiryPickupOrderEntity requirePickupOrder(String pickupOrderId) {
+    InquiryPickupOrderEntity entity = pickupOrderStore.get(pickupOrderId);
+    if (entity == null) {
+      throw new BaseException(ErrorCode.NOT_FOUND.getCode(), "提货单不存在");
     }
     return entity;
   }

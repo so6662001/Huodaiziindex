@@ -104,6 +104,13 @@ async function submitDeal() {
       throw new Error(json.message || '成交确认失败')
     }
     successMsg.value = `${json.data.message}（状态：${json.data.dealStatus}）`
+    const params = new URLSearchParams()
+    params.set('inquiryId', form.inquiryId.trim())
+    params.set('quoteId', form.quoteId.trim())
+    params.set('contactMobile', form.contactMobile.trim())
+    setTimeout(() => {
+      router.push(`/inquiry/pickup/pass?${params.toString()}`)
+    }, 500)
   } catch (error) {
     errorMsg.value = error.message || '系统繁忙，请稍后重试'
   } finally {

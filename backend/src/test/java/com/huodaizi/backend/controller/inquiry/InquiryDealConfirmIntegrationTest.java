@@ -3,6 +3,7 @@ package com.huodaizi.backend.controller.inquiry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -96,5 +97,80 @@ class InquiryDealConfirmIntegrationTest {
                 .content(payload))
         .andExpect(status().isNotFound())
         .andExpect(jsonPath("$.code").value("NOT_FOUND"));
+  }
+
+  @Test
+  void pickupOrderFlowShouldWork() throws Exception {
+    String createPayload =
+        """
+        {
+          "inquiryId":"IQ20260418001",
+          "quoteId":"IQ20260418001-Q1",
+          "contactMobile":"13800138000",
+          "buyerCompany":"唐山测试采购有限公司",
+          "buyerContact":"李经理",
+          "pickupSite":"唐山丰润提货点",
+          "pickupDate":"2026-05-02",
+          "pickupVehicleNo":"冀B12345",
+          "pickupDriverName":"张司机",
+          "pickupDriverPhone":"13800138001",
+          "agreedProtocol":true,
+          "remark":"先发提货码"
+        }
+        """;
+
+    MvcResult createResult =
+        mockMvc
+            .perform(
+                post("/api/v1/inquiries/pickup-orders")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(createPayload))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.code").value("0"))
+            .andExpect(jsonPath("$.data.pickupId").isNotEmpty())
+            .andExpect(jsonPath("$.data.status").value("CREATED"))
+            .andReturn();
+
+    Map<?, ?> createBody = objectMapper.readValue(createResult.getResponse().getContentAsString(), Map.class);
+    Map<?, ?> createData = (Map<?, ?>) createBody.get("data");
+    String pickupId = String.valueOf(createData.get("pickupId"));
+
+    mockMvc
+        .perform(
+            get("/api/v1/inquiries/pickup-orders")
+                .param("contactMobile", "13800138000")
+                .param("page", "1")
+                .param("pageSize", "10"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.code").value("0"))
+        .andExpect(jsonPath("$.data.total").value(org.hamcrest.Matchers.greaterThanOrEqualTo(1)));
+
+    mockMvc
+        .perform(
+            get("/api/v1/inquiries/pickup-orders/{pickupOrderId}", pickupId)
+                .param("contactMobile", "13800138000"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.code").value("0"))
+        .andExpect(jsonPath("$.data.order.pickupId").value(pickupId));
+
+    String updatePayload =
+        """
+        {
+          "contactMobile":"13800138000",
+          "status":"CONFIRMED",
+          "operator":"赵运营",
+          "remark":"卖方已确认放货"
+        }
+        """;
+
+    mockMvc
+        .perform(
+            put("/api/v1/inquiries/pickup-orders/{pickupOrderId}/status", pickupId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(updatePayload))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.code").value("0"))
+        .andExpect(jsonPath("$.data.order.status").value("CONFIRMED"))
+        .andExpect(jsonPath("$.data.order.statusText").value("已确认"));
   }
 }

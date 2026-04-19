@@ -4,6 +4,7 @@ import InquiryCreatePage from '../pages/InquiryCreatePage.vue'
 import InquirySuccessPage from '../pages/InquirySuccessPage.vue'
 import InquiryQuoteComparePage from '../pages/InquiryQuoteComparePage.vue'
 import InquiryDealConfirmPage from '../pages/InquiryDealConfirmPage.vue'
+import InquiryPickupPassPage from '../pages/InquiryPickupPassPage.vue'
 import InquiryMerchantLeadManagePage from '../pages/InquiryMerchantLeadManagePage.vue'
 import InquiryQuoteWorkbenchPage from '../pages/InquiryQuoteWorkbenchPage.vue'
 import SiteAdLeadMinePage from '../pages/SiteAdLeadMinePage.vue'
@@ -48,6 +49,14 @@ const routes = [
     component: InquiryDealConfirmPage,
     meta: {
       title: 'P07成交确认页_买家确认成交-货袋子'
+    }
+  },
+  {
+    path: '/inquiry/pickup/pass',
+    name: 'inquiryPickupPass',
+    component: InquiryPickupPassPage,
+    meta: {
+      title: 'P08提货通_提货单协同页-货袋子'
     }
   },
   {

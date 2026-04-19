@@ -19,6 +19,14 @@ import com.huodaizi.backend.dto.inquiry.InquiryMerchantLeadStatusUpdateRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteCompareItemDTO;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteCompareRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteCompareResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryPickupOrderCreateRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryPickupOrderCreateResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryPickupOrderDetailResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryPickupOrderItemDTO;
+import com.huodaizi.backend.dto.inquiry.InquiryPickupOrderListRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryPickupOrderListResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryPickupOrderStatus;
+import com.huodaizi.backend.dto.inquiry.InquiryPickupOrderStatusUpdateRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchBatchUpdateRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchOverviewRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchOverviewResponse;
@@ -31,6 +39,7 @@ import com.huodaizi.backend.dto.inquiry.InquiryStatus;
 import com.huodaizi.backend.repository.inquiry.InMemoryInquiryRepository;
 import com.huodaizi.backend.repository.inquiry.InquiryEntity;
 import com.huodaizi.backend.repository.inquiry.InquiryMerchantLeadEntity;
+import com.huodaizi.backend.repository.inquiry.InquiryPickupOrderEntity;
 import com.huodaizi.backend.repository.inquiry.InquiryQuoteCompareEntity;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -180,6 +189,73 @@ public class InquiryService {
         quote.getSupplierName(),
         quote.getTotalAmount(),
         "成交确认成功，平台将推进履约交付");
+  }
+
+  public InquiryPickupOrderCreateResponse createPickupOrder(InquiryPickupOrderCreateRequest request) {
+    if (!request.agreedProtocol()) {
+      throw new com.huodaizi.backend.common.BaseException(
+          com.huodaizi.backend.common.ErrorCode.BAD_REQUEST.getCode(), "请先同意提货服务协议");
+    }
+    InquiryPickupOrderEntity entity = repository.createPickupOrder(request);
+    return new InquiryPickupOrderCreateResponse(
+        entity.getPickupId(),
+        entity.getPickupNo(),
+        entity.getInquiryId(),
+        entity.getQuoteId(),
+        entity.getStatus().name(),
+        "提货单已创建，等待卖方确认放货");
+  }
+
+  public InquiryPickupOrderListResponse listPickupOrders(InquiryPickupOrderListRequest request) {
+    List<InquiryPickupOrderEntity> all = repository.listPickupOrders(request);
+    int page = request.safePage();
+    int pageSize = request.safePageSize();
+    int from = Math.max((page - 1) * pageSize, 0);
+    int to = Math.min(from + pageSize, all.size());
+    List<InquiryPickupOrderEntity> paged = from >= all.size() ? List.of() : all.subList(from, to);
+    return new InquiryPickupOrderListResponse(
+        paged.stream().map(this::toPickupItem).toList(),
+        all.size(),
+        page,
+        pageSize,
+        countPickupByStatus(all, InquiryPickupOrderStatus.CREATED),
+        countPickupByStatus(all, InquiryPickupOrderStatus.CONFIRMED),
+        countPickupByStatus(all, InquiryPickupOrderStatus.IN_TRANSIT),
+        countPickupByStatus(all, InquiryPickupOrderStatus.SIGNED),
+        countPickupByStatus(all, InquiryPickupOrderStatus.COMPLETED),
+        countPickupByStatus(all, InquiryPickupOrderStatus.CANCELLED));
+  }
+
+  public InquiryPickupOrderDetailResponse pickupOrderDetail(
+      String pickupId, InquiryPickupOrderListRequest request) {
+    InquiryPickupOrderEntity entity = repository.getPickupOrderById(pickupId, request.contactMobile());
+    return new InquiryPickupOrderDetailResponse(
+        toPickupItem(entity),
+        entity.getPickupAddress(),
+        entity.getBuyerContact(),
+        entity.getBuyerPhoneMasked(),
+        entity.getTruckNo(),
+        entity.getDriverName(),
+        entity.getDriverPhoneMasked(),
+        entity.getRemark());
+  }
+
+  public InquiryPickupOrderDetailResponse pickupOrderUpdateStatus(
+      String pickupId, InquiryPickupOrderStatusUpdateRequest request) {
+    if (request.status() == null || request.status().isBlank()) {
+      throw new com.huodaizi.backend.common.BaseException(
+          com.huodaizi.backend.common.ErrorCode.BAD_REQUEST.getCode(), "status 不能为空");
+    }
+    InquiryPickupOrderEntity entity = repository.updatePickupOrderStatus(pickupId, request);
+    return new InquiryPickupOrderDetailResponse(
+        toPickupItem(entity),
+        entity.getPickupAddress(),
+        entity.getBuyerContact(),
+        entity.getBuyerPhoneMasked(),
+        entity.getTruckNo(),
+        entity.getDriverName(),
+        entity.getDriverPhoneMasked(),
+        request.remark() == null || request.remark().isBlank() ? entity.getRemark() : request.remark());
   }
 
   private InquiryItemDTO toItem(InquiryEntity entity) {
@@ -345,6 +421,31 @@ public class InquiryService {
         entity.getQuoteTime().toString());
   }
 
+  private InquiryPickupOrderItemDTO toPickupItem(InquiryPickupOrderEntity entity) {
+    return new InquiryPickupOrderItemDTO(
+        entity.getPickupId(),
+        entity.getPickupNo(),
+        entity.getInquiryId(),
+        entity.getInquiryNo(),
+        entity.getQuoteId(),
+        entity.getSupplierId(),
+        entity.getSupplierName(),
+        entity.getBuyerCompany(),
+        entity.getPickupAddress(),
+        entity.getBuyerContact(),
+        entity.getBuyerPhoneMasked(),
+        entity.getPickupDate(),
+        "09:00-18:00",
+        entity.getTruckNo(),
+        entity.getDriverName(),
+        entity.getDriverPhoneMasked(),
+        entity.getSpecText() + " / " + entity.getQuantityTon() + "吨",
+        entity.getStatus().name(),
+        pickupStatusText(entity.getStatus()),
+        entity.getCreatedAt().toString(),
+        entity.getUpdatedAt().toString());
+  }
+
   private InquiryMerchantLeadItemDTO toMerchantLeadItem(InquiryMerchantLeadEntity entity) {
     return new InquiryMerchantLeadItemDTO(
         entity.getId(),
@@ -387,6 +488,21 @@ public class InquiryService {
 
   private int countMerchantByStatus(List<InquiryMerchantLeadEntity> items, InquiryMerchantLeadStatus status) {
     return (int) items.stream().filter(item -> item.getStatus() == status).count();
+  }
+
+  private int countPickupByStatus(List<InquiryPickupOrderEntity> items, InquiryPickupOrderStatus status) {
+    return (int) items.stream().filter(item -> item.getStatus() == status).count();
+  }
+
+  private String pickupStatusText(InquiryPickupOrderStatus status) {
+    return switch (status) {
+      case CREATED -> "待确认";
+      case CONFIRMED -> "已确认";
+      case IN_TRANSIT -> "运输中";
+      case SIGNED -> "已签收";
+      case COMPLETED -> "已完成";
+      case CANCELLED -> "已取消";
+    };
   }
 
   private String calcRate(int numerator, int denominator) {
