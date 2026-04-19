@@ -102,6 +102,14 @@ import com.huodaizi.backend.dto.inquiry.InquiryH5PickupOrderQuickStatusRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryH5PickupOrderQuickStatusResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryH5QuickQuoteInitRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryH5QuickQuoteInitResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryH5ReconcileOrderCreateRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryH5ReconcileOrderCreateResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryH5ReconcileOrderDetailRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryH5ReconcileOrderDetailResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryH5ReconcileOrderListRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryH5ReconcileOrderListResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryH5ReconcileOrderQuickStatusRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryH5ReconcileOrderQuickStatusResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchBatchUpdateRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchOverviewRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchOverviewResponse;
@@ -1116,6 +1124,96 @@ public class InquiryService {
         updated.order().status(),
         updated.order().statusText(),
         "提货单状态已更新");
+  }
+
+  public InquiryH5ReconcileOrderCreateResponse h5CreateReconcileOrder(
+      InquiryH5ReconcileOrderCreateRequest request) {
+    InquiryReconcileOrderCreateResponse created =
+        createReconcileOrder(
+            new InquiryReconcileOrderCreateRequest(
+                request.pickupOrderId().trim(),
+                request.contactMobile().trim(),
+                request.statementMonth().trim(),
+                "MONTHLY",
+                request.dueDate().trim(),
+                request.invoiceTitle(),
+                request.remark()));
+    return new InquiryH5ReconcileOrderCreateResponse(
+        created.reconcileId(),
+        created.reconcileNo(),
+        created.pickupOrderId(),
+        created.status(),
+        reconcileStatusText(InquiryReconcileOrderStatus.valueOf(created.status())),
+        "/h5/reconcile-orders?contactMobile=" + request.contactMobile().trim(),
+        "H5对账单创建成功，等待回款跟进");
+  }
+
+  public InquiryH5ReconcileOrderListResponse h5ReconcileOrders(InquiryH5ReconcileOrderListRequest request) {
+    InquiryReconcileOrderListResponse list =
+        listReconcileOrders(
+            new InquiryReconcileOrderListRequest(
+                request.contactMobile().trim(),
+                request.status(),
+                request.keyword(),
+                request.page(),
+                request.pageSize()));
+    String selectedStatus =
+        request.status() == null ? "" : request.status().trim().toUpperCase(java.util.Locale.ROOT);
+    String selectedKeyword = request.keyword() == null ? "" : request.keyword().trim();
+    return new InquiryH5ReconcileOrderListResponse(
+        maskPhone(request.contactMobile().trim()),
+        selectedStatus,
+        selectedKeyword,
+        list.items(),
+        list.total(),
+        list.page(),
+        list.pageSize(),
+        list.createdCount(),
+        list.invoicePendingCount(),
+        list.invoicedCount(),
+        list.confirmedCount(),
+        list.partialPaidCount(),
+        list.paidCount(),
+        list.closedCount(),
+        list.disputedCount(),
+        "建议每日跟进 PARTIAL_PAID 与 DISPUTED 单据，保障回款效率");
+  }
+
+  public InquiryH5ReconcileOrderDetailResponse h5ReconcileOrderDetail(
+      String reconcileOrderId, InquiryH5ReconcileOrderDetailRequest request) {
+    InquiryReconcileOrderDetailResponse detail =
+        reconcileOrderDetail(
+            reconcileOrderId,
+            new InquiryReconcileOrderListRequest(request.contactMobile().trim(), "", "", 1, 10));
+    return new InquiryH5ReconcileOrderDetailResponse(
+        detail.order(),
+        detail.latestRemark(),
+        detail.taxAmount(),
+        detail.payableAmount(),
+        detail.paidAmount(),
+        detail.unpaidAmount(),
+        detail.paymentDeadline(),
+        detail.voucherStatus(),
+        "回款建议：核销后及时更新状态并归档凭证，减少争议单积压");
+  }
+
+  public InquiryH5ReconcileOrderQuickStatusResponse h5ReconcileOrderQuickStatus(
+      String reconcileOrderId, InquiryH5ReconcileOrderQuickStatusRequest request) {
+    InquiryReconcileOrderDetailResponse updated =
+        reconcileOrderUpdateStatus(
+            reconcileOrderId,
+            new InquiryReconcileOrderStatusUpdateRequest(
+                request.contactMobile().trim(),
+                request.status().trim(),
+                request.paidAmount(),
+                "h5-reconcile",
+                request.remark()));
+    return new InquiryH5ReconcileOrderQuickStatusResponse(
+        updated.order().reconcileId(),
+        updated.order().status(),
+        updated.order().statusText(),
+        updated.order().updatedAt(),
+        "对账单状态已更新");
   }
 
   public InquiryMerchantLeadDetailResponse merchantLeadDetail(

@@ -19,6 +19,7 @@ import H5QuoteComparePage from '../pages/H5QuoteComparePage.vue'
 import H5MerchantLeadPage from '../pages/H5MerchantLeadPage.vue'
 import H5QuickQuotePage from '../pages/H5QuickQuotePage.vue'
 import H5PickupOrderPage from '../pages/H5PickupOrderPage.vue'
+import H5ReconcileOrderPage from '../pages/H5ReconcileOrderPage.vue'
 import InquiryMerchantLeadManagePage from '../pages/InquiryMerchantLeadManagePage.vue'
 import InquiryQuoteWorkbenchPage from '../pages/InquiryQuoteWorkbenchPage.vue'
 import SiteAdLeadMinePage from '../pages/SiteAdLeadMinePage.vue'
@@ -95,6 +96,14 @@ const routes = [
     component: H5PickupOrderPage,
     meta: {
       title: 'H08 H5提货单_移动端提货协同-货袋子'
+    }
+  },
+  {
+    path: '/h5/reconcile-orders',
+    name: 'h5ReconcileOrders',
+    component: H5ReconcileOrderPage,
+    meta: {
+      title: 'H09 H5对账单_移动端对账回款协同-货袋子'
     }
   },
   {

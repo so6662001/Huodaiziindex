@@ -54,6 +54,14 @@ import com.huodaizi.backend.dto.inquiry.InquiryH5PickupOrderDetailRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryH5PickupOrderDetailResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryH5PickupOrderQuickStatusRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryH5PickupOrderQuickStatusResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryH5ReconcileOrderCreateRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryH5ReconcileOrderCreateResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryH5ReconcileOrderDetailRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryH5ReconcileOrderDetailResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryH5ReconcileOrderListRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryH5ReconcileOrderListResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryH5ReconcileOrderQuickStatusRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryH5ReconcileOrderQuickStatusResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryH5QuickQuoteInitRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryH5QuickQuoteInitResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryH5MerchantLeadRequest;
@@ -346,6 +354,32 @@ public class InquiryController {
       @PathVariable("pickupOrderId") String pickupOrderId,
       @Valid @RequestBody InquiryH5PickupOrderQuickStatusRequest request) {
     return ApiResponse.success(service.h5PickupOrderQuickStatus(pickupOrderId, request));
+  }
+
+  @PostMapping("/h5/reconcile-orders")
+  public ApiResponse<InquiryH5ReconcileOrderCreateResponse> h5CreateReconcileOrder(
+      @Valid @RequestBody InquiryH5ReconcileOrderCreateRequest request) {
+    return ApiResponse.success(service.h5CreateReconcileOrder(request));
+  }
+
+  @GetMapping("/h5/reconcile-orders")
+  public ApiResponse<InquiryH5ReconcileOrderListResponse> h5ListReconcileOrders(
+      @Valid @ModelAttribute InquiryH5ReconcileOrderListRequest request) {
+    return ApiResponse.success(service.h5ReconcileOrders(request));
+  }
+
+  @GetMapping("/h5/reconcile-orders/{reconcileOrderId}")
+  public ApiResponse<InquiryH5ReconcileOrderDetailResponse> h5ReconcileOrderDetail(
+      @PathVariable("reconcileOrderId") String reconcileOrderId,
+      @Valid @ModelAttribute InquiryH5ReconcileOrderDetailRequest request) {
+    return ApiResponse.success(service.h5ReconcileOrderDetail(reconcileOrderId, request));
+  }
+
+  @PutMapping("/h5/reconcile-orders/{reconcileOrderId}/quick-status")
+  public ApiResponse<InquiryH5ReconcileOrderQuickStatusResponse> h5ReconcileOrderQuickStatus(
+      @PathVariable("reconcileOrderId") String reconcileOrderId,
+      @Valid @RequestBody InquiryH5ReconcileOrderQuickStatusRequest request) {
+    return ApiResponse.success(service.h5ReconcileOrderQuickStatus(reconcileOrderId, request));
   }
 
   @GetMapping("/merchant/messages")

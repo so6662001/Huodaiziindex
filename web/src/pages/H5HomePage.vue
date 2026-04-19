@@ -79,6 +79,10 @@ function goto(url) {
     router.push('/h5/pickup-orders?contactMobile=13800138000')
     return
   }
+  if (url.includes('/h5/reconcile-orders') || url.includes('/reconcile-orders')) {
+    router.push('/h5/reconcile-orders?contactMobile=13800138000')
+    return
+  }
   router.push(url)
 }
 
