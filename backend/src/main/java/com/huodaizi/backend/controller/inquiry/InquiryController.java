@@ -46,6 +46,14 @@ import com.huodaizi.backend.dto.inquiry.InquiryH5InquiryStep3Request;
 import com.huodaizi.backend.dto.inquiry.InquiryH5InquiryStep3Response;
 import com.huodaizi.backend.dto.inquiry.InquiryH5QuoteCompareRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryH5QuoteCompareResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryH5PickupOrderCreateRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryH5PickupOrderCreateResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryH5PickupOrderListRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryH5PickupOrderListResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryH5PickupOrderDetailRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryH5PickupOrderDetailResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryH5PickupOrderQuickStatusRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryH5PickupOrderQuickStatusResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryH5QuickQuoteInitRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryH5QuickQuoteInitResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryH5MerchantLeadRequest;
@@ -312,6 +320,32 @@ public class InquiryController {
       @PathVariable("leadId") String leadId,
       @Valid @RequestBody InquiryH5MerchantLeadQuickStatusRequest request) {
     return ApiResponse.success(service.h5MerchantLeadQuickStatus(leadId, request));
+  }
+
+  @PostMapping("/h5/pickup-orders")
+  public ApiResponse<InquiryH5PickupOrderCreateResponse> h5CreatePickupOrder(
+      @Valid @RequestBody InquiryH5PickupOrderCreateRequest request) {
+    return ApiResponse.success(service.h5CreatePickupOrder(request));
+  }
+
+  @GetMapping("/h5/pickup-orders")
+  public ApiResponse<InquiryH5PickupOrderListResponse> h5ListPickupOrders(
+      @Valid @ModelAttribute InquiryH5PickupOrderListRequest request) {
+    return ApiResponse.success(service.h5ListPickupOrders(request));
+  }
+
+  @GetMapping("/h5/pickup-orders/{pickupOrderId}")
+  public ApiResponse<InquiryH5PickupOrderDetailResponse> h5PickupOrderDetail(
+      @PathVariable("pickupOrderId") String pickupOrderId,
+      @Valid @ModelAttribute InquiryH5PickupOrderDetailRequest request) {
+    return ApiResponse.success(service.h5PickupOrderDetail(pickupOrderId, request));
+  }
+
+  @PutMapping("/h5/pickup-orders/{pickupOrderId}/quick-status")
+  public ApiResponse<InquiryH5PickupOrderQuickStatusResponse> h5PickupOrderQuickStatus(
+      @PathVariable("pickupOrderId") String pickupOrderId,
+      @Valid @RequestBody InquiryH5PickupOrderQuickStatusRequest request) {
+    return ApiResponse.success(service.h5PickupOrderQuickStatus(pickupOrderId, request));
   }
 
   @GetMapping("/merchant/messages")

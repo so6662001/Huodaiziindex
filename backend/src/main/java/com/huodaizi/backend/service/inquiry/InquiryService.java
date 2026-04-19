@@ -92,6 +92,14 @@ import com.huodaizi.backend.dto.inquiry.InquiryH5MerchantLeadQuickStatusRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryH5MerchantLeadQuickStatusResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryH5MerchantLeadRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryH5MerchantLeadResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryH5PickupOrderCreateRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryH5PickupOrderCreateResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryH5PickupOrderDetailRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryH5PickupOrderDetailResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryH5PickupOrderListRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryH5PickupOrderListResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryH5PickupOrderQuickStatusRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryH5PickupOrderQuickStatusResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryH5QuickQuoteInitRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryH5QuickQuoteInitResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchBatchUpdateRequest;
@@ -1018,6 +1026,96 @@ public class InquiryService {
         suggestedDeliveryDays,
         paymentTerm,
         "建议在10分钟内完成报价并电话回访，提升线索转化");
+  }
+
+  public InquiryH5PickupOrderCreateResponse h5CreatePickupOrder(InquiryH5PickupOrderCreateRequest request) {
+    InquiryPickupOrderCreateResponse created =
+        createPickupOrder(
+            new InquiryPickupOrderCreateRequest(
+                request.inquiryId().trim(),
+                request.quoteId().trim(),
+                request.contactMobile().trim(),
+                request.buyerCompany(),
+                request.buyerContact(),
+                request.pickupSite().trim(),
+                request.pickupDate().trim(),
+                request.pickupVehicleNo().trim(),
+                request.pickupDriverName().trim(),
+                request.pickupDriverPhone().trim(),
+                request.agreedProtocol(),
+                request.remark()));
+    return new InquiryH5PickupOrderCreateResponse(
+        created.pickupId(),
+        created.pickupNo(),
+        created.inquiryId(),
+        created.quoteId(),
+        created.status(),
+        pickupStatusText(InquiryPickupOrderStatus.valueOf(created.status())),
+        "/h5/pickup-orders?contactMobile=" + request.contactMobile().trim(),
+        "H5提货单创建成功，等待卖方确认放货");
+  }
+
+  public InquiryH5PickupOrderListResponse h5PickupOrders(InquiryH5PickupOrderListRequest request) {
+    InquiryPickupOrderListResponse list =
+        listPickupOrders(
+            new InquiryPickupOrderListRequest(
+                request.contactMobile().trim(),
+                request.status(),
+                request.keyword(),
+                request.page(),
+                request.pageSize()));
+    String selectedStatus =
+        request.status() == null ? "" : request.status().trim().toUpperCase(java.util.Locale.ROOT);
+    String selectedKeyword = request.keyword() == null ? "" : request.keyword().trim();
+    return new InquiryH5PickupOrderListResponse(
+        maskPhone(request.contactMobile().trim()),
+        selectedStatus,
+        selectedKeyword,
+        list.items(),
+        list.total(),
+        list.page(),
+        list.pageSize(),
+        list.createdCount(),
+        list.confirmedCount(),
+        list.inTransitCount(),
+        list.signedCount(),
+        list.completedCount(),
+        list.cancelledCount(),
+        "建议优先推进 CONFIRMED/IN_TRANSIT 单据，确保按时签收");
+  }
+
+  public InquiryH5PickupOrderDetailResponse h5PickupOrderDetail(
+      String pickupOrderId, InquiryH5PickupOrderDetailRequest request) {
+    InquiryPickupOrderDetailResponse detail =
+        pickupOrderDetail(
+            pickupOrderId, new InquiryPickupOrderListRequest(request.contactMobile().trim(), "", "", 1, 10));
+    return new InquiryH5PickupOrderDetailResponse(
+        detail.order(),
+        detail.pickupAddress(),
+        detail.contactName(),
+        detail.contactPhone(),
+        detail.vehicleNo(),
+        detail.driverName(),
+        detail.driverPhone(),
+        detail.latestRemark(),
+        "履约建议：提货前复核车牌与司机信息，签收后及时回传回单");
+  }
+
+  public InquiryH5PickupOrderQuickStatusResponse h5PickupOrderQuickStatus(
+      String pickupOrderId, InquiryH5PickupOrderQuickStatusRequest request) {
+    InquiryPickupOrderDetailResponse updated =
+        pickupOrderUpdateStatus(
+            pickupOrderId,
+            new InquiryPickupOrderStatusUpdateRequest(
+                request.contactMobile().trim(),
+                request.status().trim(),
+                "h5-pickup",
+                request.remark()));
+    return new InquiryH5PickupOrderQuickStatusResponse(
+        updated.order().pickupId(),
+        updated.order().status(),
+        updated.order().statusText(),
+        "提货单状态已更新");
   }
 
   public InquiryMerchantLeadDetailResponse merchantLeadDetail(

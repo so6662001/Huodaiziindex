@@ -75,6 +75,10 @@ function goto(url) {
     router.push('/h5/quick-quote?merchantId=S001')
     return
   }
+  if (url.includes('/h5/pickup-orders') || url.includes('/pickup-orders')) {
+    router.push('/h5/pickup-orders?contactMobile=13800138000')
+    return
+  }
   router.push(url)
 }
 

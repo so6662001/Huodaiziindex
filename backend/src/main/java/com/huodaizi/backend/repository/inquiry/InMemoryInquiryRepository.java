@@ -471,6 +471,13 @@ public class InMemoryInquiryRepository {
             new InquiryH5HomeEntity.QuickNavEntity(
                 "NAV005", "提货对账", "履约协同闭环", "reconcile", "/inquiry/reconcile/pass", ""),
             new InquiryH5HomeEntity.QuickNavEntity(
+                "NAV008",
+                "H5提货单",
+                "移动端提货协同",
+                "pickup",
+                "/h5/pickup-orders?contactMobile=13800138000",
+                ""),
+            new InquiryH5HomeEntity.QuickNavEntity(
                 "NAV006", "信用规则", "分发评分公开", "rule", "/dispatch/score-rules", ""));
 
     List<InquiryH5HomeEntity.MarketCardEntity> marketCards =
