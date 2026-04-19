@@ -6,6 +6,10 @@ import com.huodaizi.backend.dto.inquiry.InquiryCreateRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteCompareRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteSortBy;
 import com.huodaizi.backend.dto.inquiry.InquiryListRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryMerchantLeadListRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryMerchantLeadQuoteRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryMerchantLeadStatus;
+import com.huodaizi.backend.dto.inquiry.InquiryMerchantLeadStatusUpdateRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryStatus;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -26,6 +30,7 @@ public class InMemoryInquiryRepository {
   private final AtomicLong seq = new AtomicLong(20260418000L);
   private final ConcurrentMap<String, InquiryEntity> store = new ConcurrentHashMap<>();
   private final ConcurrentMap<String, List<InquiryQuoteCompareEntity>> quoteStore = new ConcurrentHashMap<>();
+  private final ConcurrentMap<String, InquiryMerchantLeadEntity> merchantLeadStore = new ConcurrentHashMap<>();
 
   public InMemoryInquiryRepository() {
     seed();
@@ -109,6 +114,75 @@ public class InMemoryInquiryRepository {
         .toList();
   }
 
+  public List<InquiryMerchantLeadEntity> listMerchantLeads(InquiryMerchantLeadListRequest request) {
+    String merchantId = defaultText(request.merchantId(), "").trim();
+    if (merchantId.isEmpty()) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "merchantId 不能为空");
+    }
+    String keyword = normalize(request.keyword());
+    InquiryMerchantLeadStatus status = normalizeMerchantLeadStatusOrNull(request.status());
+    return merchantLeadStore.values().stream()
+        .filter(item -> item.getMerchantId().equalsIgnoreCase(merchantId))
+        .filter(item -> status == null || item.getStatus() == status)
+        .filter(
+            item ->
+                keyword == null
+                    || normalize(item.getInquiryNo()).contains(keyword)
+                    || normalize(item.getSpecText()).contains(keyword)
+                    || normalize(item.getMerchantName()).contains(keyword)
+                    || normalize(item.getDeliveryCity()).contains(keyword))
+        .sorted(Comparator.comparing(InquiryMerchantLeadEntity::getUpdatedAt, Comparator.reverseOrder()))
+        .toList();
+  }
+
+  public InquiryMerchantLeadEntity merchantLeadDetail(String leadId, String merchantId) {
+    InquiryMerchantLeadEntity entity = requireMerchantLead(leadId);
+    if (merchantId != null
+        && !merchantId.isBlank()
+        && !entity.getMerchantId().equalsIgnoreCase(merchantId.trim())) {
+      throw new BaseException(ErrorCode.NOT_FOUND.getCode(), "线索不存在");
+    }
+    return entity;
+  }
+
+  public InquiryMerchantLeadEntity getMerchantLeadById(String leadId) {
+    return requireMerchantLead(leadId);
+  }
+
+  public InquiryMerchantLeadEntity merchantLeadQuote(
+      String leadId, InquiryMerchantLeadQuoteRequest request) {
+    InquiryMerchantLeadEntity entity = requireMerchantLead(leadId);
+    if (!entity.getMerchantId().equalsIgnoreCase(request.merchantId().trim())) {
+      throw new BaseException(ErrorCode.NOT_FOUND.getCode(), "线索不存在");
+    }
+    entity.updateQuote(
+        request.unitPrice().trim(),
+        request.totalAmount().trim(),
+        request.deliveryDays().trim(),
+        defaultText(request.paymentTerm(), "-"),
+        defaultText(request.quoteRemark(), "-"));
+    return entity;
+  }
+
+  public InquiryMerchantLeadEntity merchantLeadUpdateStatus(
+      String leadId, InquiryMerchantLeadStatusUpdateRequest request) {
+    InquiryMerchantLeadEntity entity = requireMerchantLead(leadId);
+    if (!entity.getMerchantId().equalsIgnoreCase(request.merchantId().trim())) {
+      throw new BaseException(ErrorCode.NOT_FOUND.getCode(), "线索不存在");
+    }
+    InquiryMerchantLeadStatus status = normalizeMerchantLeadStatus(request.status());
+    entity.setStatus(status);
+    if (request.comment() != null && !request.comment().isBlank()) {
+      entity.updateQuote(
+          entity.getUnitPrice(),
+          entity.getTotalAmount(),
+          entity.getDeliveryDays(),
+          entity.getPaymentTerm(),
+          request.comment().trim());
+    }
+    return entity;
+  }
+
   public InquiryEntity getById(String id) {
     InquiryEntity entity = store.get(id);
     if (entity == null) {
@@ -150,6 +224,35 @@ public class InMemoryInquiryRepository {
     }
   }
 
+  private InquiryMerchantLeadStatus normalizeMerchantLeadStatusOrNull(String status) {
+    if (status == null || status.isBlank()) {
+      return null;
+    }
+    return normalizeMerchantLeadStatus(status);
+  }
+
+  private InquiryMerchantLeadStatus normalizeMerchantLeadStatus(String status) {
+    if (status == null || status.isBlank()) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "status 不能为空");
+    }
+    String normalized = status.trim().toUpperCase(Locale.ROOT);
+    try {
+      return InquiryMerchantLeadStatus.valueOf(normalized);
+    } catch (IllegalArgumentException ex) {
+      throw new BaseException(
+          ErrorCode.BAD_REQUEST.getCode(),
+          "status 仅支持 NEW/CONTACTED/QUOTED/WON/LOST/CLOSED");
+    }
+  }
+
+  private InquiryMerchantLeadEntity requireMerchantLead(String leadId) {
+    InquiryMerchantLeadEntity entity = merchantLeadStore.get(leadId);
+    if (entity == null) {
+      throw new BaseException(ErrorCode.NOT_FOUND.getCode(), "商家线索不存在");
+    }
+    return entity;
+  }
+
   private void seed() {
     InquiryEntity inquiry1 =
         create(
@@ -176,6 +279,108 @@ public class InMemoryInquiryRepository {
             "13900139000",
             "需要可开票"));
     inquiry2.setQuoteSupplierCount(2);
+    seedMerchantLeads(inquiry1, inquiry2);
+  }
+
+  private void seedMerchantLeads(InquiryEntity inquiry1, InquiryEntity inquiry2) {
+    InquiryMerchantLeadEntity a =
+        new InquiryMerchantLeadEntity(
+            "ML-" + inquiry1.getId() + "-S001",
+            "MLN-" + inquiry1.getId() + "-001",
+            inquiry1.getId(),
+            inquiry1.getInquiryNo(),
+            "S001",
+            "唐山弘达钢贸",
+            "唐山弘达钢贸有限公司",
+            maskName("王工"),
+            maskPhone("13800138000"),
+            inquiry1.getSpecText(),
+            inquiry1.getDemandQtyTon(),
+            inquiry1.getDeliveryCity(),
+            inquiry1.getInvoiceNeed(),
+            inquiry1.getExpectedDeliveryAt(),
+            InquiryMerchantLeadStatus.NEW,
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            LocalDateTime.now().minusHours(5),
+            LocalDateTime.now().minusHours(5));
+    InquiryMerchantLeadEntity b =
+        new InquiryMerchantLeadEntity(
+            "ML-" + inquiry1.getId() + "-S002",
+            "MLN-" + inquiry1.getId() + "-002",
+            inquiry1.getId(),
+            inquiry1.getInquiryNo(),
+            "S002",
+            "无锡铭泰供应链",
+            "无锡铭泰供应链有限公司",
+            maskName("赵总"),
+            maskPhone("13900139000"),
+            inquiry1.getSpecText(),
+            inquiry1.getDemandQtyTon(),
+            inquiry1.getDeliveryCity(),
+            inquiry1.getInvoiceNeed(),
+            inquiry1.getExpectedDeliveryAt(),
+            InquiryMerchantLeadStatus.QUOTED,
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            LocalDateTime.now().minusHours(4),
+            LocalDateTime.now().minusHours(2));
+    b.updateQuote("3490", "418800", "2", "月结30天", "按期到厂");
+    InquiryMerchantLeadEntity c =
+        new InquiryMerchantLeadEntity(
+            "ML-" + inquiry2.getId() + "-S001",
+            "MLN-" + inquiry2.getId() + "-001",
+            inquiry2.getId(),
+            inquiry2.getInquiryNo(),
+            "S001",
+            "唐山弘达钢贸",
+            "某工程采购公司",
+            maskName("李经理"),
+            maskPhone("13700137000"),
+            inquiry2.getSpecText(),
+            inquiry2.getDemandQtyTon(),
+            inquiry2.getDeliveryCity(),
+            inquiry2.getInvoiceNeed(),
+            inquiry2.getExpectedDeliveryAt(),
+            InquiryMerchantLeadStatus.CONTACTED,
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            LocalDateTime.now().minusHours(6),
+            LocalDateTime.now().minusHours(3));
+    merchantLeadStore.put(a.getId(), a);
+    merchantLeadStore.put(b.getId(), b);
+    merchantLeadStore.put(c.getId(), c);
+  }
+
+  private String maskPhone(String phone) {
+    String digits = normalizePhone(phone);
+    if (digits.length() < 7) {
+      return "***";
+    }
+    return digits.substring(0, 3) + "****" + digits.substring(digits.length() - 4);
+  }
+
+  private String maskName(String name) {
+    if (name == null || name.isBlank()) {
+      return "*";
+    }
+    String trimmed = name.trim();
+    if (trimmed.length() == 1) {
+      return "*";
+    }
+    return trimmed.substring(0, 1) + "**";
   }
 
   private List<InquiryQuoteCompareEntity> mockQuoteRows(String inquiryId) {

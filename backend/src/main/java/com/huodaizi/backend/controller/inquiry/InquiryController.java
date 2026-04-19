@@ -5,6 +5,12 @@ import com.huodaizi.backend.dto.inquiry.InquiryCreateRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryCreateResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryListRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryListResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryMerchantLeadDetailResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryMerchantLeadItemDTO;
+import com.huodaizi.backend.dto.inquiry.InquiryMerchantLeadListRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryMerchantLeadListResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryMerchantLeadQuoteRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryMerchantLeadStatusUpdateRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteCompareRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteCompareResponse;
 import com.huodaizi.backend.dto.inquiry.InquirySuccessRequest;
@@ -12,8 +18,10 @@ import com.huodaizi.backend.dto.inquiry.InquirySuccessResponse;
 import com.huodaizi.backend.service.inquiry.InquiryService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -46,5 +54,30 @@ public class InquiryController {
   @GetMapping("/success")
   public ApiResponse<InquirySuccessResponse> success(@Valid @ModelAttribute InquirySuccessRequest request) {
     return ApiResponse.success(service.success(request));
+  }
+
+  @GetMapping("/merchant/leads")
+  public ApiResponse<InquiryMerchantLeadListResponse> merchantLeads(
+      @Valid @ModelAttribute InquiryMerchantLeadListRequest request) {
+    return ApiResponse.success(service.merchantLeads(request));
+  }
+
+  @GetMapping("/merchant/leads/{leadId}")
+  public ApiResponse<InquiryMerchantLeadDetailResponse> merchantLeadDetail(
+      @PathVariable("leadId") String leadId, @Valid @ModelAttribute InquiryMerchantLeadListRequest request) {
+    return ApiResponse.success(service.merchantLeadDetail(leadId, request));
+  }
+
+  @PostMapping("/merchant/leads/{leadId}/quote")
+  public ApiResponse<InquiryMerchantLeadItemDTO> merchantQuote(
+      @PathVariable("leadId") String leadId, @Valid @RequestBody InquiryMerchantLeadQuoteRequest request) {
+    return ApiResponse.success(service.merchantQuote(leadId, request));
+  }
+
+  @PutMapping("/merchant/leads/{leadId}/status")
+  public ApiResponse<InquiryMerchantLeadItemDTO> merchantUpdateStatus(
+      @PathVariable("leadId") String leadId,
+      @Valid @RequestBody InquiryMerchantLeadStatusUpdateRequest request) {
+    return ApiResponse.success(service.merchantUpdateStatus(leadId, request));
   }
 }

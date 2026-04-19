@@ -5,17 +5,23 @@ import com.huodaizi.backend.dto.inquiry.InquiryCreateResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryItemDTO;
 import com.huodaizi.backend.dto.inquiry.InquiryListRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryListResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryMerchantLeadDetailResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryMerchantLeadItemDTO;
+import com.huodaizi.backend.dto.inquiry.InquiryMerchantLeadListRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryMerchantLeadListResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryMerchantLeadQuoteRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryMerchantLeadStatus;
+import com.huodaizi.backend.dto.inquiry.InquiryMerchantLeadStatusUpdateRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteCompareItemDTO;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteCompareRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteCompareResponse;
-import com.huodaizi.backend.dto.inquiry.InquiryQuoteSortBy;
 import com.huodaizi.backend.dto.inquiry.InquirySuccessRequest;
 import com.huodaizi.backend.dto.inquiry.InquirySuccessResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryStatus;
 import com.huodaizi.backend.repository.inquiry.InMemoryInquiryRepository;
 import com.huodaizi.backend.repository.inquiry.InquiryEntity;
+import com.huodaizi.backend.repository.inquiry.InquiryMerchantLeadEntity;
 import com.huodaizi.backend.repository.inquiry.InquiryQuoteCompareEntity;
-import java.math.BigDecimal;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
@@ -137,6 +143,56 @@ public class InquiryService {
     return (int) items.stream().filter(item -> item.getStatus() == status).count();
   }
 
+  public InquiryMerchantLeadListResponse merchantLeads(InquiryMerchantLeadListRequest request) {
+    List<InquiryMerchantLeadEntity> all = repository.listMerchantLeads(request);
+    int page = request.safePage();
+    int pageSize = request.safePageSize();
+    int from = Math.max((page - 1) * pageSize, 0);
+    int to = Math.min(from + pageSize, all.size());
+    List<InquiryMerchantLeadEntity> paged = from >= all.size() ? List.of() : all.subList(from, to);
+    return new InquiryMerchantLeadListResponse(
+        paged.stream().map(this::toMerchantLeadItem).toList(),
+        all.size(),
+        page,
+        pageSize,
+        countMerchantByStatus(all, InquiryMerchantLeadStatus.NEW),
+        countMerchantByStatus(all, InquiryMerchantLeadStatus.QUOTED),
+        countMerchantByStatus(all, InquiryMerchantLeadStatus.WON),
+        countMerchantByStatus(all, InquiryMerchantLeadStatus.LOST),
+        countMerchantByStatus(all, InquiryMerchantLeadStatus.CLOSED));
+  }
+
+  public InquiryMerchantLeadDetailResponse merchantLeadDetail(
+      String leadId, InquiryMerchantLeadListRequest request) {
+    InquiryMerchantLeadEntity lead = repository.merchantLeadDetail(leadId, request.merchantId());
+    String nextAction = "优先报价后30分钟内电话回访，提升转化";
+    return new InquiryMerchantLeadDetailResponse(
+        toMerchantLeadItem(lead),
+        lead.getSpecText(),
+        lead.getDeliveryCity(),
+        lead.getDemandQtyTon(),
+        lead.getInvoiceNeed(),
+        lead.getExpectedDeliveryAt(),
+        nextAction);
+  }
+
+  public InquiryMerchantLeadItemDTO merchantQuote(
+      String leadId, InquiryMerchantLeadQuoteRequest request) {
+    validateQuote(request);
+    InquiryMerchantLeadEntity updated = repository.merchantLeadQuote(leadId, request);
+    return toMerchantLeadItem(updated);
+  }
+
+  public InquiryMerchantLeadItemDTO merchantUpdateStatus(
+      String leadId, InquiryMerchantLeadStatusUpdateRequest request) {
+    if (request.status() == null || request.status().isBlank()) {
+      throw new com.huodaizi.backend.common.BaseException(
+          com.huodaizi.backend.common.ErrorCode.BAD_REQUEST.getCode(), "status 不能为空");
+    }
+    InquiryMerchantLeadEntity updated = repository.merchantLeadUpdateStatus(leadId, request);
+    return toMerchantLeadItem(updated);
+  }
+
   private InquiryQuoteCompareItemDTO toCompareItem(InquiryQuoteCompareEntity entity) {
     return new InquiryQuoteCompareItemDTO(
         entity.getQuoteId(),
@@ -158,6 +214,45 @@ public class InquiryService {
         entity.getQuoteRemark(),
         "ACTIVE",
         entity.getQuoteTime().toString());
+  }
+
+  private InquiryMerchantLeadItemDTO toMerchantLeadItem(InquiryMerchantLeadEntity entity) {
+    return new InquiryMerchantLeadItemDTO(
+        entity.getId(),
+        entity.getInquiryId(),
+        entity.getInquiryNo(),
+        entity.getMerchantId(),
+        entity.getMerchantName(),
+        entity.getSpecText(),
+        entity.getDemandQtyTon(),
+        entity.getDeliveryCity(),
+        entity.getInvoiceNeed(),
+        entity.getContactNameMasked(),
+        entity.getContactMobileMasked(),
+        entity.getExpectedDeliveryAt(),
+        entity.getStatus().name(),
+        entity.getMerchantName(),
+        entity.getQuoteRemark(),
+        entity.getUpdatedAt().toString());
+  }
+
+  private int countMerchantByStatus(List<InquiryMerchantLeadEntity> items, InquiryMerchantLeadStatus status) {
+    return (int) items.stream().filter(item -> item.getStatus() == status).count();
+  }
+
+  private void validateQuote(InquiryMerchantLeadQuoteRequest request) {
+    if (request.unitPrice() == null || request.unitPrice().isBlank()) {
+      throw new com.huodaizi.backend.common.BaseException(
+          com.huodaizi.backend.common.ErrorCode.BAD_REQUEST.getCode(), "unitPrice 不能为空");
+    }
+    if (request.deliveryDays() == null || request.deliveryDays().isBlank()) {
+      throw new com.huodaizi.backend.common.BaseException(
+          com.huodaizi.backend.common.ErrorCode.BAD_REQUEST.getCode(), "deliveryDays 不能为空");
+    }
+    if (request.paymentTerm() == null || request.paymentTerm().isBlank()) {
+      throw new com.huodaizi.backend.common.BaseException(
+          com.huodaizi.backend.common.ErrorCode.BAD_REQUEST.getCode(), "paymentTerm 不能为空");
+    }
   }
 
   private String maskPhone(String phone) {

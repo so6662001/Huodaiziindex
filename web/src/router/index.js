@@ -3,6 +3,7 @@ import HomePage from '../pages/HomePage.vue'
 import InquiryCreatePage from '../pages/InquiryCreatePage.vue'
 import InquirySuccessPage from '../pages/InquirySuccessPage.vue'
 import InquiryQuoteComparePage from '../pages/InquiryQuoteComparePage.vue'
+import InquiryMerchantLeadManagePage from '../pages/InquiryMerchantLeadManagePage.vue'
 import SiteAdLeadMinePage from '../pages/SiteAdLeadMinePage.vue'
 import SiteAdLeadSubmitDemoPage from '../pages/SiteAdLeadSubmitDemoPage.vue'
 
@@ -37,6 +38,14 @@ const routes = [
     component: InquiryQuoteComparePage,
     meta: {
       title: '报价对比_买家决策台-货袋子'
+    }
+  },
+  {
+    path: '/merchant/lead/manage',
+    name: 'merchantLeadManage',
+    component: InquiryMerchantLeadManagePage,
+    meta: {
+      title: '商家线索管理_报价工作台-货袋子'
     }
   },
   {
