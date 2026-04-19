@@ -19,6 +19,8 @@ import com.huodaizi.backend.dto.inquiry.InquiryBillingOrderPaymentRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryMessageCenterListRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryMessageCenterReadAllRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryMessageCenterReadRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryH5HomeRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryH5HomeRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryPickupOrderCreateRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryPickupOrderListRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryPickupOrderStatus;
@@ -71,6 +73,7 @@ public class InMemoryInquiryRepository {
       new ConcurrentHashMap<>();
   private final ConcurrentMap<String, InquiryMessageCenterEntity> messageCenterStore =
       new ConcurrentHashMap<>();
+  private final ConcurrentMap<String, InquiryH5HomeEntity> h5HomeStore = new ConcurrentHashMap<>();
   private final ConcurrentMap<String, InquiryPickupOrderEntity> pickupOrderStore = new ConcurrentHashMap<>();
   private final ConcurrentMap<String, InquiryReconcileOrderEntity> reconcileOrderStore =
       new ConcurrentHashMap<>();
@@ -440,6 +443,73 @@ public class InMemoryInquiryRepository {
       }
     }
     return affected;
+  }
+
+  public InquiryH5HomeEntity h5Home(InquiryH5HomeRequest request) {
+    String city = defaultText(request.city(), "全国").trim();
+    List<InquiryH5HomeEntity.BannerEntity> banners =
+        List.of(
+            new InquiryH5HomeEntity.BannerEntity(
+                "BNR001",
+                "今日钢价速递",
+                "全国主流城市热卷价格走势更新",
+                "/inquiry/create",
+                "https://cdn.huodaizi.com/h5/banner-market.png"),
+            new InquiryH5HomeEntity.BannerEntity(
+                "BNR002",
+                "AI询价限时提速",
+                "3步提交，10分钟内拿到首批报价",
+                "/inquiry/create",
+                "https://cdn.huodaizi.com/h5/banner-ai.png"));
+
+    List<InquiryH5HomeEntity.QuickNavEntity> quickNavs =
+        List.of(
+            new InquiryH5HomeEntity.QuickNavEntity(
+                "NAV001", "AI询价", "3步快速找货", "inquiry", "/inquiry/create", "HOT"),
+            new InquiryH5HomeEntity.QuickNavEntity(
+                "NAV002", "现货大厅", "热门规格现货", "spot", "/", ""),
+            new InquiryH5HomeEntity.QuickNavEntity(
+                "NAV003", "报价对比", "多商家智能比较", "compare", "/inquiry/compare", ""),
+            new InquiryH5HomeEntity.QuickNavEntity(
+                "NAV004", "消息中心", "通知与待办", "message", "/merchant/message-center", "NEW"),
+            new InquiryH5HomeEntity.QuickNavEntity(
+                "NAV005", "提货对账", "履约协同闭环", "reconcile", "/inquiry/reconcile/pass", ""),
+            new InquiryH5HomeEntity.QuickNavEntity(
+                "NAV006", "信用规则", "分发评分公开", "rule", "/dispatch/score-rules", ""));
+
+    List<InquiryH5HomeEntity.MarketCardEntity> marketCards =
+        List.of(
+            new InquiryH5HomeEntity.MarketCardEntity("螺纹钢 HRB400E", "Φ20*12m", city, "3520", "+20", "860"),
+            new InquiryH5HomeEntity.MarketCardEntity("热轧卷板 Q235B", "3.0*1500*C", city, "3680", "-10", "420"),
+            new InquiryH5HomeEntity.MarketCardEntity("中厚板 Q355B", "10*2000*8000", city, "3890", "+15", "220"));
+
+    List<InquiryH5HomeEntity.RecommendationEntity> recommendations =
+        List.of(
+            new InquiryH5HomeEntity.RecommendationEntity(
+                "REC001",
+                "唐山弘达钢贸",
+                "响应快 · 履约稳",
+                "92",
+                "7分钟",
+                "/merchant/credit/score?merchantId=S001"),
+            new InquiryH5HomeEntity.RecommendationEntity(
+                "REC002",
+                "无锡铭泰供应链",
+                "支持月结 · 可回单",
+                "88",
+                "11分钟",
+                "/merchant/credit/score?merchantId=S002"));
+
+    return new InquiryH5HomeEntity(
+        city,
+        "晴 18-26℃",
+        "买钢卖钢 就上货袋子",
+        "AI询价 + 报价对比 + 履约协同",
+        quickNavs,
+        banners,
+        marketCards,
+        recommendations,
+        LocalDateTime.now());
   }
 
   public List<InquiryMerchantLeadEntity> workbenchTasks(InquiryQuoteWorkbenchTaskRequest request) {
@@ -954,6 +1024,7 @@ public class InMemoryInquiryRepository {
     seedBillingOrders();
     seedDispatchScoreRules();
     seedMessageCenter();
+    seedH5Home();
   }
 
   private void seedMerchantLeads(InquiryEntity inquiry1, InquiryEntity inquiry2) {
@@ -1317,6 +1388,85 @@ public class InMemoryInquiryRepository {
             "UNREAD",
             null,
             now.minusHours(3)));
+  }
+
+  private void seedH5Home() {
+    h5HomeStore.put(
+        "CN",
+        new InquiryH5HomeEntity(
+            "全国",
+            "多云 22°C",
+            "货袋子H5首页",
+            "钢材交易一站式服务",
+            List.of(
+                new InquiryH5HomeEntity.QuickNavEntity(
+                    "AI_INQUIRY",
+                    "AI询价",
+                    "3步发布需求",
+                    "https://cdn.huodaizi.com/icon/ai-inquiry.png",
+                    "/inquiry/create",
+                    ""),
+                new InquiryH5HomeEntity.QuickNavEntity(
+                    "SPOT_MALL",
+                    "现货大厅",
+                    "实时库存与报价",
+                    "https://cdn.huodaizi.com/icon/spot.png",
+                    "/",
+                    ""),
+                new InquiryH5HomeEntity.QuickNavEntity(
+                    "MERCHANT_SCORE",
+                    "信用评分",
+                    "履约与风控评分",
+                    "https://cdn.huodaizi.com/icon/score.png",
+                    "/merchant/credit/score?merchantId=S001",
+                    ""),
+                new InquiryH5HomeEntity.QuickNavEntity(
+                    "MESSAGE_CENTER",
+                    "消息中心",
+                    "待办与提醒聚合",
+                    "https://cdn.huodaizi.com/icon/message.png",
+                    "/merchant/message-center?merchantId=S001",
+                    "2")),
+            List.of(
+                new InquiryH5HomeEntity.BannerEntity(
+                    "BNR001",
+                    "钢贸商家增长计划",
+                    "入驻即送30条高意向线索",
+                    "/merchant/subscription?merchantId=S001",
+                    "orange"),
+                new InquiryH5HomeEntity.BannerEntity(
+                    "BNR002",
+                    "对账通限时体验",
+                    "履约到回款全链路协同",
+                    "/inquiry/reconcile/pass?contactMobile=13800138000",
+                    "blue")),
+            List.of(
+                new InquiryH5HomeEntity.MarketCardEntity("螺纹钢 HRB400E", "Φ20*12m", "唐山", "3520", "-20", "860"),
+                new InquiryH5HomeEntity.MarketCardEntity("热轧卷板 Q235B", "3.0*1500*C", "无锡", "3680", "+15", "420"),
+                new InquiryH5HomeEntity.MarketCardEntity("中厚板 Q355B", "10*2000*8000", "郑州", "3890", "+8", "220")),
+            List.of(
+                new InquiryH5HomeEntity.RecommendationEntity(
+                    "S001",
+                    "唐山弘达钢贸",
+                    "92",
+                    "响应快｜可开票｜当日排货",
+                    "7",
+                    "/merchant/lead/manage?merchantId=S001"),
+                new InquiryH5HomeEntity.RecommendationEntity(
+                    "S002",
+                    "无锡铭泰供应链",
+                    "89",
+                    "支持月结｜回单完整",
+                    "11",
+                    "/merchant/lead/manage?merchantId=S001"),
+                new InquiryH5HomeEntity.RecommendationEntity(
+                    "S003",
+                    "郑州鑫诚贸易",
+                    "86",
+                    "华中专线｜夜间装车",
+                    "14",
+                    "/merchant/lead/manage?merchantId=S001")),
+            LocalDateTime.now().minusMinutes(20)));
   }
 
   private String maskPhone(String phone) {

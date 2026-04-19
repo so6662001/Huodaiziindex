@@ -67,6 +67,12 @@ import com.huodaizi.backend.dto.inquiry.InquiryMessageCenterListResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryMessageCenterReadAllRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryMessageCenterReadRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryMessageCenterReadResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryH5HomeBannerItemDTO;
+import com.huodaizi.backend.dto.inquiry.InquiryH5HomeMarketCardDTO;
+import com.huodaizi.backend.dto.inquiry.InquiryH5HomeQuickNavItemDTO;
+import com.huodaizi.backend.dto.inquiry.InquiryH5HomeRecommendationItemDTO;
+import com.huodaizi.backend.dto.inquiry.InquiryH5HomeRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryH5HomeResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchBatchUpdateRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchOverviewRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchOverviewResponse;
@@ -81,6 +87,7 @@ import com.huodaizi.backend.repository.inquiry.InquiryEntity;
 import com.huodaizi.backend.repository.inquiry.InquiryMerchantCreditScoreEntity;
 import com.huodaizi.backend.repository.inquiry.InquiryMerchantLeadEntity;
 import com.huodaizi.backend.repository.inquiry.InquiryMessageCenterEntity;
+import com.huodaizi.backend.repository.inquiry.InquiryH5HomeEntity;
 import com.huodaizi.backend.repository.inquiry.InquiryMerchantSubscriptionEntity;
 import com.huodaizi.backend.repository.inquiry.InquiryPickupOrderEntity;
 import com.huodaizi.backend.repository.inquiry.InquiryReconcileOrderEntity;
@@ -675,6 +682,56 @@ public class InquiryService {
         "已读",
         java.time.LocalDateTime.now().toString(),
         "已全部标记为已读");
+  }
+
+  public InquiryH5HomeResponse h5Home(InquiryH5HomeRequest request) {
+    InquiryH5HomeEntity entity = repository.h5Home(request);
+    return new InquiryH5HomeResponse(
+        entity.getCity(),
+        entity.getWeather(),
+        entity.getUpdatedAt().toString(),
+        entity.getQuickNavs().stream()
+            .map(
+                item ->
+                    new InquiryH5HomeQuickNavItemDTO(
+                        item.code(), item.title(), item.icon(), item.actionUrl(), item.badge()))
+            .toList(),
+        entity.getBanners().stream()
+            .map(
+                item ->
+                    new InquiryH5HomeBannerItemDTO(
+                        item.bannerId(),
+                        item.title(),
+                        item.desc(),
+                        item.colorTag(),
+                        "查看详情",
+                        item.actionUrl()))
+            .toList(),
+        entity.getMarketCards().stream()
+            .map(
+                item ->
+                    new InquiryH5HomeMarketCardDTO(
+                        item.commodity(),
+                        item.commodity(),
+                        item.spec(),
+                        item.city(),
+                        item.latestPrice(),
+                        item.trend(),
+                        item.volume()))
+            .toList(),
+        entity.getRecommendations().stream()
+            .map(
+                item ->
+                    new InquiryH5HomeRecommendationItemDTO(
+                        item.merchantId(),
+                        item.merchantName(),
+                        item.tags(),
+                        item.score(),
+                        item.responseMinutes(),
+                        "主营钢材",
+                        entity.getCity(),
+                        item.actionUrl()))
+            .toList());
   }
 
   public InquiryMerchantLeadDetailResponse merchantLeadDetail(

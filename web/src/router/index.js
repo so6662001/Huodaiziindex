@@ -11,6 +11,7 @@ import InquirySubscriptionPage from '../pages/InquirySubscriptionPage.vue'
 import InquiryBillingPage from '../pages/InquiryBillingPage.vue'
 import InquiryDispatchScoreRulePage from '../pages/InquiryDispatchScoreRulePage.vue'
 import InquiryMessageCenterPage from '../pages/InquiryMessageCenterPage.vue'
+import H5HomePage from '../pages/H5HomePage.vue'
 import InquiryMerchantLeadManagePage from '../pages/InquiryMerchantLeadManagePage.vue'
 import InquiryQuoteWorkbenchPage from '../pages/InquiryQuoteWorkbenchPage.vue'
 import SiteAdLeadMinePage from '../pages/SiteAdLeadMinePage.vue'
@@ -23,6 +24,14 @@ const routes = [
     component: HomePage,
     meta: {
       title: '货袋子钢铁交易平台_找货更快卖货更稳'
+    }
+  },
+  {
+    path: '/h5',
+    name: 'h5Home',
+    component: H5HomePage,
+    meta: {
+      title: 'H01 H5首页_钢铁交易移动端首页-货袋子'
     }
   },
   {

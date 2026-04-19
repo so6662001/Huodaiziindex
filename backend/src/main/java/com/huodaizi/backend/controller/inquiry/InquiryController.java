@@ -32,6 +32,8 @@ import com.huodaizi.backend.dto.inquiry.InquiryMessageCenterListResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryMessageCenterReadAllRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryMessageCenterReadRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryMessageCenterReadResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryH5HomeRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryH5HomeResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryListRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryListResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryMerchantLeadDetailResponse;
@@ -216,6 +218,11 @@ public class InquiryController {
   public ApiResponse<InquiryDispatchScoreRuleResponse> dispatchScoreRules(
       @Valid @ModelAttribute InquiryDispatchScoreRuleRequest request) {
     return ApiResponse.success(service.dispatchScoreRules(request));
+  }
+
+  @GetMapping("/h5/home")
+  public ApiResponse<InquiryH5HomeResponse> h5Home(@Valid @ModelAttribute InquiryH5HomeRequest request) {
+    return ApiResponse.success(service.h5Home(request));
   }
 
   @GetMapping("/merchant/messages")
