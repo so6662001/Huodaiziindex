@@ -213,6 +213,17 @@ public class InMemoryTransportDemandRepository {
     return digits.substring(0, 3) + "****" + digits.substring(digits.length() - 4);
   }
 
+  private String maskContactName(String name) {
+    if (name == null || name.isBlank() || "未公开".equals(name)) {
+      return "未公开";
+    }
+    String trimmed = name.trim();
+    if (trimmed.length() == 1) {
+      return "*";
+    }
+    return trimmed.substring(0, 1) + "**";
+  }
+
   private void seed() {
     addSeed(
         "TD20260418001",
@@ -326,7 +337,7 @@ public class InMemoryTransportDemandRepository {
             needInvoice,
             needLoading,
             companyName,
-            contactName,
+            maskContactName(contactName),
             maskPhone(contactPhone),
             remark,
             status,

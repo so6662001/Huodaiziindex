@@ -1,5 +1,7 @@
 package com.huodaizi.backend.controller.transportdemand;
 
+import com.huodaizi.backend.common.BaseException;
+import com.huodaizi.backend.common.ErrorCode;
 import com.huodaizi.backend.common.ApiResponse;
 import com.huodaizi.backend.dto.transportdemand.TransportDemandAdminUpdateRequest;
 import com.huodaizi.backend.dto.transportdemand.TransportDemandItemDTO;
@@ -53,7 +55,7 @@ public class TransportDemandAdminController {
   public ApiResponse<TransportDemandItemDTO> pin(
       @PathVariable("id") String id, @Valid @RequestBody TransportDemandAdminUpdateRequest request) {
     if (request.pinned() == null) {
-      throw new IllegalArgumentException("pinned 不能为空");
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "pinned 不能为空");
     }
     return ApiResponse.success(transportDemandService.pin(id, request.pinned()));
   }

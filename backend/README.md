@@ -31,6 +31,9 @@ Base Path: `/api/v1/transport-demand`
 
 Base Path: `/api/admin/transport-demand`
 
+> 安全要求：所有 `/api/admin/**` 接口必须携带请求头  
+> `X-Admin-Token: <token>`
+
 - `GET /`
   - 中台运输需求列表（含上架/下架记录）
 - `POST /`
