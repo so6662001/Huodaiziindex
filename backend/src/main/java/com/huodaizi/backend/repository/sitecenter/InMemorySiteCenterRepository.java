@@ -106,6 +106,9 @@ public class InMemorySiteCenterRepository {
       value = request.update() != null ? request.update() : value;
       citySlug = request.citySlug() != null ? request.citySlug() : citySlug;
     }
+    if (section == SiteCenterSectionType.AD_PRODUCT && request.price() != null) {
+      value = request.price();
+    }
     entity.update(
         region, citySlug, title, subtitle, value, extra, link, normalizedStatus, request.pinned());
     return entity;

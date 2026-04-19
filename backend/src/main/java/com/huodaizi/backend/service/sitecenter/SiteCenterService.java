@@ -115,7 +115,7 @@ public class SiteCenterService {
         entity.getId(),
         entity.getSectionType().name(),
         entity.getRegion(),
-        entity.getTitle(),
+        cityNameOf(entity),
         entity.getCitySlug(),
         entity.getTitle(),
         entity.getSubtitle(),
@@ -125,6 +125,10 @@ public class SiteCenterService {
         entity.getStatus(),
         entity.isPinned(),
         entity.getUpdatedAt().toString());
+  }
+
+  private String cityNameOf(SiteCenterEntity entity) {
+    return entity.getSectionType() == SiteCenterSectionType.CITY ? entity.getTitle() : "-";
   }
 
   private int regionOrder(String region) {

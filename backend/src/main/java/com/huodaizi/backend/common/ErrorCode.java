@@ -3,6 +3,8 @@ package com.huodaizi.backend.common;
 public enum ErrorCode {
   BAD_REQUEST("BAD_REQUEST", "请求参数错误"),
   NOT_FOUND("NOT_FOUND", "资源不存在"),
+  AUTH_CONFIG_ERROR("AUTH_CONFIG_ERROR", "鉴权配置错误"),
+  UNAUTHORIZED("UNAUTHORIZED", "未授权访问"),
   INTERNAL_ERROR("INTERNAL_ERROR", "服务器内部错误");
 
   private final String code;
