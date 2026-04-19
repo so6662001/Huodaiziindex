@@ -62,8 +62,7 @@ public class InMemoryMarketDetailRepository {
             request.title(),
             defaultText(request.subtitle(), "-"),
             defaultText(request.value(), "-"),
-            defaultText(request.extra(), "-"),
-            defaultText(request.link(), "#"),
+            defaultText(request.trend(), "-"),
             STATUS_ONLINE,
             false,
             LocalDateTime.now());
@@ -80,11 +79,12 @@ public class InMemoryMarketDetailRepository {
     MarketDetailEntity entity = requireByIdAndScope(id, symbol, city, section);
     String normalizedStatus = request.status() == null ? null : normalizeStatus(request.status());
     entity.update(
+        request.symbol(),
+        request.city(),
         request.title(),
         request.subtitle(),
         request.value(),
-        request.extra(),
-        request.link(),
+        request.trend(),
         normalizedStatus,
         request.pinned());
     return entity;
@@ -280,7 +280,6 @@ public class InMemoryMarketDetailRepository {
             subtitle,
             value,
             extra,
-            link,
             STATUS_ONLINE,
             pinned,
             LocalDateTime.now().minusMinutes(minusMinutes));

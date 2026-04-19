@@ -28,6 +28,9 @@ Base Path: `/api/v1/market-detail`
 
 Base Path: `/api/admin/market-detail`
 
+> 安全要求：所有 `/api/admin/**` 接口必须携带请求头  
+> `X-Admin-Token: <token>`
+
 - `GET /{symbol}/{city}/{section}`
   - 查询指定品种+城市+板块的中台列表（含上下架）
 - `POST /{symbol}/{city}/{section}`
@@ -90,4 +93,11 @@ Base Path: `/api/admin/market-detail`
 ```bash
 cd backend
 mvn spring-boot:run
+```
+
+本地调试可使用默认 token：
+
+```bash
+curl -H "X-Admin-Token: change-this-admin-token" \
+  http://127.0.0.1:8080/api/admin/market-detail/rebar/tangshan/SUMMARY
 ```

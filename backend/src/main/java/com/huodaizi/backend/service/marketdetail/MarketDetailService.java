@@ -50,9 +50,7 @@ public class MarketDetailService {
             .toList();
     return new MarketDetailResponse(
         symbol,
-        symbolName(symbol),
         city,
-        cityName(city),
         cityName(city) + symbolName(symbol) + "价格走势",
         summaryCards(summary),
         relatedNews,
@@ -103,13 +101,9 @@ public class MarketDetailService {
   private MarketDetailSummaryDTO toSummary(List<MarketDetailEntity> summaryEntities) {
     MarketDetailEntity chart =
         summaryEntities.stream()
-            .filter(e -> "CHART".equalsIgnoreCase(fallback(e.getTrend(), "")))
+            .filter(entity -> "CHART".equalsIgnoreCase(fallback(entity.getTrend(), "")))
             .findFirst()
             .orElse(summaryEntities.get(0));
-    List<MarketDetailEntity> cards =
-        summaryEntities.stream()
-            .filter(e -> "CARD".equalsIgnoreCase(fallback(e.getTrend(), "")))
-            .toList();
     return new MarketDetailSummaryDTO(
         chart.getTitle(),
         fallback(chart.getValue(), "-"),
