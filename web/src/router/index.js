@@ -31,6 +31,7 @@ import A07PlanPricingManagePage from '../pages/A07PlanPricingManagePage.vue'
 import A08RiskAlertCenterPage from '../pages/A08RiskAlertCenterPage.vue'
 import N01LoginRegisterPage from '../pages/N01LoginRegisterPage.vue'
 import N02IdentitySelectPage from '../pages/N02IdentitySelectPage.vue'
+import N03EnterpriseCertificationPage from '../pages/N03EnterpriseCertificationPage.vue'
 import InquiryMerchantLeadManagePage from '../pages/InquiryMerchantLeadManagePage.vue'
 import InquiryQuoteWorkbenchPage from '../pages/InquiryQuoteWorkbenchPage.vue'
 import SiteAdLeadMinePage from '../pages/SiteAdLeadMinePage.vue'
@@ -203,6 +204,14 @@ const routes = [
     component: N02IdentitySelectPage,
     meta: {
       title: 'PC-N02身份选择_货袋子账号中心'
+    }
+  },
+  {
+    path: '/account/enterprise-certification',
+    name: 'n03EnterpriseCertification',
+    component: N03EnterpriseCertificationPage,
+    meta: {
+      title: 'PC-N03企业认证提交_货袋子账号中心'
     }
   },
   {

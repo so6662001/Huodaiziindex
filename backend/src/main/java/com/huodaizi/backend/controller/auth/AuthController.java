@@ -6,6 +6,8 @@ import com.huodaizi.backend.dto.auth.AuthLoginResponse;
 import com.huodaizi.backend.dto.auth.AuthRegisterRequest;
 import com.huodaizi.backend.dto.auth.AuthRegisterResponse;
 import com.huodaizi.backend.dto.auth.AuthSessionResponse;
+import com.huodaizi.backend.dto.auth.N03EnterpriseCertificationDetailResponse;
+import com.huodaizi.backend.dto.auth.N03EnterpriseCertificationSubmitRequest;
 import com.huodaizi.backend.service.auth.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,6 +41,19 @@ public class AuthController {
   public ApiResponse<AuthSessionResponse> session(
       @RequestHeader(name = AUTH_HEADER, required = false) String token) {
     return ApiResponse.success(service.session(token));
+  }
+
+  @GetMapping("/enterprise-certification/detail")
+  public ApiResponse<N03EnterpriseCertificationDetailResponse> enterpriseCertificationDetail(
+      @RequestHeader(name = AUTH_HEADER, required = false) String token) {
+    return ApiResponse.success(service.enterpriseCertificationDetail(token));
+  }
+
+  @PostMapping("/enterprise-certification/submit")
+  public ApiResponse<N03EnterpriseCertificationDetailResponse> submitEnterpriseCertification(
+      @RequestHeader(name = AUTH_HEADER, required = false) String token,
+      @Valid @RequestBody N03EnterpriseCertificationSubmitRequest request) {
+    return ApiResponse.success(service.submitEnterpriseCertification(token, request));
   }
 
   @PostMapping("/logout")

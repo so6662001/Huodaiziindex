@@ -84,6 +84,10 @@ function goHome() {
   router.push('/')
 }
 
+function goCertification() {
+  router.push('/account/enterprise-certification')
+}
+
 function goTarget(identityCode) {
   if (identityCode === 'BUYER') {
     router.push('/inquiry/create')
@@ -152,6 +156,14 @@ onMounted(() => {
               @click="switchIdentity(identity.identityCode)"
             >
               {{ identity.selected ? '当前身份' : '切换为该身份' }}
+            </button>
+            <button
+              v-if="identity.identityCode === 'BUYER'"
+              class="btn"
+              :disabled="switching"
+              @click="goCertification"
+            >
+              企业认证提交
             </button>
             <button class="btn" :disabled="switching" @click="goTarget(identity.identityCode)">进入工作台</button>
           </div>

@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -20,6 +19,8 @@ import org.springframework.stereotype.Repository;
 public class InMemoryAuthRepository {
   private final ConcurrentMap<String, AuthUserEntity> userStore = new ConcurrentHashMap<>();
   private final ConcurrentMap<String, SessionEntity> sessionStore = new ConcurrentHashMap<>();
+  private final ConcurrentMap<String, EnterpriseCertificationEntity> certificationStore =
+      new ConcurrentHashMap<>();
 
   public InMemoryAuthRepository() {
     seed();
@@ -146,6 +147,63 @@ public class InMemoryAuthRepository {
 
   public List<String> identityCodes() {
     return List.of("BUYER", "SUPPLIER", "OPERATOR");
+  }
+
+  public EnterpriseCertificationEntity saveCertification(
+      String token, EnterpriseCertificationDraft draft) {
+    SessionEntity session = requireSession(token);
+    AuthUserEntity user = userStore.get(session.getAccount());
+    if (user == null) {
+      throw new BaseException(ErrorCode.UNAUTHORIZED.getCode(), "登录态无效");
+    }
+    EnterpriseCertificationEntity current = certificationStore.get(user.getUserId());
+    LocalDateTime now = LocalDateTime.now();
+    String certificationId =
+        current == null
+            ? "EC" + UUID.randomUUID().toString().replace("-", "").substring(0, 10)
+            : current.getCertificationId();
+    EnterpriseCertificationEntity saved =
+        new EnterpriseCertificationEntity(
+            certificationId,
+            user.getUserId(),
+            user.getAccount(),
+            "PENDING_REVIEW",
+            defaultText(draft.companyName(), user.getCompanyName()),
+            draft.unifiedSocialCreditCode(),
+            draft.legalPersonName(),
+            draft.legalPersonIdNo(),
+            defaultText(draft.contactName(), user.getContactName()),
+            draft.contactMobile(),
+            maskPhone(draft.contactMobile()),
+            draft.businessLicenseUrl(),
+            draft.legalIdFrontUrl(),
+            draft.legalIdBackUrl(),
+            draft.bankAccountName(),
+            draft.bankAccountNo(),
+            draft.bankName(),
+            draft.province(),
+            draft.city(),
+            draft.address(),
+            draft.remark(),
+            defaultText(draft.operator(), "n03-pc-submit"),
+            current == null ? now : current.getCreatedAt(),
+            now,
+            now);
+    certificationStore.put(user.getUserId(), saved);
+    return saved;
+  }
+
+  public Optional<EnterpriseCertificationEntity> findCertificationByToken(String token) {
+    SessionEntity session = requireSession(token);
+    AuthUserEntity user = userStore.get(session.getAccount());
+    if (user == null) {
+      throw new BaseException(ErrorCode.UNAUTHORIZED.getCode(), "登录态无效");
+    }
+    return Optional.ofNullable(certificationStore.get(user.getUserId()));
+  }
+
+  public Optional<AuthUserEntity> findUserByToken(String token) {
+    return findByToken(token);
   }
 
   public void logout(String token) {
