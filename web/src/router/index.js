@@ -10,6 +10,7 @@ import InquiryMerchantCreditScorePage from '../pages/InquiryMerchantCreditScoreP
 import InquirySubscriptionPage from '../pages/InquirySubscriptionPage.vue'
 import InquiryBillingPage from '../pages/InquiryBillingPage.vue'
 import InquiryDispatchScoreRulePage from '../pages/InquiryDispatchScoreRulePage.vue'
+import InquiryMessageCenterPage from '../pages/InquiryMessageCenterPage.vue'
 import InquiryMerchantLeadManagePage from '../pages/InquiryMerchantLeadManagePage.vue'
 import InquiryQuoteWorkbenchPage from '../pages/InquiryQuoteWorkbenchPage.vue'
 import SiteAdLeadMinePage from '../pages/SiteAdLeadMinePage.vue'
@@ -102,6 +103,14 @@ const routes = [
     component: InquiryDispatchScoreRulePage,
     meta: {
       title: 'P13分发评分规则公开页_公开透明规则说明-货袋子'
+    }
+  },
+  {
+    path: '/merchant/message-center',
+    name: 'merchantMessageCenter',
+    component: InquiryMessageCenterPage,
+    meta: {
+      title: 'P14消息中心_通知与待办聚合-货袋子'
     }
   },
   {

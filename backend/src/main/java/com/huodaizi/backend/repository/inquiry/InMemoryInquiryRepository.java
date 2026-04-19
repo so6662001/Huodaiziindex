@@ -16,6 +16,9 @@ import com.huodaizi.backend.dto.inquiry.InquirySubscriptionMineRequest;
 import com.huodaizi.backend.dto.inquiry.InquirySubscriptionPlanListRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryBillingOrderListRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryBillingOrderPaymentRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryMessageCenterListRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryMessageCenterReadAllRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryMessageCenterReadRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryPickupOrderCreateRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryPickupOrderListRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryPickupOrderStatus;
@@ -28,6 +31,9 @@ import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchBatchUpdateRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchOverviewRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchTaskRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryDispatchScoreRuleRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryMessageCenterListRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryMessageCenterReadAllRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryMessageCenterReadRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryStatus;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -62,6 +68,8 @@ public class InMemoryInquiryRepository {
       new ConcurrentHashMap<>();
   private final ConcurrentMap<String, InquiryBillingOrderEntity> billingOrderStore = new ConcurrentHashMap<>();
   private final ConcurrentMap<String, InquiryDispatchScoreRuleEntity> dispatchRuleStore =
+      new ConcurrentHashMap<>();
+  private final ConcurrentMap<String, InquiryMessageCenterEntity> messageCenterStore =
       new ConcurrentHashMap<>();
   private final ConcurrentMap<String, InquiryPickupOrderEntity> pickupOrderStore = new ConcurrentHashMap<>();
   private final ConcurrentMap<String, InquiryReconcileOrderEntity> reconcileOrderStore =
@@ -365,6 +373,73 @@ public class InMemoryInquiryRepository {
       throw new BaseException(ErrorCode.NOT_FOUND.getCode(), "分发评分规则不存在");
     }
     return entity;
+  }
+
+  public List<InquiryMessageCenterEntity> listMessageCenter(InquiryMessageCenterListRequest request) {
+    String merchantId = defaultText(request.merchantId(), "").trim();
+    if (merchantId.isEmpty()) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "merchantId 不能为空");
+    }
+    String type = normalize(request.messageType());
+    String readStatus = normalize(request.readStatus());
+    String keyword = normalize(request.keyword());
+    return messageCenterStore.values().stream()
+        .filter(item -> item.getMerchantId().equalsIgnoreCase(merchantId))
+        .filter(item -> type == null || normalize(item.getBizType()).equals(type))
+        .filter(item -> readStatus == null || normalize(item.getReadStatus()).equals(readStatus))
+        .filter(
+            item ->
+                keyword == null
+                    || normalize(item.getTitle()).contains(keyword)
+                    || normalize(item.getContent()).contains(keyword)
+                    || normalize(item.getBizId()).contains(keyword))
+        .sorted(Comparator.comparing(InquiryMessageCenterEntity::getUpdatedAt, Comparator.reverseOrder()))
+        .toList();
+  }
+
+  public InquiryMessageCenterEntity messageCenterDetail(
+      String messageId, InquiryMessageCenterListRequest request) {
+    String merchantId = defaultText(request.merchantId(), "").trim();
+    if (merchantId.isEmpty()) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "merchantId 不能为空");
+    }
+    InquiryMessageCenterEntity entity = requireMessage(messageId);
+    if (!entity.getMerchantId().equalsIgnoreCase(merchantId)) {
+      throw new BaseException(ErrorCode.NOT_FOUND.getCode(), "消息不存在");
+    }
+    return entity;
+  }
+
+  public InquiryMessageCenterEntity messageCenterRead(
+      String messageId, InquiryMessageCenterReadRequest request) {
+    InquiryMessageCenterEntity entity =
+        messageCenterDetail(
+            messageId,
+            new InquiryMessageCenterListRequest(
+                request.merchantId(), null, null, null, 1, Integer.MAX_VALUE));
+    if (!"READ".equalsIgnoreCase(entity.getReadStatus())) {
+      entity.markRead(LocalDateTime.now());
+    }
+    return entity;
+  }
+
+  public int messageCenterReadAll(InquiryMessageCenterReadAllRequest request) {
+    String merchantId = defaultText(request.merchantId(), "").trim();
+    if (merchantId.isEmpty()) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "merchantId 不能为空");
+    }
+    int affected = 0;
+    LocalDateTime now = LocalDateTime.now();
+    for (InquiryMessageCenterEntity item : messageCenterStore.values()) {
+      if (!item.getMerchantId().equalsIgnoreCase(merchantId)) {
+        continue;
+      }
+      if (!"READ".equalsIgnoreCase(item.getReadStatus())) {
+        item.markRead(now);
+        affected++;
+      }
+    }
+    return affected;
   }
 
   public List<InquiryMerchantLeadEntity> workbenchTasks(InquiryQuoteWorkbenchTaskRequest request) {
@@ -766,6 +841,14 @@ public class InMemoryInquiryRepository {
     return entity;
   }
 
+  private InquiryMessageCenterEntity requireMessage(String messageId) {
+    InquiryMessageCenterEntity entity = messageCenterStore.get(defaultText(messageId, "").trim());
+    if (entity == null) {
+      throw new BaseException(ErrorCode.NOT_FOUND.getCode(), "消息不存在");
+    }
+    return entity;
+  }
+
   private String normalizeBillingStatusOrNull(String status) {
     if (status == null || status.isBlank()) {
       return null;
@@ -870,6 +953,7 @@ public class InMemoryInquiryRepository {
     seedMerchantSubscriptions();
     seedBillingOrders();
     seedDispatchScoreRules();
+    seedMessageCenter();
   }
 
   private void seedMerchantLeads(InquiryEntity inquiry1, InquiryEntity inquiry2) {
@@ -1169,6 +1253,70 @@ public class InMemoryInquiryRepository {
                 "付费服务不改变核心履约与风控权重，最多提供小幅加权。",
                 "若发现数据异常或申诉场景，平台将在核验后回溯修正。"),
             LocalDateTime.now().minusHours(2)));
+  }
+
+  private void seedMessageCenter() {
+    LocalDateTime now = LocalDateTime.now();
+    messageCenterStore.put(
+        "MSG20260419001",
+        new InquiryMessageCenterEntity(
+            "MSG20260419001",
+            "S001",
+            "报价工作台有新线索待处理",
+            "您有 2 条新线索超 10 分钟未响应，建议尽快报价。",
+            "SYSTEM",
+            "ML-IQ20260418001-S001",
+            "HIGH",
+            "/merchant/quote/workbench?merchantId=S001",
+            now.minusHours(2),
+            "UNREAD",
+            null,
+            now.minusHours(2)));
+    messageCenterStore.put(
+        "MSG20260419002",
+        new InquiryMessageCenterEntity(
+            "MSG20260419002",
+            "S001",
+            "订阅账单即将到期",
+            "您当前套餐账单将在 3 天后到期，请及时完成回款登记。",
+            "FINANCE",
+            "BL20260418001",
+            "MEDIUM",
+            "/merchant/billing?merchantId=S001",
+            now.minusHours(8),
+            "UNREAD",
+            null,
+            now.minusHours(8)));
+    messageCenterStore.put(
+        "MSG20260419003",
+        new InquiryMessageCenterEntity(
+            "MSG20260419003",
+            "S001",
+            "分发评分规则已更新",
+            "公开规则版本升级至 v2026.04，建议查看加减分细则。",
+            "RULE",
+            "DISPATCH-v2026.04",
+            "LOW",
+            "/dispatch/score-rules?merchantId=S001",
+            now.minusDays(1),
+            "READ",
+            now.minusHours(20),
+            now.minusHours(20)));
+    messageCenterStore.put(
+        "MSG20260419004",
+        new InquiryMessageCenterEntity(
+            "MSG20260419004",
+            "S002",
+            "提货单状态变更提醒",
+            "提货单 PU-20260419-PU20260419001 已更新为运输中。",
+            "TRANSACTION",
+            "PU20260419001",
+            "MEDIUM",
+            "/inquiry/pickup/pass?contactMobile=13900139000",
+            now.minusHours(3),
+            "UNREAD",
+            null,
+            now.minusHours(3)));
   }
 
   private String maskPhone(String phone) {

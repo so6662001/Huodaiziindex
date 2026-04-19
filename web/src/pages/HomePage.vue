@@ -117,6 +117,10 @@ function goDispatchRulePage() {
   router.push('/dispatch/score-rules?merchantId=S001')
 }
 
+function goMessageCenterPage() {
+  router.push('/merchant/messages?merchantId=S001')
+}
+
 function onSearch() {
   if (!keyword.value.trim()) {
     return
@@ -298,6 +302,7 @@ function onSearch() {
         <button class="btn" @click="goLeadCenter">查看我的投放单</button>
         <button class="btn" @click="goCreditScore">查看信用评分</button>
         <button class="btn" @click="goDispatchRulePage">分发评分规则</button>
+        <button class="btn" @click="goMessageCenterPage">消息中心</button>
         <button class="btn" @click="goSubscriptionPage">套餐与订阅</button>
         <button class="btn" @click="goBillingPage">计费与账单</button>
         <button class="btn primary" @click="goInquiry">立即体验AI询价</button>

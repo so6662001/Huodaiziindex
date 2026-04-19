@@ -60,6 +60,13 @@ import com.huodaizi.backend.dto.inquiry.InquiryDispatchScoreRuleDimensionDTO;
 import com.huodaizi.backend.dto.inquiry.InquiryDispatchScoreRulePenaltyItemDTO;
 import com.huodaizi.backend.dto.inquiry.InquiryDispatchScoreRuleRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryDispatchScoreRuleResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryMessageCenterDetailResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryMessageCenterItemDTO;
+import com.huodaizi.backend.dto.inquiry.InquiryMessageCenterListRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryMessageCenterListResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryMessageCenterReadAllRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryMessageCenterReadRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryMessageCenterReadResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchBatchUpdateRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchOverviewRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchOverviewResponse;
@@ -73,6 +80,7 @@ import com.huodaizi.backend.repository.inquiry.InMemoryInquiryRepository;
 import com.huodaizi.backend.repository.inquiry.InquiryEntity;
 import com.huodaizi.backend.repository.inquiry.InquiryMerchantCreditScoreEntity;
 import com.huodaizi.backend.repository.inquiry.InquiryMerchantLeadEntity;
+import com.huodaizi.backend.repository.inquiry.InquiryMessageCenterEntity;
 import com.huodaizi.backend.repository.inquiry.InquiryMerchantSubscriptionEntity;
 import com.huodaizi.backend.repository.inquiry.InquiryPickupOrderEntity;
 import com.huodaizi.backend.repository.inquiry.InquiryReconcileOrderEntity;
@@ -606,6 +614,69 @@ public class InquiryService {
         entity.getUpdatedAt().toString());
   }
 
+  public InquiryMessageCenterListResponse messageCenterList(InquiryMessageCenterListRequest request) {
+    List<InquiryMessageCenterEntity> all = repository.listMessageCenter(request);
+    int page = request.safePage();
+    int pageSize = request.safePageSize();
+    int from = Math.max((page - 1) * pageSize, 0);
+    int to = Math.min(from + pageSize, all.size());
+    List<InquiryMessageCenterEntity> paged = from >= all.size() ? List.of() : all.subList(from, to);
+    int unreadCount = (int) all.stream().filter(item -> "UNREAD".equalsIgnoreCase(item.getReadStatus())).count();
+    int readCount = all.size() - unreadCount;
+    int systemCount = (int) all.stream().filter(item -> "SYSTEM".equalsIgnoreCase(item.getBizType())).count();
+    int transactionCount =
+        (int)
+            all.stream()
+                .filter(item -> "INQUIRY".equalsIgnoreCase(item.getBizType()))
+                .count();
+    int riskCount = (int) all.stream().filter(item -> "RISK".equalsIgnoreCase(item.getBizType())).count();
+    return new InquiryMessageCenterListResponse(
+        request.merchantId().trim(),
+        paged.stream().map(this::toMessageItem).toList(),
+        all.size(),
+        page,
+        pageSize,
+        unreadCount,
+        readCount,
+        systemCount,
+        transactionCount,
+        riskCount);
+  }
+
+  public InquiryMessageCenterDetailResponse messageCenterDetail(
+      String messageId, InquiryMessageCenterListRequest request) {
+    InquiryMessageCenterEntity entity = repository.messageCenterDetail(messageId, request);
+    return new InquiryMessageCenterDetailResponse(
+        toMessageItem(entity),
+        entity.getContent(),
+        entity.getActionUrl(),
+        entity.getBizId(),
+        entity.getBizType());
+  }
+
+  public InquiryMessageCenterReadResponse messageCenterRead(
+      String messageId, InquiryMessageCenterReadRequest request) {
+    InquiryMessageCenterEntity entity = repository.messageCenterRead(messageId, request);
+    return new InquiryMessageCenterReadResponse(
+        request.merchantId().trim(),
+        entity.getMessageId(),
+        entity.getReadStatus(),
+        "READ".equalsIgnoreCase(entity.getReadStatus()) ? "已读" : "未读",
+        entity.getReadAt() == null ? "" : entity.getReadAt().toString(),
+        "消息已标记为已读");
+  }
+
+  public InquiryMessageCenterReadResponse messageCenterReadAll(InquiryMessageCenterReadAllRequest request) {
+    repository.messageCenterReadAll(request);
+    return new InquiryMessageCenterReadResponse(
+        request.merchantId().trim(),
+        "",
+        "READ",
+        "已读",
+        java.time.LocalDateTime.now().toString(),
+        "已全部标记为已读");
+  }
+
   public InquiryMerchantLeadDetailResponse merchantLeadDetail(
       String leadId, InquiryMerchantLeadListRequest request) {
     InquiryMerchantLeadEntity lead = repository.merchantLeadDetail(leadId, request.merchantId());
@@ -887,6 +958,69 @@ public class InquiryService {
         "ISSUED",
         entity.getCreatedAt().toString(),
         entity.getUpdatedAt().toString());
+  }
+
+  private InquiryMessageCenterItemDTO toMessageItem(InquiryMessageCenterEntity entity) {
+    String messageType = messageTypeFromBizType(entity.getBizType());
+    String messageTypeText = messageTypeText(messageType);
+    String status = entity.getReadStatus();
+    boolean unread = !"READ".equalsIgnoreCase(status);
+    List<String> tags = List.of(entity.getPriority(), messageTypeText);
+    return new InquiryMessageCenterItemDTO(
+        entity.getMessageId(),
+        entity.getMerchantId(),
+        entity.getTitle(),
+        entity.getContent(),
+        messageType,
+        messageTypeText,
+        entity.getBizType(),
+        entity.getBizId(),
+        status,
+        unread ? "未读" : "已读",
+        unread,
+        "P1".equalsIgnoreCase(entity.getPriority()),
+        priorityScore(entity.getPriority()),
+        tags,
+        "查看详情",
+        entity.getActionUrl(),
+        entity.getSendAt().toString(),
+        entity.getReadAt() == null ? "" : entity.getReadAt().toString());
+  }
+
+  private String messageTypeFromBizType(String bizType) {
+    if (bizType == null || bizType.isBlank()) {
+      return "SYSTEM";
+    }
+    String normalized = bizType.trim().toUpperCase(java.util.Locale.ROOT);
+    return switch (normalized) {
+      case "INQUIRY", "RECONCILE", "SUBSCRIPTION" -> "TRANSACTION";
+      case "RISK" -> "RISK";
+      default -> "SYSTEM";
+    };
+  }
+
+  private String messageTypeText(String type) {
+    if (type == null || type.isBlank()) {
+      return "系统";
+    }
+    return switch (type.trim().toUpperCase(java.util.Locale.ROOT)) {
+      case "TRANSACTION" -> "交易";
+      case "RISK" -> "风控";
+      default -> "系统";
+    };
+  }
+
+  private int priorityScore(String priority) {
+    if (priority == null || priority.isBlank()) {
+      return 50;
+    }
+    String normalized = priority.trim().toUpperCase(java.util.Locale.ROOT);
+    return switch (normalized) {
+      case "P1" -> 100;
+      case "P2" -> 80;
+      case "P3" -> 60;
+      default -> 50;
+    };
   }
 
   private String subscriptionStatusText(String status) {

@@ -26,6 +26,12 @@ import com.huodaizi.backend.dto.inquiry.InquiryBillingOrderPaymentRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryBillingOrderPaymentResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryDispatchScoreRuleRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryDispatchScoreRuleResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryMessageCenterDetailResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryMessageCenterListRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryMessageCenterListResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryMessageCenterReadAllRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryMessageCenterReadRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryMessageCenterReadResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryListRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryListResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryMerchantLeadDetailResponse;
@@ -210,6 +216,32 @@ public class InquiryController {
   public ApiResponse<InquiryDispatchScoreRuleResponse> dispatchScoreRules(
       @Valid @ModelAttribute InquiryDispatchScoreRuleRequest request) {
     return ApiResponse.success(service.dispatchScoreRules(request));
+  }
+
+  @GetMapping("/merchant/messages")
+  public ApiResponse<InquiryMessageCenterListResponse> messageCenterList(
+      @Valid @ModelAttribute InquiryMessageCenterListRequest request) {
+    return ApiResponse.success(service.messageCenterList(request));
+  }
+
+  @GetMapping("/merchant/messages/{messageId}")
+  public ApiResponse<InquiryMessageCenterDetailResponse> messageCenterDetail(
+      @PathVariable("messageId") String messageId,
+      @Valid @ModelAttribute InquiryMessageCenterListRequest request) {
+    return ApiResponse.success(service.messageCenterDetail(messageId, request));
+  }
+
+  @PutMapping("/merchant/messages/{messageId}/read")
+  public ApiResponse<InquiryMessageCenterReadResponse> messageCenterRead(
+      @PathVariable("messageId") String messageId,
+      @Valid @RequestBody InquiryMessageCenterReadRequest request) {
+    return ApiResponse.success(service.messageCenterRead(messageId, request));
+  }
+
+  @PutMapping("/merchant/messages/read-all")
+  public ApiResponse<InquiryMessageCenterReadResponse> messageCenterReadAll(
+      @Valid @RequestBody InquiryMessageCenterReadAllRequest request) {
+    return ApiResponse.success(service.messageCenterReadAll(request));
   }
 
   @GetMapping("/merchant/leads/{leadId}")
