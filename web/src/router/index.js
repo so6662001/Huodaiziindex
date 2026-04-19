@@ -29,6 +29,7 @@ import A05ReconcileMonitorPage from '../pages/A05ReconcileMonitorPage.vue'
 import A06DispatchStrategyConfigPage from '../pages/A06DispatchStrategyConfigPage.vue'
 import A07PlanPricingManagePage from '../pages/A07PlanPricingManagePage.vue'
 import A08RiskAlertCenterPage from '../pages/A08RiskAlertCenterPage.vue'
+import N01LoginRegisterPage from '../pages/N01LoginRegisterPage.vue'
 import InquiryMerchantLeadManagePage from '../pages/InquiryMerchantLeadManagePage.vue'
 import InquiryQuoteWorkbenchPage from '../pages/InquiryQuoteWorkbenchPage.vue'
 import SiteAdLeadMinePage from '../pages/SiteAdLeadMinePage.vue'
@@ -185,6 +186,14 @@ const routes = [
     component: A08RiskAlertCenterPage,
     meta: {
       title: 'A08风险预警中心_管理端全链路风险处置-货袋子'
+    }
+  },
+  {
+    path: '/account/login-register',
+    name: 'n01LoginRegister',
+    component: N01LoginRegisterPage,
+    meta: {
+      title: 'PC-N01登录注册_货袋子账号中心'
     }
   },
   {
