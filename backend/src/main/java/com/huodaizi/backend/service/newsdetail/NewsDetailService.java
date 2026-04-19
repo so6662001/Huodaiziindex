@@ -13,6 +13,7 @@ import com.huodaizi.backend.dto.newsdetail.NewsDetailSectionType;
 import com.huodaizi.backend.repository.newsdetail.InMemoryNewsDetailRepository;
 import com.huodaizi.backend.repository.newsdetail.NewsDetailEntity;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
@@ -36,7 +37,7 @@ public class NewsDetailService {
 
     List<String> content =
         repository.listOnlineByNewsIdAndSection(newsId, NewsDetailSectionType.CONTENT).stream()
-            .sorted((a, b) -> a.getPublishAt().compareToIgnoreCase(b.getPublishAt()))
+            .sorted(Comparator.comparingInt(this::contentOrder))
             .map(NewsDetailEntity::getContent)
             .filter(text -> text != null && !text.isBlank() && !"-".equals(text))
             .toList();
@@ -103,8 +104,8 @@ public class NewsDetailService {
         entity.getPublishAt(),
         entity.getSource(),
         entity.getSummary(),
-        parseTags(entity.getTags()),
         content,
+        parseTags(entity.getTags()),
         entity.getStatus(),
         entity.isPinned(),
         entity.getUpdatedAt().toString());
@@ -130,9 +131,9 @@ public class NewsDetailService {
         entity.getPublishAt(),
         entity.getSource(),
         entity.getSummary(),
-        entity.getContent(),
         entity.getTags(),
         entity.getRelatedNewsId(),
+        entity.getContent(),
         entity.getLink(),
         entity.getStatus(),
         entity.isPinned(),
@@ -161,5 +162,21 @@ public class NewsDetailService {
         .map(String::trim)
         .filter(s -> !s.isBlank() && !"-".equals(s))
         .toList();
+  }
+
+  private int contentOrder(NewsDetailEntity entity) {
+    String order = entity.getPublishAt();
+    if (order == null || order.isBlank()) {
+      return Integer.MAX_VALUE;
+    }
+    String digits = order.replaceAll("[^0-9]", "");
+    if (digits.isBlank()) {
+      return Integer.MAX_VALUE;
+    }
+    try {
+      return Integer.parseInt(digits);
+    } catch (NumberFormatException ex) {
+      return Integer.MAX_VALUE;
+    }
   }
 }

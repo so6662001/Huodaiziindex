@@ -28,6 +28,9 @@ Base Path: `/api/v1/news-detail`
 
 Base Path: `/api/admin/news-detail/{id}/{section}`
 
+> 安全要求：所有 `/api/admin/**` 接口必须携带请求头  
+> `X-Admin-Token: <token>`
+
 - `GET /{id}/{section}`
   - 查询指定文章 + 板块的中台列表（含上下架）
 - `POST /{id}/{section}`

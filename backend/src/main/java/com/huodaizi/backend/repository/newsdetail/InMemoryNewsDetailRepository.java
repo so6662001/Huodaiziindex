@@ -35,6 +35,7 @@ public class InMemoryNewsDetailRepository {
         .filter(item -> item.getSectionType() == section)
         .sorted(
             Comparator.comparing(NewsDetailEntity::isPinned).reversed()
+                .thenComparing(this::extractSortOrder)
                 .thenComparing(NewsDetailEntity::getUpdatedAt, Comparator.reverseOrder()))
         .toList();
   }
@@ -132,8 +133,38 @@ public class InMemoryNewsDetailRepository {
     return text == null ? "" : text.trim().toLowerCase(Locale.ROOT);
   }
 
+  private int parseOrderValue(String publishAt) {
+    if (publishAt == null || publishAt.isBlank()) {
+      return Integer.MAX_VALUE;
+    }
+    String digits = publishAt.replaceAll("[^0-9]", "");
+    if (digits.isBlank()) {
+      return Integer.MAX_VALUE;
+    }
+    try {
+      return Integer.parseInt(digits);
+    } catch (NumberFormatException ex) {
+      return Integer.MAX_VALUE;
+    }
+  }
+
   private String defaultText(String text, String fallback) {
     return text == null || text.isBlank() ? fallback : text;
+  }
+
+  private int parseOrder(String publishAt) {
+    if (publishAt == null) {
+      return Integer.MAX_VALUE;
+    }
+    String digits = publishAt.replaceAll("[^0-9]", "");
+    if (digits.isBlank()) {
+      return Integer.MAX_VALUE;
+    }
+    try {
+      return Integer.parseInt(digits);
+    } catch (NumberFormatException ex) {
+      return Integer.MAX_VALUE;
+    }
   }
 
   private String normalizeStatus(String status) {
@@ -145,6 +176,18 @@ public class InMemoryNewsDetailRepository {
       throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "status 仅支持 ONLINE/OFFLINE");
     }
     return normalized;
+  }
+
+  private int extractSortOrder(NewsDetailEntity entity) {
+    String publishAt = entity.getPublishAt();
+    if (publishAt == null || publishAt.isBlank()) {
+      return Integer.MAX_VALUE;
+    }
+    try {
+      return Integer.parseInt(publishAt.trim());
+    } catch (NumberFormatException ex) {
+      return Integer.MAX_VALUE;
+    }
   }
 
   private void seed() {
