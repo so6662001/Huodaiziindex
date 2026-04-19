@@ -38,6 +38,12 @@ import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchTaskListResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchTaskRequest;
 import com.huodaizi.backend.dto.inquiry.InquirySuccessRequest;
 import com.huodaizi.backend.dto.inquiry.InquirySuccessResponse;
+import com.huodaizi.backend.dto.inquiry.InquirySubscriptionCreateRequest;
+import com.huodaizi.backend.dto.inquiry.InquirySubscriptionCreateResponse;
+import com.huodaizi.backend.dto.inquiry.InquirySubscriptionMineRequest;
+import com.huodaizi.backend.dto.inquiry.InquirySubscriptionMineResponse;
+import com.huodaizi.backend.dto.inquiry.InquirySubscriptionPlanListRequest;
+import com.huodaizi.backend.dto.inquiry.InquirySubscriptionPlanListResponse;
 import com.huodaizi.backend.service.inquiry.InquiryService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -153,6 +159,24 @@ public class InquiryController {
   public ApiResponse<InquiryMerchantCreditScoreResponse> merchantCreditScore(
       @Valid @ModelAttribute InquiryMerchantCreditScoreRequest request) {
     return ApiResponse.success(service.merchantCreditScore(request));
+  }
+
+  @GetMapping("/merchant/subscription/plans")
+  public ApiResponse<InquirySubscriptionPlanListResponse> subscriptionPlans(
+      @Valid @ModelAttribute InquirySubscriptionPlanListRequest request) {
+    return ApiResponse.success(service.subscriptionPlans(request));
+  }
+
+  @PostMapping("/merchant/subscription")
+  public ApiResponse<InquirySubscriptionCreateResponse> createSubscription(
+      @Valid @RequestBody InquirySubscriptionCreateRequest request) {
+    return ApiResponse.success(service.createSubscription(request));
+  }
+
+  @GetMapping("/merchant/subscription/mine")
+  public ApiResponse<InquirySubscriptionMineResponse> mySubscriptions(
+      @Valid @ModelAttribute InquirySubscriptionMineRequest request) {
+    return ApiResponse.success(service.subscriptionMine(request));
   }
 
   @GetMapping("/merchant/leads/{leadId}")

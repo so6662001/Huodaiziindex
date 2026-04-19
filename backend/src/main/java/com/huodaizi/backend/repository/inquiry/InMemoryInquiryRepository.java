@@ -11,6 +11,9 @@ import com.huodaizi.backend.dto.inquiry.InquiryMerchantLeadQuoteRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryMerchantLeadStatus;
 import com.huodaizi.backend.dto.inquiry.InquiryMerchantLeadStatusUpdateRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryMerchantCreditScoreRequest;
+import com.huodaizi.backend.dto.inquiry.InquirySubscriptionCreateRequest;
+import com.huodaizi.backend.dto.inquiry.InquirySubscriptionMineRequest;
+import com.huodaizi.backend.dto.inquiry.InquirySubscriptionPlanListRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryPickupOrderCreateRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryPickupOrderListRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryPickupOrderStatus;
@@ -33,6 +36,7 @@ import java.util.Locale;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -42,10 +46,15 @@ public class InMemoryInquiryRepository {
   private final AtomicLong seq = new AtomicLong(20260418000L);
   private final AtomicLong pickupSeq = new AtomicLong(20260418000L);
   private final AtomicLong reconcileSeq = new AtomicLong(20260418000L);
+  private final AtomicLong subscriptionSeq = new AtomicLong(20260418000L);
   private final ConcurrentMap<String, InquiryEntity> store = new ConcurrentHashMap<>();
   private final ConcurrentMap<String, List<InquiryQuoteCompareEntity>> quoteStore = new ConcurrentHashMap<>();
   private final ConcurrentMap<String, InquiryMerchantLeadEntity> merchantLeadStore = new ConcurrentHashMap<>();
   private final ConcurrentMap<String, InquiryMerchantCreditScoreEntity> merchantCreditScoreStore =
+      new ConcurrentHashMap<>();
+  private final ConcurrentMap<String, InquirySubscriptionPlanEntity> subscriptionPlanStore =
+      new ConcurrentHashMap<>();
+  private final ConcurrentMap<String, InquiryMerchantSubscriptionEntity> merchantSubscriptionStore =
       new ConcurrentHashMap<>();
   private final ConcurrentMap<String, InquiryPickupOrderEntity> pickupOrderStore = new ConcurrentHashMap<>();
   private final ConcurrentMap<String, InquiryReconcileOrderEntity> reconcileOrderStore =
@@ -212,6 +221,66 @@ public class InMemoryInquiryRepository {
       throw new BaseException(ErrorCode.NOT_FOUND.getCode(), "商家信用评分不存在");
     }
     return entity;
+  }
+
+  public List<InquirySubscriptionPlanEntity> listSubscriptionPlans(InquirySubscriptionPlanListRequest request) {
+    String merchantId = defaultText(request.merchantId(), "").trim();
+    if (merchantId.isEmpty()) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "merchantId 不能为空");
+    }
+    return subscriptionPlanStore.values().stream()
+        .sorted(Comparator.comparing(InquirySubscriptionPlanEntity::getPlanCode))
+        .toList();
+  }
+
+  public InquiryMerchantSubscriptionEntity createSubscription(InquirySubscriptionCreateRequest request) {
+    String merchantId = defaultText(request.merchantId(), "").trim();
+    if (merchantId.isEmpty()) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "merchantId 不能为空");
+    }
+    InquirySubscriptionPlanEntity plan = requireSubscriptionPlan(request.planCode());
+    LocalDateTime now = LocalDateTime.now();
+    String subscriptionId = "SUB" + subscriptionSeq.incrementAndGet();
+    String status = "ACTIVE";
+    String startDate = now.toLocalDate().toString();
+    int periodMonths = "YEARLY".equalsIgnoreCase(request.billingCycle()) ? 12 : 1;
+    String endDate = now.toLocalDate().plusMonths(periodMonths).toString();
+    String amountYuan = plan.getPrice();
+    if ("YEARLY".equalsIgnoreCase(request.billingCycle())) {
+      amountYuan = toMoney(parseMoney(plan.getPrice(), "price").multiply(new BigDecimal("12")));
+    }
+    List<String> entitlements =
+        plan.getFeatures().stream().map(InquirySubscriptionPlanEntity.FeatureEntity::label).toList();
+    InquiryMerchantSubscriptionEntity entity =
+        new InquiryMerchantSubscriptionEntity(
+            subscriptionId,
+            "SUB-" + NO_FMT.format(now) + "-" + subscriptionId,
+            merchantId.toUpperCase(Locale.ROOT),
+            merchantId.toUpperCase(Locale.ROOT),
+            plan.getPlanCode(),
+            plan.getPlanName(),
+            request.billingCycle().trim().toUpperCase(Locale.ROOT),
+            status,
+            startDate,
+            endDate,
+            "Y",
+            amountYuan,
+            entitlements,
+            now,
+            now);
+    merchantSubscriptionStore.put(subscriptionId, entity);
+    return entity;
+  }
+
+  public List<InquiryMerchantSubscriptionEntity> listSubscriptions(InquirySubscriptionMineRequest request) {
+    String merchantId = defaultText(request.merchantId(), "").trim();
+    if (merchantId.isEmpty()) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "merchantId 不能为空");
+    }
+    return merchantSubscriptionStore.values().stream()
+        .filter(item -> item.getMerchantId().equalsIgnoreCase(merchantId))
+        .sorted(Comparator.comparing(InquiryMerchantSubscriptionEntity::getCreatedAt, Comparator.reverseOrder()))
+        .toList();
   }
 
   public List<InquiryMerchantLeadEntity> workbenchTasks(InquiryQuoteWorkbenchTaskRequest request) {
@@ -589,6 +658,22 @@ public class InMemoryInquiryRepository {
     return entity;
   }
 
+  private InquirySubscriptionPlanEntity requireSubscriptionPlan(String planCode) {
+    String normalizedCode = defaultText(planCode, "").trim();
+    if (normalizedCode.isEmpty()) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "planCode 不能为空");
+    }
+    InquirySubscriptionPlanEntity entity =
+        subscriptionPlanStore.values().stream()
+            .filter(item -> item.getPlanCode().equalsIgnoreCase(normalizedCode))
+            .findFirst()
+            .orElse(null);
+    if (entity == null) {
+      throw new BaseException(ErrorCode.NOT_FOUND.getCode(), "套餐不存在");
+    }
+    return entity;
+  }
+
   private boolean shouldTreatAsTimeout(InquiryMerchantLeadEntity item) {
     return item.getStatus() == InquiryMerchantLeadStatus.NEW
         || item.getStatus() == InquiryMerchantLeadStatus.CONTACTED;
@@ -622,6 +707,8 @@ public class InMemoryInquiryRepository {
     inquiry2.setQuoteSupplierCount(2);
     seedMerchantLeads(inquiry1, inquiry2);
     seedMerchantCreditScores();
+    seedSubscriptionPlans();
+    seedMerchantSubscriptions();
   }
 
   private void seedMerchantLeads(InquiryEntity inquiry1, InquiryEntity inquiry2) {
@@ -767,6 +854,87 @@ public class InMemoryInquiryRepository {
             List.of("中低风险", "回款有优化空间"),
             List.of("优化对账异常追踪", "增加高峰时段客服值守", "完善回款预警规则"),
             LocalDateTime.now().minusHours(3)));
+  }
+
+  private void seedSubscriptionPlans() {
+    subscriptionPlanStore.put(
+        "PLAN_BASIC",
+        new InquirySubscriptionPlanEntity(
+            "PLAN_BASIC",
+                "PLAN_BASIC",
+            "标准版",
+                "BASIC",
+            "MONTHLY",
+            "1999",
+                "2499",
+                false,
+                "线索型商家",
+            List.of(
+                    new InquirySubscriptionPlanEntity.FeatureEntity("LEAD", "线索管理", "支持线索筛选、状态跟进", "核心"),
+                    new InquirySubscriptionPlanEntity.FeatureEntity(
+                        "QUOTE", "报价工作台", "报价任务视图与批量处理", "核心"),
+                    new InquirySubscriptionPlanEntity.FeatureEntity(
+                        "REPORT", "基础报表", "成交率与响应时效看板", "基础"))));
+    subscriptionPlanStore.put(
+        "PLAN_PRO",
+        new InquirySubscriptionPlanEntity(
+            "PLAN_PRO",
+                "PLAN_PRO",
+            "进阶版",
+                "PRO",
+            "MONTHLY",
+            "3999",
+                "4599",
+                true,
+                "成交增长商家",
+            List.of(
+                    new InquirySubscriptionPlanEntity.FeatureEntity(
+                        "PICKUP", "提货通", "提货单协同与履约留痕", "增强"),
+                    new InquirySubscriptionPlanEntity.FeatureEntity(
+                        "RECONCILE", "对账通", "对账回款流程管理", "增强"),
+                    new InquirySubscriptionPlanEntity.FeatureEntity(
+                        "CREDIT", "信用评分", "信用分与改进建议", "增强"))));
+    subscriptionPlanStore.put(
+        "PLAN_ENTERPRISE",
+        new InquirySubscriptionPlanEntity(
+            "PLAN_ENTERPRISE",
+                "PLAN_ENTERPRISE",
+            "企业版",
+                "ENTERPRISE",
+            "YEARLY",
+            "69999",
+                "79999",
+                false,
+                "集团与平台型客户",
+            List.of(
+                    new InquirySubscriptionPlanEntity.FeatureEntity(
+                        "RBAC", "多账号权限", "支持组织架构权限分级", "企业"),
+                    new InquirySubscriptionPlanEntity.FeatureEntity(
+                        "RISK", "风控预警", "回款/争议/履约阈值策略", "企业"),
+                    new InquirySubscriptionPlanEntity.FeatureEntity(
+                        "API", "数据API", "支持经营数据API对接", "企业"))));
+  }
+
+  private void seedMerchantSubscriptions() {
+    LocalDateTime now = LocalDateTime.now();
+    merchantSubscriptionStore.put(
+        "SUB20260418001",
+        new InquiryMerchantSubscriptionEntity(
+            "SUB20260418001",
+            "SUB-20260418-SUB20260418001",
+            "S001",
+            "唐山弘达钢贸",
+            "PLAN_PRO",
+            "进阶版",
+            "MONTHLY",
+            now.toLocalDate().minusMonths(1).toString(),
+            now.toLocalDate().plusMonths(11).toString(),
+            "ACTIVE",
+            "Y",
+            "3999",
+            List.of("提货通", "对账通", "信用评分"),
+            now.minusDays(7),
+            now.minusDays(1)));
   }
 
   private String maskPhone(String phone) {

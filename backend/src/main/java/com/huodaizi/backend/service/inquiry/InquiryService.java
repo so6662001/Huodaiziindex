@@ -17,6 +17,15 @@ import com.huodaizi.backend.dto.inquiry.InquiryMerchantCreditScoreDimensionDTO;
 import com.huodaizi.backend.dto.inquiry.InquiryMerchantCreditScoreRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryMerchantCreditScoreResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryMerchantCreditScoreTrendPointDTO;
+import com.huodaizi.backend.dto.inquiry.InquirySubscriptionCreateRequest;
+import com.huodaizi.backend.dto.inquiry.InquirySubscriptionCreateResponse;
+import com.huodaizi.backend.dto.inquiry.InquirySubscriptionMineItemDTO;
+import com.huodaizi.backend.dto.inquiry.InquirySubscriptionMineRequest;
+import com.huodaizi.backend.dto.inquiry.InquirySubscriptionMineResponse;
+import com.huodaizi.backend.dto.inquiry.InquirySubscriptionPlanFeatureDTO;
+import com.huodaizi.backend.dto.inquiry.InquirySubscriptionPlanItemDTO;
+import com.huodaizi.backend.dto.inquiry.InquirySubscriptionPlanListRequest;
+import com.huodaizi.backend.dto.inquiry.InquirySubscriptionPlanListResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryMerchantLeadQuoteRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryMerchantLeadStatus;
 import com.huodaizi.backend.dto.inquiry.InquiryMerchantLeadStatusUpdateRequest;
@@ -52,9 +61,11 @@ import com.huodaizi.backend.repository.inquiry.InMemoryInquiryRepository;
 import com.huodaizi.backend.repository.inquiry.InquiryEntity;
 import com.huodaizi.backend.repository.inquiry.InquiryMerchantCreditScoreEntity;
 import com.huodaizi.backend.repository.inquiry.InquiryMerchantLeadEntity;
+import com.huodaizi.backend.repository.inquiry.InquiryMerchantSubscriptionEntity;
 import com.huodaizi.backend.repository.inquiry.InquiryPickupOrderEntity;
 import com.huodaizi.backend.repository.inquiry.InquiryReconcileOrderEntity;
 import com.huodaizi.backend.repository.inquiry.InquiryQuoteCompareEntity;
+import com.huodaizi.backend.repository.inquiry.InquirySubscriptionPlanEntity;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
@@ -414,6 +425,58 @@ public class InquiryService {
         entity.getSuggestions());
   }
 
+  public InquirySubscriptionPlanListResponse subscriptionPlans(InquirySubscriptionPlanListRequest request) {
+    List<InquirySubscriptionPlanEntity> all = repository.listSubscriptionPlans(request);
+    String recommendPlanCode =
+        all.stream()
+            .filter(InquirySubscriptionPlanEntity::isRecommended)
+            .map(InquirySubscriptionPlanEntity::getPlanCode)
+            .findFirst()
+            .orElse("");
+    return new InquirySubscriptionPlanListResponse(
+        request.merchantId().trim(),
+        "merchant-saas",
+        all.stream().map(this::toSubscriptionPlanItem).toList(),
+        recommendPlanCode,
+        "CNY");
+  }
+
+  public InquirySubscriptionCreateResponse createSubscription(InquirySubscriptionCreateRequest request) {
+    InquiryMerchantSubscriptionEntity entity = repository.createSubscription(request);
+    return new InquirySubscriptionCreateResponse(
+        entity.getSubscriptionId(),
+        entity.getSubscriptionNo(),
+        entity.getMerchantId(),
+        entity.getPlanCode(),
+        entity.getPlanName(),
+        entity.getStatus(),
+        entity.getStartAt(),
+        entity.getEndAt(),
+        entity.getAmountYuan(),
+        "CNY",
+        "订阅开通成功，功能权限将在 5 分钟内生效");
+  }
+
+  public InquirySubscriptionMineResponse subscriptionMine(InquirySubscriptionMineRequest request) {
+    List<InquiryMerchantSubscriptionEntity> all = repository.listSubscriptions(request);
+    int page = 1;
+    int pageSize = all.size();
+    int total = all.size();
+    int activeCount = (int) all.stream().filter(item -> "ACTIVE".equalsIgnoreCase(item.getStatus())).count();
+    int expiringSoonCount =
+        (int) all.stream().filter(item -> "EXPIRING_SOON".equalsIgnoreCase(item.getStatus())).count();
+    int expiredCount = (int) all.stream().filter(item -> "EXPIRED".equalsIgnoreCase(item.getStatus())).count();
+    return new InquirySubscriptionMineResponse(
+        request.merchantId().trim(),
+        all.stream().map(this::toSubscriptionMineItem).toList(),
+        total,
+        page,
+        pageSize,
+        activeCount,
+        expiringSoonCount,
+        expiredCount);
+  }
+
   public InquiryMerchantLeadDetailResponse merchantLeadDetail(
       String leadId, InquiryMerchantLeadListRequest request) {
     InquiryMerchantLeadEntity lead = repository.merchantLeadDetail(leadId, request.merchantId());
@@ -626,6 +689,78 @@ public class InquiryService {
         entity.getStatus().name(),
         entity.getQuoteRemark(),
         entity.getUpdatedAt().toString());
+  }
+
+  private InquirySubscriptionPlanItemDTO toSubscriptionPlanItem(InquirySubscriptionPlanEntity entity) {
+    return new InquirySubscriptionPlanItemDTO(
+        entity.getPlanId(),
+        entity.getPlanCode(),
+        entity.getPlanName(),
+        entity.getSuitableFor(),
+        entity.getBillingCycle(),
+        entity.getOriginalPrice(),
+        entity.getPrice(),
+        entity.isRecommended(),
+        entity.getSuitableFor(),
+        entity.getFeatures().stream()
+            .map(
+                feature ->
+                    new InquirySubscriptionPlanFeatureDTO(
+                        feature.key(),
+                        feature.label(),
+                        feature.value(),
+                        feature.highlight()))
+            .toList());
+  }
+
+  private InquirySubscriptionMineItemDTO toSubscriptionMineItem(InquiryMerchantSubscriptionEntity entity) {
+    String planTier = planTierByCode(entity.getPlanCode());
+    String statusText = subscriptionStatusText(entity.getStatus());
+    return new InquirySubscriptionMineItemDTO(
+        entity.getSubscriptionId(),
+        entity.getMerchantId(),
+        entity.getMerchantName(),
+        entity.getPlanCode(),
+        entity.getPlanName(),
+        planTier,
+        entity.getStatus(),
+        statusText,
+        entity.getBillingCycle(),
+        entity.getStartAt(),
+        entity.getEndAt(),
+        entity.getAutoRenew(),
+        entity.getAmountYuan(),
+        "CNY",
+        entity.getEntitlements(),
+        entity.getCreatedAt().toString(),
+        entity.getUpdatedAt().toString());
+  }
+
+  private String subscriptionStatusText(String status) {
+    if (status == null || status.isBlank()) {
+      return "未知";
+    }
+    String normalized = status.trim().toUpperCase(java.util.Locale.ROOT);
+    return switch (normalized) {
+      case "ACTIVE" -> "生效中";
+      case "EXPIRING_SOON" -> "即将到期";
+      case "EXPIRED" -> "已过期";
+      case "CANCELLED" -> "已取消";
+      default -> normalized;
+    };
+  }
+
+  private String planTierByCode(String planCode) {
+    if (planCode == null || planCode.isBlank()) {
+      return "STANDARD";
+    }
+    if (planCode.contains("ENTERPRISE")) {
+      return "ENTERPRISE";
+    }
+    if (planCode.contains("PRO")) {
+      return "PRO";
+    }
+    return "STANDARD";
   }
 
   private int countMerchantByStatus(List<InquiryMerchantLeadEntity> items, InquiryMerchantLeadStatus status) {
