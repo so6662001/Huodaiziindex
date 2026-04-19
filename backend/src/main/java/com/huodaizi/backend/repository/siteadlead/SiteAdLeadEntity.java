@@ -2,8 +2,8 @@ package com.huodaizi.backend.repository.siteadlead;
 
 import com.huodaizi.backend.dto.siteadlead.SiteAdLeadStatus;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class SiteAdLeadEntity {
   private final String id;
@@ -22,7 +22,7 @@ public class SiteAdLeadEntity {
   private String closeReason;
   private String nextFollowAt;
   private final LocalDateTime createdAt;
-  private final List<SiteAdLeadFollowEntity> followLogs = new ArrayList<>();
+  private final List<SiteAdLeadFollowEntity> followLogs = new CopyOnWriteArrayList<>();
   private LocalDateTime updatedAt;
 
   public SiteAdLeadEntity(
@@ -127,34 +127,34 @@ public class SiteAdLeadEntity {
   }
 
   public List<SiteAdLeadFollowEntity> getFollowLogs() {
-    return followLogs;
+    return List.copyOf(followLogs);
   }
 
   public LocalDateTime getUpdatedAt() {
     return updatedAt;
   }
 
-  public void setStatus(SiteAdLeadStatus status) {
+  public synchronized void setStatus(SiteAdLeadStatus status) {
     this.status = status;
     this.updatedAt = LocalDateTime.now();
   }
 
-  public void setOwner(String owner) {
+  public synchronized void setOwner(String owner) {
     this.owner = owner;
     this.updatedAt = LocalDateTime.now();
   }
 
-  public void setCloseReason(String closeReason) {
+  public synchronized void setCloseReason(String closeReason) {
     this.closeReason = closeReason;
     this.updatedAt = LocalDateTime.now();
   }
 
-  public void setNextFollowAt(String nextFollowAt) {
+  public synchronized void setNextFollowAt(String nextFollowAt) {
     this.nextFollowAt = nextFollowAt;
     this.updatedAt = LocalDateTime.now();
   }
 
-  public void addFollow(SiteAdLeadFollowEntity followEntity) {
+  public synchronized void addFollow(SiteAdLeadFollowEntity followEntity) {
     this.followLogs.add(followEntity);
     if (followEntity.getNextAction() != null && !followEntity.getNextAction().isBlank()) {
       this.nextFollowAt = followEntity.getNextAction();
@@ -162,42 +162,42 @@ public class SiteAdLeadEntity {
     this.updatedAt = LocalDateTime.now();
   }
 
-  public void setCity(String city) {
+  public synchronized void setCity(String city) {
     this.city = city;
     this.updatedAt = LocalDateTime.now();
   }
 
-  public void setPlacementName(String placementName) {
+  public synchronized void setPlacementName(String placementName) {
     this.placementName = placementName;
     this.updatedAt = LocalDateTime.now();
   }
 
-  public void setDuration(String duration) {
+  public synchronized void setDuration(String duration) {
     this.duration = duration;
     this.updatedAt = LocalDateTime.now();
   }
 
-  public void setBudget(String budget) {
+  public synchronized void setBudget(String budget) {
     this.budget = budget;
     this.updatedAt = LocalDateTime.now();
   }
 
-  public void setCompanyName(String companyName) {
+  public synchronized void setCompanyName(String companyName) {
     this.companyName = companyName;
     this.updatedAt = LocalDateTime.now();
   }
 
-  public void setContactName(String contactName) {
+  public synchronized void setContactName(String contactName) {
     this.contactName = contactName;
     this.updatedAt = LocalDateTime.now();
   }
 
-  public void setContactPhone(String contactPhone) {
+  public synchronized void setContactPhone(String contactPhone) {
     this.contactPhone = contactPhone;
     this.updatedAt = LocalDateTime.now();
   }
 
-  public void setRemark(String remark) {
+  public synchronized void setRemark(String remark) {
     this.remark = remark;
     this.updatedAt = LocalDateTime.now();
   }
