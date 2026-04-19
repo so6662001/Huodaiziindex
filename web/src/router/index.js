@@ -4,6 +4,7 @@ import InquiryCreatePage from '../pages/InquiryCreatePage.vue'
 import InquirySuccessPage from '../pages/InquirySuccessPage.vue'
 import InquiryQuoteComparePage from '../pages/InquiryQuoteComparePage.vue'
 import InquiryMerchantLeadManagePage from '../pages/InquiryMerchantLeadManagePage.vue'
+import InquiryQuoteWorkbenchPage from '../pages/InquiryQuoteWorkbenchPage.vue'
 import SiteAdLeadMinePage from '../pages/SiteAdLeadMinePage.vue'
 import SiteAdLeadSubmitDemoPage from '../pages/SiteAdLeadSubmitDemoPage.vue'
 
@@ -46,6 +47,14 @@ const routes = [
     component: InquiryMerchantLeadManagePage,
     meta: {
       title: '商家线索管理_报价工作台-货袋子'
+    }
+  },
+  {
+    path: '/merchant/quote/workbench',
+    name: 'merchantQuoteWorkbench',
+    component: InquiryQuoteWorkbenchPage,
+    meta: {
+      title: 'P06报价工作台_任务视图-货袋子'
     }
   },
   {

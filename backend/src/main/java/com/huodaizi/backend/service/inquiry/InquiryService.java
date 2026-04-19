@@ -15,6 +15,12 @@ import com.huodaizi.backend.dto.inquiry.InquiryMerchantLeadStatusUpdateRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteCompareItemDTO;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteCompareRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteCompareResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchBatchUpdateRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchOverviewRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchOverviewResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchTaskItemDTO;
+import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchTaskListResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchTaskRequest;
 import com.huodaizi.backend.dto.inquiry.InquirySuccessRequest;
 import com.huodaizi.backend.dto.inquiry.InquirySuccessResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryStatus;
@@ -193,6 +199,76 @@ public class InquiryService {
     return toMerchantLeadItem(updated);
   }
 
+  public InquiryQuoteWorkbenchOverviewResponse quoteWorkbenchOverview(
+      InquiryQuoteWorkbenchOverviewRequest request) {
+    List<InquiryMerchantLeadEntity> all = repository.workbenchOverview(request);
+    int newCount = countMerchantByStatus(all, InquiryMerchantLeadStatus.NEW);
+    int contactedCount = countMerchantByStatus(all, InquiryMerchantLeadStatus.CONTACTED);
+    int quotedCount = countMerchantByStatus(all, InquiryMerchantLeadStatus.QUOTED);
+    int wonCount = countMerchantByStatus(all, InquiryMerchantLeadStatus.WON);
+    int lostCount = countMerchantByStatus(all, InquiryMerchantLeadStatus.LOST);
+    int closedCount = countMerchantByStatus(all, InquiryMerchantLeadStatus.CLOSED);
+    int pendingQuoteCount = newCount + contactedCount;
+    String avgResponseMinutes = averageResponseMinutes(all);
+    String quoteRate = calcRate(quotedCount, all.size());
+    return new InquiryQuoteWorkbenchOverviewResponse(
+        request.merchantId().trim(),
+        all.size(),
+        newCount,
+        contactedCount,
+        quotedCount,
+        wonCount,
+        lostCount,
+        closedCount,
+        pendingQuoteCount,
+        avgResponseMinutes,
+        quoteRate);
+  }
+
+  public InquiryQuoteWorkbenchTaskListResponse quoteWorkbenchTasks(InquiryQuoteWorkbenchTaskRequest request) {
+    List<InquiryMerchantLeadEntity> all = repository.workbenchTasks(request);
+    int page = request.safePage();
+    int pageSize = request.safePageSize();
+    int from = Math.max((page - 1) * pageSize, 0);
+    int to = Math.min(from + pageSize, all.size());
+    List<InquiryMerchantLeadEntity> paged = from >= all.size() ? List.of() : all.subList(from, to);
+    return new InquiryQuoteWorkbenchTaskListResponse(
+        paged.stream().map(this::toWorkbenchTaskItem).toList(),
+        all.size(),
+        page,
+        pageSize,
+        countMerchantByStatus(all, InquiryMerchantLeadStatus.NEW),
+        countMerchantByStatus(all, InquiryMerchantLeadStatus.QUOTED),
+        countMerchantByStatus(all, InquiryMerchantLeadStatus.CONTACTED),
+        countMerchantByStatus(all, InquiryMerchantLeadStatus.WON),
+        countMerchantByStatus(all, InquiryMerchantLeadStatus.LOST),
+        countMerchantByStatus(all, InquiryMerchantLeadStatus.CLOSED));
+  }
+
+  public InquiryQuoteWorkbenchTaskListResponse quoteWorkbenchBatchUpdate(
+      InquiryQuoteWorkbenchBatchUpdateRequest request) {
+    if (request.leadIds() == null || request.leadIds().isEmpty()) {
+      throw new com.huodaizi.backend.common.BaseException(
+          com.huodaizi.backend.common.ErrorCode.BAD_REQUEST.getCode(), "leadIds 不能为空");
+    }
+    if (request.status() == null || request.status().isBlank()) {
+      throw new com.huodaizi.backend.common.BaseException(
+          com.huodaizi.backend.common.ErrorCode.BAD_REQUEST.getCode(), "status 不能为空");
+    }
+    List<InquiryMerchantLeadEntity> updated = repository.workbenchBatchUpdate(request);
+    return new InquiryQuoteWorkbenchTaskListResponse(
+        updated.stream().map(this::toWorkbenchTaskItem).toList(),
+        updated.size(),
+        1,
+        updated.size(),
+        countMerchantByStatus(updated, InquiryMerchantLeadStatus.NEW),
+        countMerchantByStatus(updated, InquiryMerchantLeadStatus.QUOTED),
+        countMerchantByStatus(updated, InquiryMerchantLeadStatus.CONTACTED),
+        countMerchantByStatus(updated, InquiryMerchantLeadStatus.WON),
+        countMerchantByStatus(updated, InquiryMerchantLeadStatus.LOST),
+        countMerchantByStatus(updated, InquiryMerchantLeadStatus.CLOSED));
+  }
+
   private InquiryQuoteCompareItemDTO toCompareItem(InquiryQuoteCompareEntity entity) {
     return new InquiryQuoteCompareItemDTO(
         entity.getQuoteId(),
@@ -236,8 +312,63 @@ public class InquiryService {
         entity.getUpdatedAt().toString());
   }
 
+  private InquiryQuoteWorkbenchTaskItemDTO toWorkbenchTaskItem(InquiryMerchantLeadEntity entity) {
+    return new InquiryQuoteWorkbenchTaskItemDTO(
+        entity.getId(),
+        entity.getLeadNo(),
+        entity.getInquiryId(),
+        entity.getInquiryNo(),
+        entity.getMerchantId(),
+        entity.getMerchantName(),
+        entity.getSpecText(),
+        entity.getDemandQtyTon(),
+        entity.getDeliveryCity(),
+        entity.getInvoiceNeed(),
+        entity.getExpectedDeliveryAt(),
+        quoteAgeMinutes(entity),
+        entity.getUnitPrice() != null && !entity.getUnitPrice().isBlank(),
+        entity.getStatus().name(),
+        entity.getQuoteRemark(),
+        entity.getUpdatedAt().toString());
+  }
+
   private int countMerchantByStatus(List<InquiryMerchantLeadEntity> items, InquiryMerchantLeadStatus status) {
     return (int) items.stream().filter(item -> item.getStatus() == status).count();
+  }
+
+  private String calcRate(int numerator, int denominator) {
+    if (denominator <= 0) {
+      return "0.0%";
+    }
+    double pct = numerator * 100.0 / denominator;
+    return String.format(java.util.Locale.ROOT, "%.1f%%", pct);
+  }
+
+  private String averageResponseMinutes(List<InquiryMerchantLeadEntity> items) {
+    List<Integer> values =
+        items.stream()
+            .map(InquiryMerchantLeadEntity::getResponseMinutes)
+            .filter(v -> v != null && !v.isBlank())
+            .map(v -> {
+              try {
+                return Integer.parseInt(v.trim());
+              } catch (Exception ex) {
+                return null;
+              }
+            })
+            .filter(v -> v != null)
+            .toList();
+    if (values.isEmpty()) {
+      return "0";
+    }
+    int sum = values.stream().mapToInt(Integer::intValue).sum();
+    return String.valueOf(sum / values.size());
+  }
+
+  private String quoteAgeMinutes(InquiryMerchantLeadEntity entity) {
+    long minutes =
+        java.time.Duration.between(entity.getCreatedAt(), entity.getUpdatedAt()).toMinutes();
+    return String.valueOf(Math.max(minutes, 0));
   }
 
   private void validateQuote(InquiryMerchantLeadQuoteRequest request) {

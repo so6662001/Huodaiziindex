@@ -13,6 +13,11 @@ import com.huodaizi.backend.dto.inquiry.InquiryMerchantLeadQuoteRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryMerchantLeadStatusUpdateRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteCompareRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteCompareResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchBatchUpdateRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchOverviewRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchOverviewResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchTaskListResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchTaskRequest;
 import com.huodaizi.backend.dto.inquiry.InquirySuccessRequest;
 import com.huodaizi.backend.dto.inquiry.InquirySuccessResponse;
 import com.huodaizi.backend.service.inquiry.InquiryService;
@@ -79,5 +84,23 @@ public class InquiryController {
       @PathVariable("leadId") String leadId,
       @Valid @RequestBody InquiryMerchantLeadStatusUpdateRequest request) {
     return ApiResponse.success(service.merchantUpdateStatus(leadId, request));
+  }
+
+  @GetMapping("/merchant/workbench/overview")
+  public ApiResponse<InquiryQuoteWorkbenchOverviewResponse> quoteWorkbenchOverview(
+      @Valid @ModelAttribute InquiryQuoteWorkbenchOverviewRequest request) {
+    return ApiResponse.success(service.quoteWorkbenchOverview(request));
+  }
+
+  @GetMapping("/merchant/workbench/tasks")
+  public ApiResponse<InquiryQuoteWorkbenchTaskListResponse> quoteWorkbenchTasks(
+      @Valid @ModelAttribute InquiryQuoteWorkbenchTaskRequest request) {
+    return ApiResponse.success(service.quoteWorkbenchTasks(request));
+  }
+
+  @PutMapping("/merchant/workbench/tasks/status")
+  public ApiResponse<InquiryQuoteWorkbenchTaskListResponse> quoteWorkbenchBatchUpdateStatus(
+      @Valid @RequestBody InquiryQuoteWorkbenchBatchUpdateRequest request) {
+    return ApiResponse.success(service.quoteWorkbenchBatchUpdate(request));
   }
 }

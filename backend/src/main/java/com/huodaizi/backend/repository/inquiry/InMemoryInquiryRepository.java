@@ -10,6 +10,9 @@ import com.huodaizi.backend.dto.inquiry.InquiryMerchantLeadListRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryMerchantLeadQuoteRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryMerchantLeadStatus;
 import com.huodaizi.backend.dto.inquiry.InquiryMerchantLeadStatusUpdateRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchBatchUpdateRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchOverviewRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchTaskRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryStatus;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -183,6 +186,56 @@ public class InMemoryInquiryRepository {
     return entity;
   }
 
+  public List<InquiryMerchantLeadEntity> workbenchTasks(InquiryQuoteWorkbenchTaskRequest request) {
+    String merchantId = defaultText(request.merchantId(), "").trim();
+    if (merchantId.isEmpty()) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "merchantId 不能为空");
+    }
+    String keyword = normalize(request.keyword());
+    Boolean quoteTimeoutOnly = request.quoteTimeoutOnly();
+    InquiryMerchantLeadStatus status = normalizeMerchantLeadStatusOrNull(request.status());
+    return merchantLeadStore.values().stream()
+        .filter(item -> item.getMerchantId().equalsIgnoreCase(merchantId))
+        .filter(item -> status == null || item.getStatus() == status)
+        .filter(item -> !Boolean.TRUE.equals(quoteTimeoutOnly) || shouldTreatAsTimeout(item))
+        .filter(
+            item ->
+                keyword == null
+                    || normalize(item.getInquiryNo()).contains(keyword)
+                    || normalize(item.getSpecText()).contains(keyword)
+                    || normalize(item.getBuyerCompany()).contains(keyword))
+        .sorted(Comparator.comparing(InquiryMerchantLeadEntity::getUpdatedAt, Comparator.reverseOrder()))
+        .toList();
+  }
+
+  public List<InquiryMerchantLeadEntity> workbenchOverview(
+      InquiryQuoteWorkbenchOverviewRequest request) {
+    return workbenchTasks(
+        new InquiryQuoteWorkbenchTaskRequest(
+            request.merchantId(), null, false, null, null, 1, Integer.MAX_VALUE));
+  }
+
+  public List<InquiryMerchantLeadEntity> workbenchBatchUpdate(
+      InquiryQuoteWorkbenchBatchUpdateRequest request) {
+    InquiryMerchantLeadStatus status = normalizeMerchantLeadStatus(request.status());
+    String merchantId = defaultText(request.merchantId(), "").trim();
+    if (merchantId.isEmpty()) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "merchantId 不能为空");
+    }
+    List<String> ids = request.leadIds() == null ? List.of() : request.leadIds();
+    if (ids.isEmpty()) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "leadIds 不能为空");
+    }
+    for (String leadId : ids) {
+      InquiryMerchantLeadEntity entity = requireMerchantLead(leadId);
+      if (!entity.getMerchantId().equalsIgnoreCase(merchantId)) {
+        throw new BaseException(ErrorCode.NOT_FOUND.getCode(), "线索不存在");
+      }
+      entity.updateStatus(status, defaultText(request.comment(), ""));
+    }
+    return ids.stream().map(this::requireMerchantLead).toList();
+  }
+
   public InquiryEntity getById(String id) {
     InquiryEntity entity = store.get(id);
     if (entity == null) {
@@ -251,6 +304,11 @@ public class InMemoryInquiryRepository {
       throw new BaseException(ErrorCode.NOT_FOUND.getCode(), "商家线索不存在");
     }
     return entity;
+  }
+
+  private boolean shouldTreatAsTimeout(InquiryMerchantLeadEntity item) {
+    return item.getStatus() == InquiryMerchantLeadStatus.NEW
+        || item.getStatus() == InquiryMerchantLeadStatus.CONTACTED;
   }
 
   private void seed() {

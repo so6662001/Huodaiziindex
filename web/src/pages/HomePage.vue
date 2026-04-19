@@ -94,7 +94,7 @@ function goInquiry() {
 }
 
 function goWorkbench() {
-  router.push('/merchant/lead/manage')
+  router.push('/quote/workbench')
 }
 
 function goLeadCenter() {
