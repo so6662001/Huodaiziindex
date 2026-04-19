@@ -128,11 +128,26 @@ public class MarketService {
   private List<String> insights() {
     return repository.adminList(MarketSectionType.INSIGHT).stream()
         .filter(item -> "ONLINE".equals(item.getStatus()))
-        .map(MarketEntity::getTitle)
+        .map(item -> firstMeaningful(item.getValue(), item.getTitle(), item.getSubtitle()))
+        .filter(text -> !text.isBlank())
         .toList();
   }
 
   private String fallback(String value, String defaultText) {
     return value == null || value.isBlank() ? defaultText : value;
+  }
+
+  private String firstMeaningful(String... candidates) {
+    for (String candidate : candidates) {
+      if (candidate == null) {
+        continue;
+      }
+      String text = candidate.trim();
+      if (text.isBlank() || "-".equals(text) || "--".equals(text)) {
+        continue;
+      }
+      return text;
+    }
+    return "";
   }
 }

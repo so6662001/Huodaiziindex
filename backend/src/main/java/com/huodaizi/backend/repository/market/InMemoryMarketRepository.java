@@ -141,6 +141,10 @@ public class InMemoryMarketRepository {
     return text == null || text.isBlank() ? fallback : text;
   }
 
+  private String defaultTextOrDash(String text) {
+    return text == null || text.isBlank() ? "-" : text;
+  }
+
   private String normalizeStatus(String status) {
     if (status == null || status.isBlank()) {
       throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "status 不能为空");
@@ -156,9 +160,7 @@ public class InMemoryMarketRepository {
     if (range.isBlank() || "7日".equals(range)) {
       return true;
     }
-    String title = normalize(entity.getTitle());
-    String subtitle = normalize(entity.getSubtitle());
-    return title.contains(range) || subtitle.contains(range);
+    return normalize(entity.getRangeTag()).contains(range);
   }
 
   private void seed() {
@@ -360,6 +362,8 @@ public class InMemoryMarketRepository {
       String tag,
       boolean pinned,
       long minusMinutes) {
+    String rangeTag = inferRangeTag(title);
+    String normalizedValue = section == MarketSectionType.INSIGHT ? defaultTextOrDash(value) : value;
     seq.updateAndGet(v -> Math.max(v, parseNumericId(id)));
     MarketEntity entity =
         new MarketEntity(
@@ -367,10 +371,10 @@ public class InMemoryMarketRepository {
             section,
             category,
             city,
-            "7日",
+            rangeTag,
             title,
             subtitle,
-            value,
+            normalizedValue,
             highPrice,
             lowPrice,
             extra,
@@ -380,6 +384,17 @@ public class InMemoryMarketRepository {
             pinned,
             LocalDateTime.now().minusMinutes(minusMinutes));
     store.put(id, entity);
+  }
+
+  private String inferRangeTag(String title) {
+    String normalizedTitle = normalize(title);
+    if (normalizedTitle.contains("30日")) {
+      return "30日";
+    }
+    if (normalizedTitle.contains("90日")) {
+      return "90日";
+    }
+    return "7日";
   }
 
   private long parseNumericId(String id) {
