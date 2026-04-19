@@ -132,6 +132,10 @@ public class InMemoryInquiryRepository {
     return List.copyOf(billingOrderStore.values());
   }
 
+  public List<InquiryDispatchScoreRuleEntity> allDispatchScoreRules() {
+    return List.copyOf(dispatchRuleStore.values());
+  }
+
   public List<InquiryMerchantSubscriptionEntity> allSubscriptions() {
     return List.copyOf(merchantSubscriptionStore.values());
   }
@@ -433,6 +437,10 @@ public class InMemoryInquiryRepository {
       throw new BaseException(ErrorCode.NOT_FOUND.getCode(), "分发评分规则不存在");
     }
     return entity;
+  }
+
+  public void saveDispatchScoreRule(InquiryDispatchScoreRuleEntity entity) {
+    dispatchRuleStore.put(entity.getSceneCode().trim().toUpperCase(Locale.ROOT), entity);
   }
 
   public List<InquiryMessageCenterEntity> listMessageCenter(InquiryMessageCenterListRequest request) {

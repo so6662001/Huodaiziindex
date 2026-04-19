@@ -26,6 +26,7 @@ import A02LeadOpsPage from '../pages/A02LeadOpsPage.vue'
 import A03QuoteEfficiencyPage from '../pages/A03QuoteEfficiencyPage.vue'
 import A04PickupMonitorPage from '../pages/A04PickupMonitorPage.vue'
 import A05ReconcileMonitorPage from '../pages/A05ReconcileMonitorPage.vue'
+import A06DispatchStrategyConfigPage from '../pages/A06DispatchStrategyConfigPage.vue'
 import InquiryMerchantLeadManagePage from '../pages/InquiryMerchantLeadManagePage.vue'
 import InquiryQuoteWorkbenchPage from '../pages/InquiryQuoteWorkbenchPage.vue'
 import SiteAdLeadMinePage from '../pages/SiteAdLeadMinePage.vue'
@@ -158,6 +159,14 @@ const routes = [
     component: A05ReconcileMonitorPage,
     meta: {
       title: 'A05对账监控中心_管理端回款与对账监控-货袋子'
+    }
+  },
+  {
+    path: '/admin/dispatch-strategy/a06',
+    name: 'a06DispatchStrategyConfig',
+    component: A06DispatchStrategyConfigPage,
+    meta: {
+      title: 'A06分发策略配置页_管理端分发规则配置-货袋子'
     }
   },
   {

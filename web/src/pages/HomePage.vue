@@ -165,6 +165,10 @@ function goA05ReconcileMonitorPage() {
   router.push('/admin/reconcile-monitor/a05')
 }
 
+function goA06DispatchStrategyPage() {
+  router.push('/admin/dispatch-strategy/a06')
+}
+
 function onSearch() {
   if (!keyword.value.trim()) {
     return
@@ -358,6 +362,7 @@ function onSearch() {
         <button class="btn" @click="goA03QuoteEfficiencyPage">A03报价效率中心</button>
         <button class="btn" @click="goA04PickupMonitorPage">A04提货监控中心</button>
         <button class="btn" @click="goA05ReconcileMonitorPage">A05对账监控中心</button>
+        <button class="btn" @click="goA06DispatchStrategyPage">A06分发策略配置</button>
         <button class="btn" @click="goSubscriptionPage">套餐与订阅</button>
         <button class="btn" @click="goBillingPage">计费与账单</button>
         <button class="btn primary" @click="goInquiry">立即体验AI询价</button>
