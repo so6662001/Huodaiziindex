@@ -219,15 +219,7 @@ public class InMemoryInquiryRepository {
       throw new BaseException(ErrorCode.NOT_FOUND.getCode(), "线索不存在");
     }
     InquiryMerchantLeadStatus status = normalizeMerchantLeadStatus(request.status());
-    entity.setStatus(status);
-    if (request.comment() != null && !request.comment().isBlank()) {
-      entity.updateQuote(
-          entity.getUnitPrice(),
-          entity.getTotalAmount(),
-          entity.getDeliveryDays(),
-          entity.getPaymentTerm(),
-          request.comment().trim());
-    }
+    entity.updateStatus(status, request.comment());
     return entity;
   }
 

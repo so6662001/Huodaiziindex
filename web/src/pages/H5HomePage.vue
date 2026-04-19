@@ -67,6 +67,10 @@ function goto(url) {
     router.push('/h5/inquiry/step1')
     return
   }
+  if (url.includes('/merchant/lead/manage')) {
+    router.push('/h5/merchant/leads?merchantId=S001')
+    return
+  }
   router.push(url)
 }
 

@@ -86,6 +86,12 @@ import com.huodaizi.backend.dto.inquiry.InquiryH5InquiryStep3Request;
 import com.huodaizi.backend.dto.inquiry.InquiryH5InquiryStep3Response;
 import com.huodaizi.backend.dto.inquiry.InquiryH5QuoteCompareRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryH5QuoteCompareResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryH5MerchantLeadQuickQuoteRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryH5MerchantLeadQuickQuoteResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryH5MerchantLeadQuickStatusRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryH5MerchantLeadQuickStatusResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryH5MerchantLeadRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryH5MerchantLeadResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchBatchUpdateRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchOverviewRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchOverviewResponse;
@@ -892,6 +898,79 @@ public class InquiryService {
         response.pageSize(),
         "建议优先比较总价、交付天数与履约评分，再进入成交确认",
         "/inquiry/deal/confirm");
+  }
+
+  public InquiryH5MerchantLeadResponse h5MerchantLeads(InquiryH5MerchantLeadRequest request) {
+    InquiryMerchantLeadListResponse response =
+        merchantLeads(
+            new InquiryMerchantLeadListRequest(
+                request.merchantId(), request.status(), request.keyword(), request.page(), request.pageSize()));
+    return new InquiryH5MerchantLeadResponse(
+        request.merchantId().trim(),
+        request.status() == null ? "" : request.status().trim().toUpperCase(java.util.Locale.ROOT),
+        request.keyword() == null ? "" : request.keyword().trim(),
+        response.items(),
+        response.total(),
+        response.page(),
+        response.pageSize(),
+        response.pendingQuoteCount(),
+        response.quotedCount(),
+        response.wonCount(),
+        response.lostCount(),
+        response.closedCount(),
+        "建议优先处理 NEW/CONTACTED 状态线索，提升报价时效");
+  }
+
+  public InquiryH5MerchantLeadQuickQuoteResponse h5MerchantLeadQuickQuote(
+      String leadId, InquiryH5MerchantLeadQuickQuoteRequest request) {
+    InquiryMerchantLeadEntity lead = repository.merchantLeadDetail(leadId, request.merchantId());
+    java.math.BigDecimal qty = new java.math.BigDecimal(lead.getDemandQtyTon());
+    java.math.BigDecimal unitPrice = new java.math.BigDecimal(request.unitPrice().trim());
+    java.math.BigDecimal total = unitPrice.multiply(qty);
+    String quoteRemark =
+        request.quoteRemark() == null || request.quoteRemark().isBlank()
+            ? null
+            : request.quoteRemark().trim();
+    InquiryMerchantLeadItemDTO updated =
+        merchantQuote(
+            leadId,
+            new InquiryMerchantLeadQuoteRequest(
+                request.merchantId().trim(),
+                lead.getMerchantName(),
+                request.unitPrice().trim(),
+                toMoney(total),
+                "含税到厂",
+                request.deliveryDays().trim(),
+                request.paymentTerm() == null || request.paymentTerm().isBlank()
+                    ? "月结15天"
+                    : request.paymentTerm().trim(),
+                "YES",
+                quoteRemark,
+                "h5-merchant-lead"));
+    return new InquiryH5MerchantLeadQuickQuoteResponse(
+        updated.leadId(),
+        updated.status(),
+        request.unitPrice().trim(),
+        toMoney(total),
+        request.deliveryDays().trim(),
+        "快捷报价已提交");
+  }
+
+  public InquiryH5MerchantLeadQuickStatusResponse h5MerchantLeadQuickStatus(
+      String leadId, InquiryH5MerchantLeadQuickStatusRequest request) {
+    InquiryMerchantLeadItemDTO updated =
+        merchantUpdateStatus(
+            leadId,
+            new InquiryMerchantLeadStatusUpdateRequest(
+                request.merchantId().trim(),
+                request.status().trim(),
+                "h5-merchant-lead",
+                request.comment()));
+    return new InquiryH5MerchantLeadQuickStatusResponse(
+        updated.leadId(),
+        updated.status(),
+        updated.latestFollow(),
+        "线索状态已更新");
   }
 
   public InquiryMerchantLeadDetailResponse merchantLeadDetail(

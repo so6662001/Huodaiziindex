@@ -16,6 +16,7 @@ import H5InquiryStep1Page from '../pages/H5InquiryStep1Page.vue'
 import H5InquiryStep2Page from '../pages/H5InquiryStep2Page.vue'
 import H5InquiryStep3Page from '../pages/H5InquiryStep3Page.vue'
 import H5QuoteComparePage from '../pages/H5QuoteComparePage.vue'
+import H5MerchantLeadPage from '../pages/H5MerchantLeadPage.vue'
 import InquiryMerchantLeadManagePage from '../pages/InquiryMerchantLeadManagePage.vue'
 import InquiryQuoteWorkbenchPage from '../pages/InquiryQuoteWorkbenchPage.vue'
 import SiteAdLeadMinePage from '../pages/SiteAdLeadMinePage.vue'
@@ -68,6 +69,14 @@ const routes = [
     component: H5QuoteComparePage,
     meta: {
       title: 'H05 H5报价对比_移动端商家报价对比-货袋子'
+    }
+  },
+  {
+    path: '/h5/merchant/leads',
+    name: 'h5MerchantLeads',
+    component: H5MerchantLeadPage,
+    meta: {
+      title: 'H06 H5我的线索_商家移动端线索管理-货袋子'
     }
   },
   {

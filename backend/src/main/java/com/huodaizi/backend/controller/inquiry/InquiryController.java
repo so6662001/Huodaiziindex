@@ -46,6 +46,12 @@ import com.huodaizi.backend.dto.inquiry.InquiryH5InquiryStep3Request;
 import com.huodaizi.backend.dto.inquiry.InquiryH5InquiryStep3Response;
 import com.huodaizi.backend.dto.inquiry.InquiryH5QuoteCompareRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryH5QuoteCompareResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryH5MerchantLeadRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryH5MerchantLeadResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryH5MerchantLeadQuickQuoteRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryH5MerchantLeadQuickQuoteResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryH5MerchantLeadQuickStatusRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryH5MerchantLeadQuickStatusResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryListRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryListResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryMerchantLeadDetailResponse;
@@ -271,6 +277,26 @@ public class InquiryController {
   public ApiResponse<InquiryH5QuoteCompareResponse> h5QuoteCompare(
       @Valid @ModelAttribute InquiryH5QuoteCompareRequest request) {
     return ApiResponse.success(service.h5QuoteCompare(request));
+  }
+
+  @GetMapping("/h5/merchant/leads")
+  public ApiResponse<InquiryH5MerchantLeadResponse> h5MerchantLeads(
+      @Valid @ModelAttribute InquiryH5MerchantLeadRequest request) {
+    return ApiResponse.success(service.h5MerchantLeads(request));
+  }
+
+  @PostMapping("/h5/merchant/leads/{leadId}/quick-quote")
+  public ApiResponse<InquiryH5MerchantLeadQuickQuoteResponse> h5MerchantLeadQuickQuote(
+      @PathVariable("leadId") String leadId,
+      @Valid @RequestBody InquiryH5MerchantLeadQuickQuoteRequest request) {
+    return ApiResponse.success(service.h5MerchantLeadQuickQuote(leadId, request));
+  }
+
+  @PutMapping("/h5/merchant/leads/{leadId}/quick-status")
+  public ApiResponse<InquiryH5MerchantLeadQuickStatusResponse> h5MerchantLeadQuickStatus(
+      @PathVariable("leadId") String leadId,
+      @Valid @RequestBody InquiryH5MerchantLeadQuickStatusRequest request) {
+    return ApiResponse.success(service.h5MerchantLeadQuickStatus(leadId, request));
   }
 
   @GetMapping("/merchant/messages")
