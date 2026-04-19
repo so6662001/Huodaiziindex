@@ -186,11 +186,15 @@ public class InMemoryStorageDemandRepository {
   }
 
   private boolean matchServiceNeed(StorageDemandEntity item, String serviceNeedFilter) {
-    if (serviceNeedFilter.isBlank() || "全部服务".equals(serviceNeedFilter)) {
+    if (serviceNeedFilter.isBlank()) {
+      return true;
+    }
+    String normalizedFilter = normalize(serviceNeedFilter);
+    if ("全部服务".equals(normalizedFilter)) {
       return true;
     }
     String need = normalize(serviceNeedLabel(item.isNeedLoading(), item.isNeedSorting()));
-    return need.equals(serviceNeedFilter);
+    return need.equals(normalizedFilter);
   }
 
   private String serviceNeedLabel(boolean needLoading, boolean needSorting) {

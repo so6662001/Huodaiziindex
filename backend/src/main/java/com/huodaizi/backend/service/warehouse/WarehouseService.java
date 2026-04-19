@@ -10,6 +10,7 @@ import com.huodaizi.backend.dto.warehouse.WarehouseListResponse;
 import com.huodaizi.backend.dto.warehouse.WarehousePublishRequest;
 import com.huodaizi.backend.repository.warehouse.InMemoryWarehouseRepository;
 import com.huodaizi.backend.repository.warehouse.WarehouseEntity;
+import java.util.Arrays;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
@@ -81,10 +82,21 @@ public class WarehouseService {
         entity.getCapacity(),
         entity.getThroughput(),
         entity.getCapability(),
-        entity.getCategories(),
+        splitCategories(entity.getCategories()),
         entity.getPrice(),
+        entity.getContactPhone(),
         entity.getStatus(),
         entity.isPinned(),
         entity.getUpdatedAt().toString());
+  }
+
+  private List<String> splitCategories(String categoriesText) {
+    if (categoriesText == null || categoriesText.isBlank()) {
+      return List.of();
+    }
+    return Arrays.stream(categoriesText.split(","))
+        .map(String::trim)
+        .filter(s -> !s.isBlank())
+        .toList();
   }
 }

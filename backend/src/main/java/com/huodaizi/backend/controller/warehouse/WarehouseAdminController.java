@@ -52,7 +52,8 @@ public class WarehouseAdminController {
   public ApiResponse<WarehouseItemDTO> pin(
       @PathVariable("id") String id, @Valid @RequestBody WarehouseAdminUpdateRequest request) {
     if (request.pinned() == null) {
-      throw new IllegalArgumentException("pinned 不能为空");
+      throw new com.huodaizi.backend.common.BaseException(
+          com.huodaizi.backend.common.ErrorCode.BAD_REQUEST.getCode(), "pinned 不能为空");
     }
     return ApiResponse.success(warehouseService.pin(id, request.pinned()));
   }

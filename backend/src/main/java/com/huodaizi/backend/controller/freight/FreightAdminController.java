@@ -1,6 +1,8 @@
 package com.huodaizi.backend.controller.freight;
 
 import com.huodaizi.backend.common.ApiResponse;
+import com.huodaizi.backend.common.BaseException;
+import com.huodaizi.backend.common.ErrorCode;
 import com.huodaizi.backend.dto.freight.FreightAdminUpdateRequest;
 import com.huodaizi.backend.dto.freight.FreightItemDTO;
 import com.huodaizi.backend.dto.freight.FreightPublishRequest;
@@ -52,7 +54,7 @@ public class FreightAdminController {
   public ApiResponse<FreightItemDTO> pin(
       @PathVariable("id") String id, @Valid @RequestBody FreightAdminUpdateRequest request) {
     if (request.pinned() == null) {
-      throw new IllegalArgumentException("pinned 不能为空");
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "pinned 不能为空");
     }
     return ApiResponse.success(freightService.pin(id, request.pinned()));
   }

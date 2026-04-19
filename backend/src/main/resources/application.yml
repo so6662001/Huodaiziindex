@@ -4,3 +4,9 @@ server:
 spring:
   application:
     name: huodaizi-backend
+
+huodaizi:
+  admin:
+    auth:
+      enabled: true
+      token: change-this-admin-token

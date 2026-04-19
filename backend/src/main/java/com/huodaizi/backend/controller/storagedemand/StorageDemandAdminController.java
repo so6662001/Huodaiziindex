@@ -4,6 +4,8 @@ import com.huodaizi.backend.common.ApiResponse;
 import com.huodaizi.backend.dto.storagedemand.StorageDemandAdminUpdateRequest;
 import com.huodaizi.backend.dto.storagedemand.StorageDemandItemDTO;
 import com.huodaizi.backend.dto.storagedemand.StorageDemandPublishRequest;
+import com.huodaizi.backend.common.BaseException;
+import com.huodaizi.backend.common.ErrorCode;
 import com.huodaizi.backend.service.storagedemand.StorageDemandService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -53,7 +55,7 @@ public class StorageDemandAdminController {
   public ApiResponse<StorageDemandItemDTO> pin(
       @PathVariable("id") String id, @Valid @RequestBody StorageDemandAdminUpdateRequest request) {
     if (request.pinned() == null) {
-      throw new IllegalArgumentException("pinned 不能为空");
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "pinned 不能为空");
     }
     return ApiResponse.success(storageDemandService.pin(id, request.pinned()));
   }
