@@ -100,7 +100,13 @@ onMounted(() => {
           <p class="tip">{{ summary.tipText || '-' }}</p>
 
           <div class="actions">
-            <button class="btn btn--primary" :disabled="!summary.compareUrl" @click="gotoCompare">查看报价对比</button>
+            <button
+              class="btn btn--primary"
+              :disabled="!summary.draftId"
+              @click="router.push(`/h5/quote-compare?draftId=${encodeURIComponent(summary.draftId)}`)"
+            >
+              查看报价对比
+            </button>
             <button class="btn" @click="restartInquiry">再发一单</button>
             <button class="btn" @click="loadStep3">刷新状态</button>
           </div>

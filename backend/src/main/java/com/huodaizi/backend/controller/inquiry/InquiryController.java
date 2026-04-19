@@ -44,6 +44,8 @@ import com.huodaizi.backend.dto.inquiry.InquiryH5InquiryStep2SubmitRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryH5InquiryStep2SubmitResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryH5InquiryStep3Request;
 import com.huodaizi.backend.dto.inquiry.InquiryH5InquiryStep3Response;
+import com.huodaizi.backend.dto.inquiry.InquiryH5QuoteCompareRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryH5QuoteCompareResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryListRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryListResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryMerchantLeadDetailResponse;
@@ -263,6 +265,12 @@ public class InquiryController {
   public ApiResponse<InquiryH5InquiryStep3Response> h5InquiryStep3(
       @Valid @ModelAttribute InquiryH5InquiryStep3Request request) {
     return ApiResponse.success(service.h5InquiryStep3(request));
+  }
+
+  @GetMapping("/h5/quote-compare")
+  public ApiResponse<InquiryH5QuoteCompareResponse> h5QuoteCompare(
+      @Valid @ModelAttribute InquiryH5QuoteCompareRequest request) {
+    return ApiResponse.success(service.h5QuoteCompare(request));
   }
 
   @GetMapping("/merchant/messages")

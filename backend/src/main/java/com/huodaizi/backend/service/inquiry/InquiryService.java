@@ -84,6 +84,8 @@ import com.huodaizi.backend.dto.inquiry.InquiryH5InquiryStep2SubmitRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryH5InquiryStep2SubmitResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryH5InquiryStep3Request;
 import com.huodaizi.backend.dto.inquiry.InquiryH5InquiryStep3Response;
+import com.huodaizi.backend.dto.inquiry.InquiryH5QuoteCompareRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryH5QuoteCompareResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchBatchUpdateRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchOverviewRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchOverviewResponse;
@@ -851,6 +853,45 @@ public class InquiryService {
         success.nextSteps(),
         success.compareUrl(),
         "H5询价已完成，后续可在报价对比页继续跟进");
+  }
+
+  public InquiryH5QuoteCompareResponse h5QuoteCompare(InquiryH5QuoteCompareRequest request) {
+    InquiryH5InquiryStep1DraftEntity draft = repository.getH5InquiryStep1Draft(request.draftId());
+    if (!"SUBMITTED".equalsIgnoreCase(draft.getStatus())) {
+      throw new com.huodaizi.backend.common.BaseException(
+          com.huodaizi.backend.common.ErrorCode.BAD_REQUEST.getCode(), "请先完成Step2提交");
+    }
+    InquiryQuoteCompareResponse response =
+        compareQuotes(
+            new InquiryQuoteCompareRequest(
+                draft.getInquiryId(),
+                draft.getContactMobile(),
+                request.deliveryCycle(),
+                request.invoiceType(),
+                request.sortBy(),
+                request.page(),
+                request.pageSize()));
+    String selectedSortBy =
+        request.sortBy() == null || request.sortBy().isBlank()
+            ? "TOTAL_PRICE"
+            : request.sortBy().trim().toUpperCase(java.util.Locale.ROOT);
+    return new InquiryH5QuoteCompareResponse(
+        draft.getDraftId(),
+        response.inquiryId(),
+        response.inquiryNo(),
+        response.inquiryStatus(),
+        response.specText(),
+        response.demandQtyTon(),
+        response.deliveryCity(),
+        maskPhone(draft.getContactMobile()),
+        selectedSortBy,
+        response.quotes().size(),
+        response.quotes(),
+        response.total(),
+        response.page(),
+        response.pageSize(),
+        "建议优先比较总价、交付天数与履约评分，再进入成交确认",
+        "/inquiry/deal/confirm");
   }
 
   public InquiryMerchantLeadDetailResponse merchantLeadDetail(
