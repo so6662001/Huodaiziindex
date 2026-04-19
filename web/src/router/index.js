@@ -25,6 +25,7 @@ import A01DashboardPage from '../pages/A01DashboardPage.vue'
 import A02LeadOpsPage from '../pages/A02LeadOpsPage.vue'
 import A03QuoteEfficiencyPage from '../pages/A03QuoteEfficiencyPage.vue'
 import A04PickupMonitorPage from '../pages/A04PickupMonitorPage.vue'
+import A05ReconcileMonitorPage from '../pages/A05ReconcileMonitorPage.vue'
 import InquiryMerchantLeadManagePage from '../pages/InquiryMerchantLeadManagePage.vue'
 import InquiryQuoteWorkbenchPage from '../pages/InquiryQuoteWorkbenchPage.vue'
 import SiteAdLeadMinePage from '../pages/SiteAdLeadMinePage.vue'
@@ -149,6 +150,14 @@ const routes = [
     component: A04PickupMonitorPage,
     meta: {
       title: 'A04提货监控中心_管理端提货履约监控-货袋子'
+    }
+  },
+  {
+    path: '/admin/reconcile-monitor/a05',
+    name: 'a05ReconcileMonitor',
+    component: A05ReconcileMonitorPage,
+    meta: {
+      title: 'A05对账监控中心_管理端回款与对账监控-货袋子'
     }
   },
   {
