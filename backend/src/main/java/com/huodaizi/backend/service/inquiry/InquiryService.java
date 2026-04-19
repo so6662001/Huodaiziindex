@@ -82,6 +82,8 @@ import com.huodaizi.backend.dto.inquiry.InquiryH5InquiryStep2InitRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryH5InquiryStep2InitResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryH5InquiryStep2SubmitRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryH5InquiryStep2SubmitResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryH5InquiryStep3Request;
+import com.huodaizi.backend.dto.inquiry.InquiryH5InquiryStep3Response;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchBatchUpdateRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchOverviewRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchOverviewResponse;
@@ -822,9 +824,33 @@ public class InquiryService {
         draft.getDraftId(),
         draft.getInquiryId(),
         draft.getInquiryNo(),
-        "/inquiry/success?inquiryId=" + draft.getInquiryId() + "&contactMobile=" + draft.getContactMobile(),
+        "/h5/inquiry/step3?draftId=" + draft.getDraftId(),
         "询价提交成功，系统正在为您匹配优质商家",
         draft.getUpdatedAt().toString());
+  }
+
+  public InquiryH5InquiryStep3Response h5InquiryStep3(InquiryH5InquiryStep3Request request) {
+    InquiryH5InquiryStep1DraftEntity draft = repository.getH5InquiryStep1Draft(request.draftId());
+    if (!"SUBMITTED".equalsIgnoreCase(draft.getStatus())) {
+      throw new com.huodaizi.backend.common.BaseException(
+          com.huodaizi.backend.common.ErrorCode.BAD_REQUEST.getCode(), "请先完成Step2提交");
+    }
+    InquirySuccessResponse success =
+        success(new InquirySuccessRequest(draft.getInquiryId(), draft.getContactMobile()));
+    return new InquiryH5InquiryStep3Response(
+        draft.getDraftId(),
+        success.inquiryId(),
+        success.inquiryNo(),
+        success.inquiryStatus(),
+        success.specText(),
+        success.deliveryCity(),
+        success.demandQtyTon(),
+        success.contactMobileMasked(),
+        success.createdAt(),
+        success.quoteCount(),
+        success.nextSteps(),
+        success.compareUrl(),
+        "H5询价已完成，后续可在报价对比页继续跟进");
   }
 
   public InquiryMerchantLeadDetailResponse merchantLeadDetail(

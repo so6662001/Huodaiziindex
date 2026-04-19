@@ -94,8 +94,8 @@ async function submitStep2() {
     }
     const data = json.data || {}
     successMsg.value = data.successMessage || '提交成功'
-    if (data.successUrl) {
-      router.push(data.successUrl)
+    if (data.nextStepUrl) {
+      router.push(data.nextStepUrl)
     }
   } catch (error) {
     errorMsg.value = error.message || '系统繁忙，请稍后重试'
