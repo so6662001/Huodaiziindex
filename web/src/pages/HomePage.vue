@@ -101,6 +101,10 @@ function goLeadCenter() {
   router.push('/site/ad/mine')
 }
 
+function goCreditScore() {
+  router.push('/merchant/credit/score?merchantId=S001')
+}
+
 function onSearch() {
   if (!keyword.value.trim()) {
     return
@@ -280,6 +284,7 @@ function onSearch() {
       </ul>
       <div class="rules-actions">
         <button class="btn" @click="goLeadCenter">查看我的投放单</button>
+        <button class="btn" @click="goCreditScore">查看信用评分</button>
         <button class="btn primary" @click="goInquiry">立即体验AI询价</button>
       </div>
     </section>

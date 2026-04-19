@@ -23,6 +23,8 @@ import com.huodaizi.backend.dto.inquiry.InquiryListRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryListResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryMerchantLeadDetailResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryMerchantLeadItemDTO;
+import com.huodaizi.backend.dto.inquiry.InquiryMerchantCreditScoreRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryMerchantCreditScoreResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryMerchantLeadListRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryMerchantLeadListResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryMerchantLeadQuoteRequest;
@@ -145,6 +147,12 @@ public class InquiryController {
   public ApiResponse<InquiryMerchantLeadListResponse> merchantLeads(
       @Valid @ModelAttribute InquiryMerchantLeadListRequest request) {
     return ApiResponse.success(service.merchantLeads(request));
+  }
+
+  @GetMapping("/merchant/credit-score")
+  public ApiResponse<InquiryMerchantCreditScoreResponse> merchantCreditScore(
+      @Valid @ModelAttribute InquiryMerchantCreditScoreRequest request) {
+    return ApiResponse.success(service.merchantCreditScore(request));
   }
 
   @GetMapping("/merchant/leads/{leadId}")

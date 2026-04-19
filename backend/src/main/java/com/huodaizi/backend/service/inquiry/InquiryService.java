@@ -13,6 +13,10 @@ import com.huodaizi.backend.dto.inquiry.InquiryMerchantLeadDetailResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryMerchantLeadItemDTO;
 import com.huodaizi.backend.dto.inquiry.InquiryMerchantLeadListRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryMerchantLeadListResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryMerchantCreditScoreDimensionDTO;
+import com.huodaizi.backend.dto.inquiry.InquiryMerchantCreditScoreRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryMerchantCreditScoreResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryMerchantCreditScoreTrendPointDTO;
 import com.huodaizi.backend.dto.inquiry.InquiryMerchantLeadQuoteRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryMerchantLeadStatus;
 import com.huodaizi.backend.dto.inquiry.InquiryMerchantLeadStatusUpdateRequest;
@@ -46,6 +50,7 @@ import com.huodaizi.backend.dto.inquiry.InquirySuccessResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryStatus;
 import com.huodaizi.backend.repository.inquiry.InMemoryInquiryRepository;
 import com.huodaizi.backend.repository.inquiry.InquiryEntity;
+import com.huodaizi.backend.repository.inquiry.InquiryMerchantCreditScoreEntity;
 import com.huodaizi.backend.repository.inquiry.InquiryMerchantLeadEntity;
 import com.huodaizi.backend.repository.inquiry.InquiryPickupOrderEntity;
 import com.huodaizi.backend.repository.inquiry.InquiryReconcileOrderEntity;
@@ -373,6 +378,40 @@ public class InquiryService {
         countMerchantByStatus(all, InquiryMerchantLeadStatus.WON),
         countMerchantByStatus(all, InquiryMerchantLeadStatus.LOST),
         countMerchantByStatus(all, InquiryMerchantLeadStatus.CLOSED));
+  }
+
+  public InquiryMerchantCreditScoreResponse merchantCreditScore(InquiryMerchantCreditScoreRequest request) {
+    InquiryMerchantCreditScoreEntity entity = repository.merchantCreditScore(request);
+    List<InquiryMerchantCreditScoreDimensionDTO> dimensions =
+        entity.getDimensions().stream()
+            .map(
+                item ->
+                    new InquiryMerchantCreditScoreDimensionDTO(
+                        item.code(), item.name(), item.score(), item.weight(), item.trend(), item.summary()))
+            .toList();
+    List<InquiryMerchantCreditScoreTrendPointDTO> trend =
+        entity.getTrendPoints().stream()
+            .map(
+                point ->
+                    new InquiryMerchantCreditScoreTrendPointDTO(
+                        point.month(),
+                        point.creditScore(),
+                        point.fulfillmentRate(),
+                        point.disputeRate(),
+                        point.responseMinutes()))
+            .toList();
+    return new InquiryMerchantCreditScoreResponse(
+        entity.getMerchantId(),
+        entity.getMerchantName(),
+        entity.getScore(),
+        entity.getGrade(),
+        entity.getRankPercent(),
+        entity.getScoreVersion(),
+        entity.getUpdatedAt().toString(),
+        dimensions,
+        trend,
+        entity.getRisks(),
+        entity.getSuggestions());
   }
 
   public InquiryMerchantLeadDetailResponse merchantLeadDetail(

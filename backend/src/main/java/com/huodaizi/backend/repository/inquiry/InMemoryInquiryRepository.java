@@ -10,6 +10,7 @@ import com.huodaizi.backend.dto.inquiry.InquiryMerchantLeadListRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryMerchantLeadQuoteRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryMerchantLeadStatus;
 import com.huodaizi.backend.dto.inquiry.InquiryMerchantLeadStatusUpdateRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryMerchantCreditScoreRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryPickupOrderCreateRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryPickupOrderListRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryPickupOrderStatus;
@@ -44,6 +45,8 @@ public class InMemoryInquiryRepository {
   private final ConcurrentMap<String, InquiryEntity> store = new ConcurrentHashMap<>();
   private final ConcurrentMap<String, List<InquiryQuoteCompareEntity>> quoteStore = new ConcurrentHashMap<>();
   private final ConcurrentMap<String, InquiryMerchantLeadEntity> merchantLeadStore = new ConcurrentHashMap<>();
+  private final ConcurrentMap<String, InquiryMerchantCreditScoreEntity> merchantCreditScoreStore =
+      new ConcurrentHashMap<>();
   private final ConcurrentMap<String, InquiryPickupOrderEntity> pickupOrderStore = new ConcurrentHashMap<>();
   private final ConcurrentMap<String, InquiryReconcileOrderEntity> reconcileOrderStore =
       new ConcurrentHashMap<>();
@@ -195,6 +198,18 @@ public class InMemoryInquiryRepository {
           entity.getDeliveryDays(),
           entity.getPaymentTerm(),
           request.comment().trim());
+    }
+    return entity;
+  }
+
+  public InquiryMerchantCreditScoreEntity merchantCreditScore(InquiryMerchantCreditScoreRequest request) {
+    String merchantId = defaultText(request.merchantId(), "").trim();
+    if (merchantId.isEmpty()) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "merchantId 不能为空");
+    }
+    InquiryMerchantCreditScoreEntity entity = merchantCreditScoreStore.get(merchantId.toUpperCase(Locale.ROOT));
+    if (entity == null) {
+      throw new BaseException(ErrorCode.NOT_FOUND.getCode(), "商家信用评分不存在");
     }
     return entity;
   }
@@ -606,6 +621,7 @@ public class InMemoryInquiryRepository {
             "需要可开票"));
     inquiry2.setQuoteSupplierCount(2);
     seedMerchantLeads(inquiry1, inquiry2);
+    seedMerchantCreditScores();
   }
 
   private void seedMerchantLeads(InquiryEntity inquiry1, InquiryEntity inquiry2) {
@@ -688,6 +704,69 @@ public class InMemoryInquiryRepository {
     merchantLeadStore.put(a.getId(), a);
     merchantLeadStore.put(b.getId(), b);
     merchantLeadStore.put(c.getId(), c);
+  }
+
+  private void seedMerchantCreditScores() {
+    merchantCreditScoreStore.put(
+        "S001",
+        new InquiryMerchantCreditScoreEntity(
+            "S001",
+            "唐山弘达钢贸",
+            "92",
+            "A",
+            "TOP 18%",
+            "v2026.04",
+            List.of(
+                new InquiryMerchantCreditScoreEntity.DimensionEntity(
+                    "FULFILLMENT", "履约稳定性", 98, 40, "UP", "逾期率低，交付准时"),
+                new InquiryMerchantCreditScoreEntity.DimensionEntity(
+                    "RESPONSE", "响应效率", 95, 25, "FLAT", "平均响应 7 分钟"),
+                new InquiryMerchantCreditScoreEntity.DimensionEntity(
+                    "PAYMENT", "回款质量", 89, 25, "UP", "回款周期稳定"),
+                new InquiryMerchantCreditScoreEntity.DimensionEntity(
+                    "DATA_QUALITY", "数据完整性", 90, 10, "UP", "电子回单完整率持续提升")),
+            List.of(
+                new InquiryMerchantCreditScoreEntity.TrendPointEntity(
+                    "2026-01", "86", "96.2%", "1.8%", "10"),
+                new InquiryMerchantCreditScoreEntity.TrendPointEntity(
+                    "2026-02", "88", "97.1%", "1.6%", "9"),
+                new InquiryMerchantCreditScoreEntity.TrendPointEntity(
+                    "2026-03", "90", "97.8%", "1.4%", "8"),
+                new InquiryMerchantCreditScoreEntity.TrendPointEntity(
+                    "2026-04", "92", "98.1%", "1.2%", "7")),
+            List.of("低风险", "履约稳健"),
+            List.of("保持回款登记时效在 T+1 内", "将争议工单平均关闭时长压缩到 24h", "提高电子回单上传完整率至 99%"),
+            LocalDateTime.now().minusHours(2)));
+    merchantCreditScoreStore.put(
+        "S002",
+        new InquiryMerchantCreditScoreEntity(
+            "S002",
+            "无锡铭泰供应链",
+            "88",
+            "A-",
+            "TOP 24%",
+            "v2026.04",
+            List.of(
+                new InquiryMerchantCreditScoreEntity.DimensionEntity(
+                    "FULFILLMENT", "履约稳定性", 95, 40, "UP", "履约率稳定"),
+                new InquiryMerchantCreditScoreEntity.DimensionEntity(
+                    "RESPONSE", "响应效率", 90, 25, "UP", "平均响应 11 分钟"),
+                new InquiryMerchantCreditScoreEntity.DimensionEntity(
+                    "PAYMENT", "回款质量", 85, 25, "FLAT", "部分订单回款延后"),
+                new InquiryMerchantCreditScoreEntity.DimensionEntity(
+                    "DATA_QUALITY", "数据完整性", 86, 10, "UP", "对账凭证完整度较高")),
+            List.of(
+                new InquiryMerchantCreditScoreEntity.TrendPointEntity(
+                    "2026-01", "84", "95.5%", "2.4%", "13"),
+                new InquiryMerchantCreditScoreEntity.TrendPointEntity(
+                    "2026-02", "85", "96.1%", "2.2%", "12"),
+                new InquiryMerchantCreditScoreEntity.TrendPointEntity(
+                    "2026-03", "87", "96.8%", "2.0%", "11"),
+                new InquiryMerchantCreditScoreEntity.TrendPointEntity(
+                    "2026-04", "88", "97.3%", "1.9%", "11")),
+            List.of("中低风险", "回款有优化空间"),
+            List.of("优化对账异常追踪", "增加高峰时段客服值守", "完善回款预警规则"),
+            LocalDateTime.now().minusHours(3)));
   }
 
   private String maskPhone(String phone) {

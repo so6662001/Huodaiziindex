@@ -6,6 +6,7 @@ import InquiryQuoteComparePage from '../pages/InquiryQuoteComparePage.vue'
 import InquiryDealConfirmPage from '../pages/InquiryDealConfirmPage.vue'
 import InquiryPickupPassPage from '../pages/InquiryPickupPassPage.vue'
 import InquiryReconcilePassPage from '../pages/InquiryReconcilePassPage.vue'
+import InquiryMerchantCreditScorePage from '../pages/InquiryMerchantCreditScorePage.vue'
 import InquiryMerchantLeadManagePage from '../pages/InquiryMerchantLeadManagePage.vue'
 import InquiryQuoteWorkbenchPage from '../pages/InquiryQuoteWorkbenchPage.vue'
 import SiteAdLeadMinePage from '../pages/SiteAdLeadMinePage.vue'
@@ -66,6 +67,14 @@ const routes = [
     component: InquiryReconcilePassPage,
     meta: {
       title: 'P09对账通_往来对账协同页-货袋子'
+    }
+  },
+  {
+    path: '/merchant/credit/score',
+    name: 'merchantCreditScore',
+    component: InquiryMerchantCreditScorePage,
+    meta: {
+      title: 'P10信用评分页_商家信用评估-货袋子'
     }
   },
   {
