@@ -77,6 +77,9 @@ Base Path: `/api/v1/spot`
 
 Base Path: `/api/admin/spot`
 
+> 安全要求：所有 `/api/admin/**` 接口必须携带请求头  
+> `X-Admin-Token: <token>`
+
 - `GET /`
   - 中台现货列表（含上架/下架记录）
 - `POST /`
@@ -133,6 +136,13 @@ Base Path: `/api/admin/spot`
 ```bash
 cd backend
 mvn spring-boot:run
+```
+
+本地调试中台接口示例：
+
+```bash
+curl -H "X-Admin-Token: change-this-admin-token" \
+  http://127.0.0.1:8080/api/admin/spot
 ```
 
 ## 后续建议（下一阶段）
