@@ -21,6 +21,7 @@ import com.huodaizi.backend.dto.inquiry.InquiryMessageCenterReadAllRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryMessageCenterReadRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryH5HomeRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryH5InquiryStep1SaveRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryH5InquiryStep2SubmitRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryPickupOrderCreateRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryPickupOrderListRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryPickupOrderStatus;
@@ -526,6 +527,13 @@ public class InMemoryInquiryRepository {
             "ANY",
             "",
             "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
             "INIT",
             now,
             now);
@@ -553,11 +561,72 @@ public class InMemoryInquiryRepository {
             normalizeInvoiceNeedForH5(request.invoiceNeed()),
             request.contactMobile().trim(),
             defaultText(request.remark(), ""),
+            existing.getExpectedDeliveryAt(),
+            existing.getDeliveryTimeRange(),
+            existing.getUnloadSupport(),
+            existing.getNeedInvoice(),
+            existing.getStep2Remark(),
+            existing.getInquiryId(),
+            existing.getInquiryNo(),
             "STEP1_SAVED",
             existing.getCreatedAt(),
             now);
     h5InquiryStep1DraftStore.put(draftId, saved);
     return saved;
+  }
+
+  public InquiryH5InquiryStep1DraftEntity getH5InquiryStep1Draft(String draftId) {
+    String normalizedDraftId = defaultText(draftId, "").trim();
+    if (normalizedDraftId.isEmpty()) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "draftId 不能为空");
+    }
+    InquiryH5InquiryStep1DraftEntity entity = h5InquiryStep1DraftStore.get(normalizedDraftId);
+    if (entity == null) {
+      throw new BaseException(ErrorCode.NOT_FOUND.getCode(), "询价草稿不存在");
+    }
+    return entity;
+  }
+
+  public InquiryH5InquiryStep1DraftEntity submitH5InquiryStep2(InquiryH5InquiryStep2SubmitRequest request) {
+    InquiryH5InquiryStep1DraftEntity draft = getH5InquiryStep1Draft(request.draftId());
+    if (!"STEP1_SAVED".equalsIgnoreCase(draft.getStatus())) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "请先完成Step1");
+    }
+    String normalizedNeedInvoice = normalizeYesNo(request.needInvoice(), "needInvoice");
+    String invoiceNeed = "Y".equals(normalizedNeedInvoice) ? "YES" : "NO";
+    InquiryEntity inquiry =
+        create(
+            new InquiryCreateRequest(
+                draft.getCategoryCode(),
+                draft.getSpecText(),
+                parsePositiveMoney(draft.getDemandQtyTon(), "demandQtyTon"),
+                draft.getDeliveryCity(),
+                defaultText(request.expectedDeliveryAt(), ""),
+                invoiceNeed,
+                draft.getContactMobile(),
+                mergeRemarks(draft.getRemark(), request.step2Remark(), request.deliveryTimeRange(), request.unloadSupport())));
+    InquiryH5InquiryStep1DraftEntity submitted =
+        new InquiryH5InquiryStep1DraftEntity(
+            draft.getDraftId(),
+            draft.getCategoryCode(),
+            draft.getSpecText(),
+            draft.getDeliveryCity(),
+            draft.getDemandQtyTon(),
+            draft.getInvoiceNeed(),
+            draft.getContactMobile(),
+            draft.getRemark(),
+            defaultText(request.expectedDeliveryAt(), ""),
+            defaultText(request.deliveryTimeRange(), ""),
+            normalizeYesNo(request.unloadSupport(), "unloadSupport"),
+            normalizedNeedInvoice,
+            defaultText(request.step2Remark(), ""),
+            inquiry.getId(),
+            inquiry.getInquiryNo(),
+            "SUBMITTED",
+            draft.getCreatedAt(),
+            LocalDateTime.now());
+    h5InquiryStep1DraftStore.put(submitted.getDraftId(), submitted);
+    return submitted;
   }
 
   private String buildH5InquiryDraftId() {
@@ -995,6 +1064,32 @@ public class InMemoryInquiryRepository {
       case "ANY", "YES", "NO" -> normalized;
       default -> throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "invoiceNeed 仅支持 ANY/YES/NO");
     };
+  }
+
+  private String normalizeYesNo(String value, String fieldName) {
+    String normalized = defaultText(value, "").trim().toUpperCase(Locale.ROOT);
+    return switch (normalized) {
+      case "Y", "N" -> normalized;
+      default -> throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), fieldName + " 仅支持 Y/N");
+    };
+  }
+
+  private String mergeRemarks(
+      String step1Remark, String step2Remark, String deliveryTimeRange, String unloadSupport) {
+    List<String> remarks = new java.util.ArrayList<>();
+    if (step1Remark != null && !step1Remark.isBlank()) {
+      remarks.add("Step1备注:" + step1Remark.trim());
+    }
+    if (step2Remark != null && !step2Remark.isBlank()) {
+      remarks.add("Step2备注:" + step2Remark.trim());
+    }
+    if (deliveryTimeRange != null && !deliveryTimeRange.isBlank()) {
+      remarks.add("收货时段:" + deliveryTimeRange.trim());
+    }
+    if (unloadSupport != null && !unloadSupport.isBlank()) {
+      remarks.add("需要卸货协助:" + unloadSupport.trim());
+    }
+    return remarks.isEmpty() ? "-" : String.join(" | ", remarks);
   }
 
   private BigDecimal parsePositiveMoney(String text, String field) {
@@ -1542,6 +1637,13 @@ public class InMemoryInquiryRepository {
             "YES",
             "13800138000",
             "现货优先，当日可装车",
+            "2026-04-21",
+            "09:00-18:00",
+            "N",
+            "Y",
+            "",
+            "",
+            "",
             "STEP1_SAVED",
             now.minusMinutes(4),
             now);

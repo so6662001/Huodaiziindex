@@ -165,6 +165,9 @@ onMounted(() => {
           <button class="btn btn--primary" :disabled="!canSave || saving || !state.draftId" @click="saveStep1">
             {{ saving ? '保存中...' : '保存并进入Step2' }}
           </button>
+          <button class="btn" :disabled="!state.draftId || initLoading || saving" @click="router.push(`/h5/inquiry/step2?draftId=${encodeURIComponent(state.draftId)}`)">
+            直接去Step2
+          </button>
           <button class="btn" :disabled="initLoading || saving" @click="loadInit">重新初始化</button>
         </div>
       </template>

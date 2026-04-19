@@ -13,6 +13,7 @@ import InquiryDispatchScoreRulePage from '../pages/InquiryDispatchScoreRulePage.
 import InquiryMessageCenterPage from '../pages/InquiryMessageCenterPage.vue'
 import H5HomePage from '../pages/H5HomePage.vue'
 import H5InquiryStep1Page from '../pages/H5InquiryStep1Page.vue'
+import H5InquiryStep2Page from '../pages/H5InquiryStep2Page.vue'
 import InquiryMerchantLeadManagePage from '../pages/InquiryMerchantLeadManagePage.vue'
 import InquiryQuoteWorkbenchPage from '../pages/InquiryQuoteWorkbenchPage.vue'
 import SiteAdLeadMinePage from '../pages/SiteAdLeadMinePage.vue'
@@ -41,6 +42,14 @@ const routes = [
     component: H5InquiryStep1Page,
     meta: {
       title: 'H02 H5询价Step1_移动端询价第一步-货袋子'
+    }
+  },
+  {
+    path: '/h5/inquiry/step2',
+    name: 'h5InquiryStep2',
+    component: H5InquiryStep2Page,
+    meta: {
+      title: 'H03 H5询价Step2_移动端询价第二步-货袋子'
     }
   },
   {

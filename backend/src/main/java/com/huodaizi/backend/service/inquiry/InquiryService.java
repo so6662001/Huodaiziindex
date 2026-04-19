@@ -78,6 +78,10 @@ import com.huodaizi.backend.dto.inquiry.InquiryH5InquiryStep1InitResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryH5InquiryStep1OptionDTO;
 import com.huodaizi.backend.dto.inquiry.InquiryH5InquiryStep1SaveRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryH5InquiryStep1SaveResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryH5InquiryStep2InitRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryH5InquiryStep2InitResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryH5InquiryStep2SubmitRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryH5InquiryStep2SubmitResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchBatchUpdateRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchOverviewRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryQuoteWorkbenchOverviewResponse;
@@ -779,6 +783,47 @@ public class InquiryService {
         draft.getStatus(),
         "/h5/inquiry/step2?draftId=" + draft.getDraftId(),
         summary,
+        draft.getUpdatedAt().toString());
+  }
+
+  public InquiryH5InquiryStep2InitResponse h5InquiryStep2Init(InquiryH5InquiryStep2InitRequest request) {
+    InquiryH5InquiryStep1DraftEntity draft = repository.getH5InquiryStep1Draft(request.draftId());
+    if (!"STEP1_SAVED".equalsIgnoreCase(draft.getStatus()) && !"SUBMITTED".equalsIgnoreCase(draft.getStatus())) {
+      throw new com.huodaizi.backend.common.BaseException(
+          com.huodaizi.backend.common.ErrorCode.BAD_REQUEST.getCode(), "请先完成Step1");
+    }
+    List<InquiryH5InquiryStep1OptionDTO> expectedDeliveryOptions =
+        List.of(
+            new InquiryH5InquiryStep1OptionDTO("当天", "当天"),
+            new InquiryH5InquiryStep1OptionDTO("3天内", "3天内"),
+            new InquiryH5InquiryStep1OptionDTO("7天内", "7天内"),
+            new InquiryH5InquiryStep1OptionDTO("15天内", "15天内"));
+    List<InquiryH5InquiryStep1OptionDTO> settleTypeOptions =
+        List.of(
+            new InquiryH5InquiryStep1OptionDTO("货到付款", "货到付款"),
+            new InquiryH5InquiryStep1OptionDTO("月结30天", "月结30天"),
+            new InquiryH5InquiryStep1OptionDTO("现款现货", "现款现货"));
+    return new InquiryH5InquiryStep2InitResponse(
+        draft.getDraftId(),
+        draft.getCategoryCode(),
+        draft.getSpecText(),
+        draft.getDeliveryCity(),
+        draft.getDemandQtyTon(),
+        draft.getInvoiceNeed(),
+        maskPhone(draft.getContactMobile()),
+        expectedDeliveryOptions,
+        settleTypeOptions,
+        "补充交期与履约偏好后即可提交询价");
+  }
+
+  public InquiryH5InquiryStep2SubmitResponse h5InquiryStep2Submit(InquiryH5InquiryStep2SubmitRequest request) {
+    InquiryH5InquiryStep1DraftEntity draft = repository.submitH5InquiryStep2(request);
+    return new InquiryH5InquiryStep2SubmitResponse(
+        draft.getDraftId(),
+        draft.getInquiryId(),
+        draft.getInquiryNo(),
+        "/inquiry/success?inquiryId=" + draft.getInquiryId() + "&contactMobile=" + draft.getContactMobile(),
+        "询价提交成功，系统正在为您匹配优质商家",
         draft.getUpdatedAt().toString());
   }
 

@@ -38,6 +38,10 @@ import com.huodaizi.backend.dto.inquiry.InquiryH5InquiryStep1InitRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryH5InquiryStep1InitResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryH5InquiryStep1SaveRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryH5InquiryStep1SaveResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryH5InquiryStep2InitRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryH5InquiryStep2InitResponse;
+import com.huodaizi.backend.dto.inquiry.InquiryH5InquiryStep2SubmitRequest;
+import com.huodaizi.backend.dto.inquiry.InquiryH5InquiryStep2SubmitResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryListRequest;
 import com.huodaizi.backend.dto.inquiry.InquiryListResponse;
 import com.huodaizi.backend.dto.inquiry.InquiryMerchantLeadDetailResponse;
@@ -239,6 +243,18 @@ public class InquiryController {
   public ApiResponse<InquiryH5InquiryStep1SaveResponse> h5InquiryStep1Save(
       @Valid @RequestBody InquiryH5InquiryStep1SaveRequest request) {
     return ApiResponse.success(service.h5InquiryStep1Save(request));
+  }
+
+  @GetMapping("/h5/inquiry/step2/init")
+  public ApiResponse<InquiryH5InquiryStep2InitResponse> h5InquiryStep2Init(
+      @Valid @ModelAttribute InquiryH5InquiryStep2InitRequest request) {
+    return ApiResponse.success(service.h5InquiryStep2Init(request));
+  }
+
+  @PostMapping("/h5/inquiry/step2/submit")
+  public ApiResponse<InquiryH5InquiryStep2SubmitResponse> h5InquiryStep2Submit(
+      @Valid @RequestBody InquiryH5InquiryStep2SubmitRequest request) {
+    return ApiResponse.success(service.h5InquiryStep2Submit(request));
   }
 
   @GetMapping("/merchant/messages")
