@@ -49,6 +49,10 @@ public class SiteCityEntity {
     return city;
   }
 
+  public String getCitySlug() {
+    return city;
+  }
+
   public SiteCitySectionType getSectionType() {
     return sectionType;
   }

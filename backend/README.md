@@ -79,6 +79,21 @@ Base Path: `/api/admin/site-city`
 - 城市参数支持 slug 与中文城市名，未命中城市会回退到通用占位数据
 - 重启服务后数据会重置
 
+## 中台鉴权（已启用）
+
+- 所有 `/api/admin/**` 接口默认开启静态 Token 鉴权。
+- 请求头需携带：`X-Admin-Token: change-this-admin-token`（可在配置中修改）。
+
+配置位置（`src/main/resources/application.yml`）：
+
+```yaml
+huodaizi:
+  admin:
+    auth:
+      enabled: true
+      token: change-this-admin-token
+```
+
 ## 启动方式
 
 环境需求：

@@ -29,9 +29,9 @@ public class InMemorySiteCityRepository {
 
   public List<SiteCityEntity> listByCityAndSection(
       String citySlug, SiteCitySectionType section, boolean onlyOnline) {
-    String normalizedCity = normalize(citySlug);
+    String normalizedCity = normalizeCity(citySlug);
     return store.values().stream()
-        .filter(item -> normalize(item.getCitySlug()).equals(normalizedCity))
+        .filter(item -> normalizeCity(item.getCitySlug()).equals(normalizedCity))
         .filter(item -> item.getSectionType() == section)
         .filter(item -> !onlyOnline || STATUS_ONLINE.equals(item.getStatus()))
         .sorted(
@@ -103,7 +103,8 @@ public class InMemorySiteCityRepository {
     if (entity == null) {
       throw new BaseException(ErrorCode.NOT_FOUND.getCode(), "分站记录不存在");
     }
-    if (!normalize(entity.getCitySlug()).equals(normalize(citySlug)) || entity.getSectionType() != section) {
+    if (!normalizeCity(entity.getCitySlug()).equals(normalizeCity(citySlug))
+        || entity.getSectionType() != section) {
       throw new BaseException(ErrorCode.NOT_FOUND.getCode(), "分站记录不存在");
     }
     return entity;
@@ -123,6 +124,18 @@ public class InMemorySiteCityRepository {
 
   private String normalize(String text) {
     return text == null ? "" : text.trim().toLowerCase(Locale.ROOT);
+  }
+
+  private String normalizeCity(String city) {
+    return switch (normalize(city)) {
+      case "tangshan", "唐山" -> "tangshan";
+      case "wuxi", "无锡" -> "wuxi";
+      case "foshan", "佛山" -> "foshan";
+      case "wuhan", "武汉" -> "wuhan";
+      case "zhengzhou", "郑州" -> "zhengzhou";
+      case "chengdu", "成都" -> "chengdu";
+      default -> normalize(city);
+    };
   }
 
   private String normalizeStatus(String status) {

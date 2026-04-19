@@ -23,16 +23,17 @@ public class SiteCityService {
   }
 
   public SiteCityOverviewResponse overview(String city) {
+    String resolvedCity = normalizeCity(city);
     return new SiteCityOverviewResponse(
-        city,
-        cityName(city),
-        cityCode(city),
-        marketItems(city),
-        simpleItems(city, SiteCitySectionType.SPOT),
-        simpleItems(city, SiteCitySectionType.BUY),
-        simpleItems(city, SiteCitySectionType.LOGISTICS),
-        simpleItems(city, SiteCitySectionType.COMPANY),
-        simpleItems(city, SiteCitySectionType.AD));
+        resolvedCity,
+        cityName(resolvedCity),
+        cityCode(resolvedCity),
+        marketItems(resolvedCity),
+        simpleItems(resolvedCity, SiteCitySectionType.SPOT),
+        simpleItems(resolvedCity, SiteCitySectionType.BUY),
+        simpleItems(resolvedCity, SiteCitySectionType.LOGISTICS),
+        simpleItems(resolvedCity, SiteCitySectionType.COMPANY),
+        simpleItems(resolvedCity, SiteCitySectionType.AD));
   }
 
   public List<SiteCityEntity> adminList(String city, SiteCitySectionType section) {
@@ -71,6 +72,18 @@ public class SiteCityService {
       case "wuhan", "武汉" -> "武汉";
       case "zhengzhou", "郑州" -> "郑州";
       case "chengdu", "成都" -> "成都";
+      default -> city;
+    };
+  }
+
+  private String normalizeCity(String city) {
+    return switch (city.toLowerCase()) {
+      case "tangshan", "唐山" -> "tangshan";
+      case "wuxi", "无锡" -> "wuxi";
+      case "foshan", "佛山" -> "foshan";
+      case "wuhan", "武汉" -> "wuhan";
+      case "zhengzhou", "郑州" -> "zhengzhou";
+      case "chengdu", "成都" -> "chengdu";
       default -> city;
     };
   }

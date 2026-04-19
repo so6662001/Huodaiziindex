@@ -1,6 +1,8 @@
 package com.huodaizi.backend.controller.sitecity;
 
 import com.huodaizi.backend.common.ApiResponse;
+import com.huodaizi.backend.common.BaseException;
+import com.huodaizi.backend.common.ErrorCode;
 import com.huodaizi.backend.dto.sitecity.SiteCityAdminCreateRequest;
 import com.huodaizi.backend.dto.sitecity.SiteCityAdminUpdateRequest;
 import com.huodaizi.backend.dto.sitecity.SiteCitySectionType;
@@ -66,7 +68,7 @@ public class SiteCityAdminController {
       @PathVariable("id") String id,
       @Valid @RequestBody SiteCityAdminUpdateRequest request) {
     if (request.pinned() == null) {
-      throw new IllegalArgumentException("pinned 不能为空");
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "pinned 不能为空");
     }
     return ApiResponse.success(siteCityService.adminPin(city, section, id, request.pinned()));
   }
