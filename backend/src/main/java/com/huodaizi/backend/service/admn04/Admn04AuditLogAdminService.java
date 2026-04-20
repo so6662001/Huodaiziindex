@@ -129,6 +129,7 @@ public class Admn04AuditLogAdminService {
       case "ADMN05" -> "/api/admin/category-spec-dicts";
       case "ADMN06" -> "/api/admin/lead-quality";
       case "ADMN08" -> "/api/admin/deal-funnel";
+      case "ADMN09" -> "/api/admin/arbitration-tickets";
       default -> "/api/admin/unknown";
     };
   }
@@ -138,6 +139,9 @@ public class Admn04AuditLogAdminService {
       return "GET";
     }
     if (actionCode.contains("UPSERT")) {
+      return "POST";
+    }
+    if ("ARBITRATION_REVIEW".equals(actionCode)) {
       return "POST";
     }
     return "PUT";

@@ -143,6 +143,7 @@ public class Admn03RolePermissionAdminService {
       case "ADMN05_DICT_MANAGE" -> "类目规格词库管理";
       case "ADMN06_LEAD_QA_MANAGE" -> "线索质检中心";
       case "ADMN08_FUNNEL_VIEW" -> "成交漏斗分析";
+      case "ADMN09_ARBITRATION_MANAGE" -> "仲裁工单中心";
       default -> "权限-" + safeText(permissionCode);
     };
   }

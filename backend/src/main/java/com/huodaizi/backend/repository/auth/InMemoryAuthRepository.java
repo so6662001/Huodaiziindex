@@ -47,6 +47,8 @@ public class InMemoryAuthRepository {
       new ConcurrentHashMap<>();
   private final ConcurrentMap<String, Admn06LeadQualityEntity> admn06LeadQualityStore =
       new ConcurrentHashMap<>();
+  private final ConcurrentMap<String, Admn09ArbitrationTicketEntity> admn09ArbitrationStore =
+      new ConcurrentHashMap<>();
 
   public InMemoryAuthRepository() {
     seed();
@@ -565,6 +567,7 @@ public class InMemoryAuthRepository {
       case "ADMN05_DICT_MANAGE" -> "类目规格词库管理";
       case "ADMN06_LEAD_QA_MANAGE" -> "线索质检中心";
       case "ADMN08_FUNNEL_VIEW" -> "成交漏斗分析";
+      case "ADMN09_ARBITRATION_MANAGE" -> "仲裁工单中心";
       default -> "未命名权限";
     };
   }
@@ -671,6 +674,204 @@ public class InMemoryAuthRepository {
       case "MEDIUM" -> "中风险";
       case "HIGH" -> "高风险";
       default -> "未知";
+    };
+  }
+
+  public List<Admn09ArbitrationTicketEntity> listArbitrationTicketsForAdmin(
+      String arbitrationStatus,
+      String priorityLevel,
+      String city,
+      String assignedArbitrator,
+      String keyword) {
+    String statusFilter = defaultText(arbitrationStatus, "").toUpperCase(Locale.ROOT);
+    String priorityFilter = defaultText(priorityLevel, "").toUpperCase(Locale.ROOT);
+    String cityFilter = defaultText(city, "").toLowerCase(Locale.ROOT);
+    String arbitratorFilter = defaultText(assignedArbitrator, "").toLowerCase(Locale.ROOT);
+    String keywordFilter = defaultText(keyword, "").toLowerCase(Locale.ROOT);
+    return admn09ArbitrationStore.values().stream()
+        .filter(
+            item ->
+                statusFilter.isBlank()
+                    || statusFilter.equals(defaultText(item.getArbitrationStatus(), "").toUpperCase(Locale.ROOT)))
+        .filter(
+            item ->
+                priorityFilter.isBlank()
+                    || priorityFilter.equals(defaultText(item.getPriorityLevel(), "").toUpperCase(Locale.ROOT)))
+        .filter(item -> cityFilter.isBlank() || defaultText(item.getCity(), "").toLowerCase(Locale.ROOT).contains(cityFilter))
+        .filter(
+            item ->
+                arbitratorFilter.isBlank()
+                    || defaultText(item.getAssignedArbitrator(), "")
+                        .toLowerCase(Locale.ROOT)
+                        .contains(arbitratorFilter))
+        .filter(
+            item -> {
+              if (keywordFilter.isBlank()) {
+                return true;
+              }
+              N08AfterSaleDisputeEntity dispute = afterSaleStore.get(item.getDisputeId());
+              return defaultText(item.getTicketId(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                  || defaultText(item.getDisputeId(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                  || (dispute != null
+                      && (defaultText(dispute.getOrderNo(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                          || defaultText(dispute.getInquiryNo(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                          || defaultText(dispute.getBuyerCompany(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                          || defaultText(dispute.getSupplierName(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                          || defaultText(dispute.getIssueSummary(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)))
+                  || defaultText(item.getLatestConclusion(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                  || defaultText(item.getLatestRemark(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                  || defaultText(item.getAssignedArbitrator(), "").toLowerCase(Locale.ROOT).contains(keywordFilter);
+            })
+        .sorted(Comparator.comparing(Admn09ArbitrationTicketEntity::getUpdatedAt).reversed())
+        .toList();
+  }
+
+  public Admn09ArbitrationTicketEntity getArbitrationTicketForAdmin(String ticketId) {
+    String normalized = defaultText(ticketId, "");
+    if (normalized.isBlank()) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "ticketId 不能为空");
+    }
+    Admn09ArbitrationTicketEntity entity = admn09ArbitrationStore.get(normalized);
+    if (entity == null) {
+      throw new BaseException(ErrorCode.NOT_FOUND.getCode(), "仲裁工单不存在");
+    }
+    return entity;
+  }
+
+  public N08AfterSaleDisputeEntity getAfterSaleDisputeDetailForAdmin(String disputeId) {
+    String normalized = defaultText(disputeId, "");
+    if (normalized.isBlank()) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "disputeId 不能为空");
+    }
+    N08AfterSaleDisputeEntity entity = afterSaleStore.get(normalized);
+    if (entity == null) {
+      throw new BaseException(ErrorCode.NOT_FOUND.getCode(), "售后争议单不存在");
+    }
+    return entity;
+  }
+
+  public Admn09ArbitrationTicketEntity assignArbitrationTicketForAdmin(
+      String ticketId,
+      String action,
+      String assignedArbitrator,
+      String priorityLevel,
+      String handleRemark,
+      String operator) {
+    Admn09ArbitrationTicketEntity ticket = getArbitrationTicketForAdmin(ticketId);
+    N08AfterSaleDisputeEntity dispute = getAfterSaleDisputeDetailForAdmin(ticket.getDisputeId());
+    String normalizedAction = defaultText(action, "").toUpperCase(Locale.ROOT);
+    if (!normalizedAction.matches("ACCEPT|TRANSFER|START_REVIEW")) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "action 仅支持 ACCEPT/TRANSFER/START_REVIEW");
+    }
+    String nextPriority =
+        defaultText(priorityLevel, ticket.getPriorityLevel()).toUpperCase(Locale.ROOT);
+    if (!nextPriority.matches("LOW|MEDIUM|HIGH|URGENT")) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "priorityLevel 仅支持 LOW/MEDIUM/HIGH/URGENT");
+    }
+    String nextArbitrator = defaultText(assignedArbitrator, ticket.getAssignedArbitrator());
+    if ("ACCEPT".equals(normalizedAction) && nextArbitrator.isBlank()) {
+      nextArbitrator = defaultText(operator, "仲裁员-待分配");
+    }
+    String nextStatus = "PROCESSING";
+    String safeOperator = defaultText(operator, "admn09-assign");
+    String remark = defaultText(handleRemark, "仲裁工单已进入处理流程");
+    LocalDateTime now = LocalDateTime.now();
+    ticket.updateCase(
+        nextStatus,
+        nextPriority,
+        nextArbitrator,
+        ticket.getHearingAt(),
+        ticket.getLatestConclusion(),
+        remark,
+        safeOperator,
+        now);
+    ticket.appendTimeline(
+        "ASSIGN_" + normalizedAction,
+        "仲裁分派",
+        nextStatus,
+        admn09ArbitrationStatusText(nextStatus),
+        safeOperator,
+        remark,
+        now.toString());
+    if ("SUBMITTED".equalsIgnoreCase(dispute.getStatus())) {
+      dispute.updateStatus(
+          "PROCESSING",
+          disputeStatusText("PROCESSING"),
+          "平台仲裁处理中：" + remark,
+          safeOperator,
+          now);
+    }
+    admn09ArbitrationStore.put(ticket.getTicketId(), ticket);
+    return ticket;
+  }
+
+  public Admn09ArbitrationTicketEntity reviewArbitrationTicketForAdmin(
+      String ticketId, String action, String resolutionSummary, String resolutionDetail, String operator) {
+    Admn09ArbitrationTicketEntity ticket = getArbitrationTicketForAdmin(ticketId);
+    N08AfterSaleDisputeEntity dispute = getAfterSaleDisputeDetailForAdmin(ticket.getDisputeId());
+    String normalizedAction = defaultText(action, "").toUpperCase(Locale.ROOT);
+    if (!normalizedAction.matches("SUPPORT_BUYER|SUPPORT_SUPPLIER|MEDIATION|CLOSE_NO_FAULT|REOPEN")) {
+      throw new BaseException(
+          ErrorCode.BAD_REQUEST.getCode(),
+          "action 仅支持 SUPPORT_BUYER/SUPPORT_SUPPLIER/MEDIATION/CLOSE_NO_FAULT/REOPEN");
+    }
+    String safeOperator = defaultText(operator, "admn09-review");
+    String summary =
+        defaultText(resolutionSummary, defaultArbitrationConclusionByAction(normalizedAction));
+    String detail = defaultText(resolutionDetail, summary);
+    String nextStatus = "REOPEN".equals(normalizedAction) ? "PROCESSING" : "RESOLVED";
+    if ("CLOSE_NO_FAULT".equals(normalizedAction)) {
+      nextStatus = "CLOSED";
+    }
+    LocalDateTime now = LocalDateTime.now();
+    ticket.updateCase(
+        nextStatus,
+        ticket.getPriorityLevel(),
+        ticket.getAssignedArbitrator(),
+        ticket.getHearingAt(),
+        summary,
+        detail,
+        safeOperator,
+        now);
+    ticket.appendTimeline(
+        "REVIEW_" + normalizedAction,
+        "仲裁裁决",
+        nextStatus,
+        admn09ArbitrationStatusText(nextStatus),
+        safeOperator,
+        detail,
+        now.toString());
+    String disputeNextStatus = "REOPEN".equals(normalizedAction) ? "SUBMITTED" : "RESOLVED";
+    if ("CLOSE_NO_FAULT".equals(normalizedAction)) {
+      disputeNextStatus = "CLOSED";
+    }
+    dispute.updateStatus(
+        disputeNextStatus,
+        disputeStatusText(disputeNextStatus),
+        "仲裁结果：" + summary,
+        safeOperator,
+        now);
+    admn09ArbitrationStore.put(ticket.getTicketId(), ticket);
+    return ticket;
+  }
+
+  public String admn09ArbitrationStatusText(String arbitrationStatus) {
+    return switch (defaultText(arbitrationStatus, "").toUpperCase(Locale.ROOT)) {
+      case "PENDING_ASSIGN" -> "待分派";
+      case "PROCESSING" -> "仲裁处理中";
+      case "RESOLVED" -> "已裁决";
+      case "CLOSED" -> "已归档";
+      default -> "处理中";
+    };
+  }
+
+  public String admn09PriorityText(String priorityLevel) {
+    return switch (defaultText(priorityLevel, "").toUpperCase(Locale.ROOT)) {
+      case "LOW" -> "低优先级";
+      case "MEDIUM" -> "中优先级";
+      case "HIGH" -> "高优先级";
+      case "URGENT" -> "紧急";
+      default -> "中优先级";
     };
   }
 
@@ -1767,6 +1968,7 @@ public class InMemoryAuthRepository {
       case "ADMN05" -> "类目规格词库管理";
       case "ADMN06" -> "线索质检中心";
       case "ADMN08" -> "成交漏斗分析";
+      case "ADMN09" -> "仲裁工单中心";
       default -> "其他模块";
     };
   }
@@ -1783,6 +1985,9 @@ public class InMemoryAuthRepository {
       case "LEAD_QA_REVIEW" -> "线索质检复核";
       case "LEAD_QA_QUERY" -> "线索质检查询";
       case "DEAL_FUNNEL_QUERY" -> "成交漏斗查询";
+      case "ARBITRATION_ASSIGN" -> "仲裁分派处理";
+      case "ARBITRATION_REVIEW" -> "仲裁裁决处理";
+      case "ARBITRATION_QUERY" -> "仲裁工单查询";
       default -> "通用操作";
     };
   }
@@ -1837,6 +2042,7 @@ public class InMemoryAuthRepository {
     seedAdmn04AuditLogs();
     seedAdmn05CategorySpecDicts();
     seedAdmn06LeadQuality();
+    seedAdmn09ArbitrationTickets();
     seedNegotiation(seed);
     seedOrders(seed);
     seedTradeTerms(seed);
@@ -1932,7 +2138,9 @@ public class InMemoryAuthRepository {
                 "ADMN03_RBAC_MANAGE",
                 "ADMN04_AUDIT_LOG_VIEW",
                 "ADMN05_DICT_MANAGE",
-                "ADMN06_LEAD_QA_MANAGE"),
+                "ADMN06_LEAD_QA_MANAGE",
+                "ADMN08_FUNNEL_VIEW",
+                "ADMN09_ARBITRATION_MANAGE"),
             "seed",
             now.minusDays(30),
             now.minusDays(1));
@@ -1952,7 +2160,8 @@ public class InMemoryAuthRepository {
                 "DASHBOARD_VIEW",
                 "ADMN04_AUDIT_LOG_VIEW",
                 "ADMN05_DICT_MANAGE",
-                "ADMN06_LEAD_QA_MANAGE"),
+                "ADMN06_LEAD_QA_MANAGE",
+                "ADMN09_ARBITRATION_MANAGE"),
             "seed",
             now.minusDays(20),
             now.minusDays(2));
@@ -2121,6 +2330,73 @@ public class InMemoryAuthRepository {
             now.minusDays(2),
             now.minusHours(2));
     admn06LeadQualityStore.put(inquiryRiskQa.getQualityId(), inquiryRiskQa);
+  }
+
+  private void seedAdmn09ArbitrationTickets() {
+    LocalDateTime now = LocalDateTime.now();
+    Admn09ArbitrationTicketEntity first =
+        new Admn09ArbitrationTicketEntity(
+            "ARB_0001",
+            "AS00000001",
+            "唐山",
+            "PENDING_ASSIGN",
+            "HIGH",
+            "",
+            "",
+            "",
+            "争议单已升级至平台仲裁，待分派仲裁员",
+            "seed",
+            now.minusHours(6),
+            now.minusHours(3));
+    first.appendTimeline(
+        "UPGRADE_FROM_DISPUTE",
+        "升级仲裁",
+        "PENDING_ASSIGN",
+        admn09ArbitrationStatusText("PENDING_ASSIGN"),
+        "system",
+        "交付延迟争议升级至平台仲裁",
+        now.minusHours(6).toString());
+    first.appendTimeline(
+        "WAIT_ASSIGN",
+        "待分派仲裁员",
+        "PENDING_ASSIGN",
+        admn09ArbitrationStatusText("PENDING_ASSIGN"),
+        "system",
+        "待值班仲裁员接单",
+        now.minusHours(3).toString());
+    admn09ArbitrationStore.put(first.getTicketId(), first);
+
+    Admn09ArbitrationTicketEntity second =
+        new Admn09ArbitrationTicketEntity(
+            "ARB_0002",
+            "AS00000002",
+            "无锡",
+            "PROCESSING",
+            "MEDIUM",
+            "仲裁员-周宁",
+            now.plusHours(4).toString(),
+            "已受理质量偏差争议，待复检报告回传",
+            "双方同意第三方复检后裁决",
+            "seed",
+            now.minusDays(1),
+            now.minusHours(2));
+    second.appendTimeline(
+        "UPGRADE_FROM_DISPUTE",
+        "升级仲裁",
+        "PENDING_ASSIGN",
+        admn09ArbitrationStatusText("PENDING_ASSIGN"),
+        "system",
+        "质量异议升级至仲裁流程",
+        now.minusDays(1).toString());
+    second.appendTimeline(
+        "ASSIGN_ACCEPT",
+        "仲裁分派",
+        "PROCESSING",
+        admn09ArbitrationStatusText("PROCESSING"),
+        "admn09-seed",
+        "已指派仲裁员-周宁",
+        now.minusHours(12).toString());
+    admn09ArbitrationStore.put(second.getTicketId(), second);
   }
 
   private void seedNegotiation(AuthUserEntity user) {
@@ -2846,6 +3122,17 @@ public class InMemoryAuthRepository {
       case "RESOLVED" -> "已解决";
       case "CLOSED" -> "已关闭";
       default -> "处理中";
+    };
+  }
+
+  private String defaultArbitrationConclusionByAction(String action) {
+    return switch (defaultText(action, "").toUpperCase(Locale.ROOT)) {
+      case "SUPPORT_BUYER" -> "支持买方诉求并执行补偿方案";
+      case "SUPPORT_SUPPLIER" -> "支持卖方诉求并关闭异议";
+      case "MEDIATION" -> "平台调解达成一致方案";
+      case "CLOSE_NO_FAULT" -> "证据不足，工单归档";
+      case "REOPEN" -> "根据补充证据重新仲裁";
+      default -> "仲裁处理中";
     };
   }
 

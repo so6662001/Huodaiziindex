@@ -246,7 +246,11 @@ function goAdmn06LeadQualityCenterPage() {
 }
 
 function goAdmn08DealFunnelAnalysisPage() {
-  router.push('/admin/deal-funnel/admn08')
+  router.push('/admin/deal-funnel-analysis/admn08')
+}
+
+function goAdmn09ArbitrationTicketCenterPage() {
+  router.push('/admin/arbitration-ticket-center/admn09')
 }
 
 function goN01LoginRegisterPage() {
@@ -519,6 +523,7 @@ function onSearch() {
         <button class="btn" @click="goAdmn05CategorySpecDictPage">ADM-N05类目/规格词库管理</button>
         <button class="btn" @click="goAdmn06LeadQualityCenterPage">ADM-N06线索质检中心</button>
         <button class="btn" @click="goAdmn08DealFunnelAnalysisPage">ADM-N08成交漏斗分析</button>
+        <button class="btn" @click="goAdmn09ArbitrationTicketCenterPage">ADM-N09仲裁工单中心</button>
         <button class="btn" @click="goN01LoginRegisterPage">PC-N01登录/注册</button>
         <button class="btn" @click="goN02IdentitySelectPage">PC-N02身份选择</button>
         <button class="btn" @click="goN03EnterpriseCertificationPage">PC-N03企业认证提交</button>

@@ -47,6 +47,7 @@ import Admn04AuditLogPage from '../pages/Admn04AuditLogPage.vue'
 import Admn05CategorySpecDictPage from '../pages/Admn05CategorySpecDictPage.vue'
 import Admn06LeadQualityCenterPage from '../pages/Admn06LeadQualityCenterPage.vue'
 import Admn08DealFunnelAnalysisPage from '../pages/Admn08DealFunnelAnalysisPage.vue'
+import Admn09ArbitrationTicketCenterPage from '../pages/Admn09ArbitrationTicketCenterPage.vue'
 import N01LoginRegisterPage from '../pages/N01LoginRegisterPage.vue'
 import N02IdentitySelectPage from '../pages/N02IdentitySelectPage.vue'
 import N03EnterpriseCertificationPage from '../pages/N03EnterpriseCertificationPage.vue'
@@ -361,6 +362,14 @@ const routes = [
     component: Admn08DealFunnelAnalysisPage,
     meta: {
       title: 'ADM-N08成交漏斗分析_管理端成交转化链路分析-货袋子'
+    }
+  },
+  {
+    path: '/admin/arbitration-ticket-center/admn09',
+    name: 'admn09ArbitrationTicketCenter',
+    component: Admn09ArbitrationTicketCenterPage,
+    meta: {
+      title: 'ADM-N09仲裁工单中心_管理端争议仲裁流转与裁决处理-货袋子'
     }
   },
   {
