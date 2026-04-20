@@ -54,6 +54,7 @@ import Admn12AdSlotScheduleCenterPage from '../pages/Admn12AdSlotScheduleCenterP
 import Admn13CreditModelVersionManagePage from '../pages/Admn13CreditModelVersionManagePage.vue'
 import Admn14AbExperimentCenterPage from '../pages/Admn14AbExperimentCenterPage.vue'
 import Admn15RiskAlertTicketCenterPage from '../pages/Admn15RiskAlertTicketCenterPage.vue'
+import Admn16DataApiSubscriptionManagePage from '../pages/Admn16DataApiSubscriptionManagePage.vue'
 import N01LoginRegisterPage from '../pages/N01LoginRegisterPage.vue'
 import N02IdentitySelectPage from '../pages/N02IdentitySelectPage.vue'
 import N03EnterpriseCertificationPage from '../pages/N03EnterpriseCertificationPage.vue'
@@ -424,6 +425,14 @@ const routes = [
     component: Admn15RiskAlertTicketCenterPage,
     meta: {
       title: 'ADM-N15风险预警工单中心_管理端预警工单流转与闭环处置-货袋子'
+    }
+  },
+  {
+    path: '/admin/data-api-subscription-manage/admn16',
+    name: 'admn16DataApiSubscriptionManage',
+    component: Admn16DataApiSubscriptionManagePage,
+    meta: {
+      title: 'ADM-N16数据API订阅管理页_管理端订阅治理与配额风控-货袋子'
     }
   },
   {

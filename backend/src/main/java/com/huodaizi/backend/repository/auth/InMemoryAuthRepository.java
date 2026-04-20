@@ -63,6 +63,8 @@ public class InMemoryAuthRepository {
       new ConcurrentHashMap<>();
   private final ConcurrentMap<String, Admn15RiskAlertTicketEntity> admn15RiskAlertTicketStore =
       new ConcurrentHashMap<>();
+  private final ConcurrentMap<String, Admn16DataApiSubscriptionEntity> admn16DataApiSubscriptionStore =
+      new ConcurrentHashMap<>();
 
   public InMemoryAuthRepository() {
     seed();
@@ -588,6 +590,7 @@ public class InMemoryAuthRepository {
       case "ADMN13_CREDIT_MODEL_VERSION_MANAGE" -> "信用模型版本管理";
       case "ADMN14_AB_EXPERIMENT_MANAGE" -> "A/B实验中心";
       case "ADMN15_RISK_ALERT_TICKET_MANAGE" -> "风险预警工单中心";
+      case "ADMN16_DATA_API_SUBSCRIPTION_MANAGE" -> "数据API订阅管理";
       default -> "未命名权限";
     };
   }
@@ -2171,6 +2174,7 @@ public class InMemoryAuthRepository {
       case "ADMN13" -> "信用模型版本管理";
       case "ADMN14" -> "A/B实验中心";
       case "ADMN15" -> "风险预警工单中心";
+      case "ADMN16" -> "数据API订阅管理";
       default -> "其他模块";
     };
   }
@@ -2202,6 +2206,8 @@ public class InMemoryAuthRepository {
       case "AB_EXPERIMENT_QUERY" -> "A/B实验查询";
       case "RISK_ALERT_TICKET_HANDLE" -> "风险预警工单处置";
       case "RISK_ALERT_TICKET_QUERY" -> "风险预警工单查询";
+      case "DATA_API_SUBSCRIPTION_UPSERT" -> "数据API订阅新增/更新";
+      case "DATA_API_SUBSCRIPTION_QUERY" -> "数据API订阅查询";
       default -> "通用操作";
     };
   }
@@ -2262,6 +2268,7 @@ public class InMemoryAuthRepository {
     seedAdmn13CreditModelVersions();
     seedAdmn14AbExperiments();
     seedAdmn15RiskAlertTickets();
+    seedAdmn16DataApiSubscriptions();
     seedNegotiation(seed);
     seedOrders(seed);
     seedTradeTerms(seed);
@@ -2366,7 +2373,8 @@ public class InMemoryAuthRepository {
                 "ADMN12_AD_SLOT_SCHEDULE_MANAGE",
                 "ADMN13_CREDIT_MODEL_VERSION_MANAGE",
                 "ADMN14_AB_EXPERIMENT_MANAGE",
-                "ADMN15_RISK_ALERT_TICKET_MANAGE"),
+                "ADMN15_RISK_ALERT_TICKET_MANAGE",
+                "ADMN16_DATA_API_SUBSCRIPTION_MANAGE"),
             "seed",
             now.minusDays(30),
             now.minusDays(1));
@@ -2393,7 +2401,8 @@ public class InMemoryAuthRepository {
                 "ADMN12_AD_SLOT_SCHEDULE_MANAGE",
                 "ADMN13_CREDIT_MODEL_VERSION_MANAGE",
                 "ADMN14_AB_EXPERIMENT_MANAGE",
-                "ADMN15_RISK_ALERT_TICKET_MANAGE"),
+                "ADMN15_RISK_ALERT_TICKET_MANAGE",
+                "ADMN16_DATA_API_SUBSCRIPTION_MANAGE"),
             "seed",
             now.minusDays(20),
             now.minusDays(2));
@@ -3704,14 +3713,386 @@ public class InMemoryAuthRepository {
     return "LOW";
   }
 
+
+  private void seedAdmn16DataApiSubscriptions() {
+    LocalDateTime now = LocalDateTime.now();
+    Admn16DataApiSubscriptionEntity first =
+        new Admn16DataApiSubscriptionEntity(
+            "DAS000001",
+            "DAPI_SUB_CREDIT_PRO_2026Q2",
+            "M000001",
+            "唐山弘达钢贸",
+            "CREDIT_DATA",
+            "信用数据API",
+            "PRO",
+            "专业版",
+            "ACTIVE",
+            "MONTHLY",
+            "AK_SK",
+            "80",
+            "250000",
+            "7500000",
+            "113000",
+            "3290000",
+            "45.2%",
+            "2026-04-01",
+            "2026-12-31",
+            "数据产品组",
+            "生产订阅，持续观测调用峰值",
+            "admn16-seed",
+            now.minusDays(21),
+            now.minusHours(3),
+            List.of(
+                new Admn16DataApiSubscriptionEntity.QuotaMetricSnapshot(
+                    "SUCCESS_RATE", "调用成功率", "99.62%", "100%", "99.62%", "+0.18%"),
+                new Admn16DataApiSubscriptionEntity.QuotaMetricSnapshot(
+                    "P95_LATENCY", "P95延迟", "238ms", "300ms", "79.3%", "-17ms")));
+    admn16DataApiSubscriptionStore.put(first.getSubscriptionId(), first);
+
+    Admn16DataApiSubscriptionEntity second =
+        new Admn16DataApiSubscriptionEntity(
+            "DAS000002",
+            "DAPI_SUB_PRICE_STD_2026Q2",
+            "M000002",
+            "无锡铭泰供应链",
+            "PRICE_DATA",
+            "行情数据API",
+            "STANDARD",
+            "标准版",
+            "SUSPENDED",
+            "MONTHLY",
+            "IP_WHITELIST",
+            "40",
+            "120000",
+            "3600000",
+            "116500",
+            "2410000",
+            "97.1%",
+            "2026-03-01",
+            "2026-08-15",
+            "平台风控组",
+            "命中阈值自动暂停，待密钥轮转",
+            "admn16-seed",
+            now.minusDays(30),
+            now.minusHours(8),
+            List.of(
+                new Admn16DataApiSubscriptionEntity.QuotaMetricSnapshot(
+                    "SUCCESS_RATE", "调用成功率", "98.91%", "100%", "98.91%", "-0.42%"),
+                new Admn16DataApiSubscriptionEntity.QuotaMetricSnapshot(
+                    "ABNORMAL_RATIO", "异常请求占比", "2.1%", "5%", "42.0%", "+0.6%")));
+    admn16DataApiSubscriptionStore.put(second.getSubscriptionId(), second);
+
+    Admn16DataApiSubscriptionEntity third =
+        new Admn16DataApiSubscriptionEntity(
+            "DAS000003",
+            "DAPI_SUB_RISK_BASIC_2025Q4",
+            "M000003",
+            "佛山联胜金属",
+            "RISK_TAG",
+            "风控标签API",
+            "BASIC",
+            "基础版",
+            "EXPIRED",
+            "QUARTERLY",
+            "AK_SK",
+            "25",
+            "90000",
+            "2700000",
+            "87000",
+            "2090000",
+            "96.7%",
+            "2025-10-01",
+            "2026-03-31",
+            "数据产品组",
+            "订阅到期待续费",
+            "admn16-seed",
+            now.minusDays(120),
+            now.minusDays(15),
+            List.of(
+                new Admn16DataApiSubscriptionEntity.QuotaMetricSnapshot(
+                    "SUCCESS_RATE", "调用成功率", "99.15%", "100%", "99.15%", "-0.03%"),
+                new Admn16DataApiSubscriptionEntity.QuotaMetricSnapshot(
+                    "QPS_PEAK", "峰值QPS", "22", "25", "88.0%", "+1")));
+    admn16DataApiSubscriptionStore.put(third.getSubscriptionId(), third);
+  }
+
+  public List<Admn16DataApiSubscriptionEntity> listDataApiSubscriptionsForAdmin(
+      String subscriptionStatus, String apiProductCode, String billingCycle, String owner, String keyword) {
+    String statusFilter = defaultText(subscriptionStatus, "").toUpperCase(Locale.ROOT);
+    String productFilter = defaultText(apiProductCode, "").toUpperCase(Locale.ROOT);
+    String billingCycleFilter = defaultText(billingCycle, "").toUpperCase(Locale.ROOT);
+    String ownerFilter = defaultText(owner, "").toLowerCase(Locale.ROOT);
+    String keywordFilter = defaultText(keyword, "").toLowerCase(Locale.ROOT);
+    return admn16DataApiSubscriptionStore.values().stream()
+        .filter(
+            item ->
+                statusFilter.isBlank()
+                    || statusFilter.equals(defaultText(item.getSubscriptionStatus(), "").toUpperCase(Locale.ROOT)))
+        .filter(
+            item ->
+                productFilter.isBlank()
+                    || productFilter.equals(defaultText(item.getApiProductCode(), "").toUpperCase(Locale.ROOT)))
+        .filter(
+            item ->
+                billingCycleFilter.isBlank()
+                    || billingCycleFilter.equals(
+                        defaultText(item.getBillingCycle(), "").toUpperCase(Locale.ROOT)))
+        .filter(
+            item ->
+                ownerFilter.isBlank()
+                    || defaultText(item.getOwner(), "").toLowerCase(Locale.ROOT).contains(ownerFilter))
+        .filter(
+            item -> {
+              if (keywordFilter.isBlank()) {
+                return true;
+              }
+              return defaultText(item.getSubscriptionId(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                  || defaultText(item.getSubscriptionCode(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                  || defaultText(item.getMerchantId(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                  || defaultText(item.getMerchantName(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                  || defaultText(item.getApiProductCode(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                  || defaultText(item.getApiProductName(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                  || defaultText(item.getPlanCode(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                  || defaultText(item.getPlanName(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                  || defaultText(item.getOwner(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                  || defaultText(item.getRemark(), "").toLowerCase(Locale.ROOT).contains(keywordFilter);
+            })
+        .sorted(Comparator.comparing(Admn16DataApiSubscriptionEntity::getUpdatedAt).reversed())
+        .toList();
+  }
+
+  public Admn16DataApiSubscriptionEntity getDataApiSubscriptionForAdmin(String subscriptionId) {
+    String normalized = defaultText(subscriptionId, "");
+    if (normalized.isBlank()) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "subscriptionId 不能为空");
+    }
+    Admn16DataApiSubscriptionEntity entity = admn16DataApiSubscriptionStore.get(normalized);
+    if (entity == null) {
+      throw new BaseException(ErrorCode.NOT_FOUND.getCode(), "数据API订阅不存在");
+    }
+    return entity;
+  }
+
+  public Admn16DataApiSubscriptionEntity upsertDataApiSubscriptionForAdmin(
+      String subscriptionCode,
+      String subscriptionName,
+      String merchantId,
+      String merchantName,
+      String apiProductCode,
+      String apiProductName,
+      String subscriptionStatus,
+      String billingCycle,
+      String securityPolicy,
+      String qpsLimit,
+      String dailyQuota,
+      String monthlyQuota,
+      String usedDaily,
+      String usedMonthly,
+      List<Admn16DataApiSubscriptionEntity.QuotaMetricSnapshot> quotaMetrics,
+      String startDate,
+      String endDate,
+      String owner,
+      String remark,
+      String operator) {
+    String safeCode = defaultText(subscriptionCode, "").toUpperCase(Locale.ROOT);
+    String safeSubscriptionName = defaultText(subscriptionName, "");
+    String safeProductCode = defaultText(apiProductCode, "").toUpperCase(Locale.ROOT);
+    String safeProductName = defaultText(apiProductName, admn16ApiProductText(safeProductCode));
+    String safeMerchantId = defaultText(merchantId, "").toUpperCase(Locale.ROOT);
+    String safeMerchantName = defaultText(merchantName, "");
+    if (safeCode.isBlank() || safeProductCode.isBlank() || safeMerchantId.isBlank() || safeMerchantName.isBlank()) {
+      throw new BaseException(
+          ErrorCode.BAD_REQUEST.getCode(),
+          "subscriptionCode/apiProductCode/merchantId/merchantName 不能为空");
+    }
+    LocalDateTime now = LocalDateTime.now();
+    Admn16DataApiSubscriptionEntity existing =
+        admn16DataApiSubscriptionStore.values().stream()
+            .filter(item -> safeCode.equalsIgnoreCase(defaultText(item.getSubscriptionCode(), "")))
+            .findFirst()
+            .orElse(null);
+
+    List<Admn16DataApiSubscriptionEntity.QuotaMetricSnapshot> metrics =
+        quotaMetrics == null ? List.of() : quotaMetrics;
+    String resolvedStatus =
+        defaultText(subscriptionStatus, existing == null ? "ACTIVE" : existing.getSubscriptionStatus())
+            .toUpperCase(Locale.ROOT);
+    String resolvedBillingCycle =
+        defaultText(billingCycle, existing == null ? "MONTHLY" : existing.getBillingCycle())
+            .toUpperCase(Locale.ROOT);
+    String resolvedSecurityPolicy =
+        defaultText(securityPolicy, existing == null ? "AK_SK" : existing.getAuthMode())
+            .toUpperCase(Locale.ROOT);
+    String resolvedQps = defaultText(qpsLimit, existing == null ? "20" : existing.getQpsLimit());
+    String resolvedDailyQuota =
+        defaultText(dailyQuota, existing == null ? "100000" : existing.getDailyQuota());
+    String resolvedMonthlyQuota =
+        defaultText(monthlyQuota, existing == null ? resolvedDailyQuota : existing.getMonthlyQuota());
+    String resolvedUsedDaily = defaultText(usedDaily, existing == null ? "0" : existing.getUsedDaily());
+    String resolvedUsedMonthly =
+        defaultText(usedMonthly, existing == null ? resolvedUsedDaily : existing.getUsedMonthly());
+    String resolvedStartDate =
+        defaultText(startDate, existing == null ? LocalDate.now().toString() : existing.getStartDate());
+    String resolvedEndDate =
+        defaultText(endDate, existing == null ? LocalDate.now().plusDays(30).toString() : existing.getEndDate());
+    String resolvedOwner =
+        defaultText(owner, existing == null ? defaultText(operator, "admn16-upsert") : existing.getOwner());
+    String resolvedRemark = defaultText(remark, existing == null ? "" : existing.getRemark());
+    String resolvedOperator =
+        defaultText(operator, existing == null ? "admn16-upsert" : existing.getOperator());
+    String resolvedPlanCode = existing == null ? "STANDARD" : defaultText(existing.getPlanCode(), "STANDARD");
+    String resolvedPlanName =
+        defaultText(safeSubscriptionName, existing == null ? "标准版订阅" : existing.getPlanName());
+    long usedValue =
+        parseLongSafe(resolvedUsedMonthly, parseLongSafe(defaultText(resolvedUsedDaily, "0"), 0L));
+    long quotaValue = parseLongSafe(defaultText(resolvedMonthlyQuota, "0"), 0L);
+    String usageRate = buildUsageRate(usedValue, quotaValue);
+
+    if (existing == null) {
+      String id =
+          "DAS"
+              + UUID.randomUUID().toString().replace("-", "").substring(0, 8).toUpperCase(Locale.ROOT);
+      Admn16DataApiSubscriptionEntity created =
+          new Admn16DataApiSubscriptionEntity(
+              id,
+              safeCode,
+              safeMerchantId,
+              safeMerchantName,
+              safeProductCode,
+              safeProductName,
+              resolvedPlanCode,
+              resolvedPlanName,
+              resolvedStatus,
+              resolvedBillingCycle,
+              resolvedSecurityPolicy,
+              resolvedQps,
+              resolvedDailyQuota,
+              resolvedMonthlyQuota,
+              resolvedUsedDaily,
+              resolvedUsedMonthly,
+              usageRate,
+              resolvedStartDate,
+              resolvedEndDate,
+              resolvedOwner,
+              resolvedRemark,
+              resolvedOperator,
+              now,
+              now,
+              metrics);
+      admn16DataApiSubscriptionStore.put(created.getSubscriptionId(), created);
+      return created;
+    }
+
+    existing.update(
+        safeCode,
+        safeMerchantId,
+        safeMerchantName,
+        safeProductCode,
+        safeProductName,
+        resolvedPlanCode,
+        resolvedPlanName,
+        resolvedStatus,
+        resolvedBillingCycle,
+        resolvedSecurityPolicy,
+        resolvedQps,
+        resolvedDailyQuota,
+        resolvedMonthlyQuota,
+        resolvedUsedDaily,
+        resolvedUsedMonthly,
+        usageRate,
+        resolvedStartDate,
+        resolvedEndDate,
+        resolvedOwner,
+        resolvedRemark,
+        resolvedOperator,
+        metrics,
+        now);
+    admn16DataApiSubscriptionStore.put(existing.getSubscriptionId(), existing);
+    return existing;
+  }
+
+  public String admn16ApiProductText(String apiProductCode) {
+    return switch (defaultText(apiProductCode, "").toUpperCase(Locale.ROOT)) {
+      case "CREDIT_DATA" -> "信用数据API";
+      case "PRICE_DATA" -> "行情数据API";
+      case "RISK_TAG" -> "风控标签API";
+      case "CAPACITY_FORECAST" -> "产能预测API";
+      default -> "其他API";
+    };
+  }
+
+  public String admn16CallingAppTypeText(String billingCycle) {
+    return switch (defaultText(billingCycle, "").toUpperCase(Locale.ROOT)) {
+      case "MONTHLY" -> "月付";
+      case "QUARTERLY" -> "季付";
+      case "YEARLY" -> "年付";
+      default -> "其他周期";
+    };
+  }
+
+  public String admn16SubscriptionStatusText(String subscriptionStatus) {
+    return switch (defaultText(subscriptionStatus, "").toUpperCase(Locale.ROOT)) {
+      case "ACTIVE" -> "生效中";
+      case "SUSPENDED" -> "已暂停";
+      case "EXPIRED" -> "已到期";
+      case "TRIALING" -> "试用中";
+      default -> "未知";
+    };
+  }
+
+  public String admn16SecurityPolicyText(String securityPolicyCode) {
+    return switch (defaultText(securityPolicyCode, "").toUpperCase(Locale.ROOT)) {
+      case "AK_SK" -> "AK/SK签名";
+      case "OAUTH2" -> "OAuth2";
+      case "IP_WHITELIST" -> "IP白名单";
+      default -> "其他策略";
+    };
+  }
+
+  public String admn16BillingCycleText(String billingCycle) {
+    return switch (defaultText(billingCycle, "").toUpperCase(Locale.ROOT)) {
+      case "MONTHLY" -> "月付";
+      case "QUARTERLY" -> "季付";
+      case "YEARLY" -> "年付";
+      default -> "其他周期";
+    };
+  }
+
+  public String admn16AuditRiskLevel(String subscriptionStatus, String usageRate) {
+    String status = defaultText(subscriptionStatus, "").toUpperCase(Locale.ROOT);
+    double usage = parsePercent(usageRate);
+    if ("ACTIVE".equals(status) && usage >= 90D) {
+      return "HIGH";
+    }
+    if ("SUSPENDED".equals(status) || usage >= 75D) {
+      return "MEDIUM";
+    }
+    return "LOW";
+  }
+
+  private String buildUsageRate(long used, long quota) {
+    if (quota <= 0) {
+      return "0%";
+    }
+    BigDecimal rate =
+        new BigDecimal(used)
+            .multiply(new BigDecimal("100"))
+            .divide(new BigDecimal(quota), 1, java.math.RoundingMode.HALF_UP);
+    return rate.stripTrailingZeros().toPlainString() + "%";
+  }
+
   private long parseLongSafe(String text, long fallback) {
-    String normalized = defaultText(text, "").replace("小时", "").replace("h", "").trim();
+    String normalized = defaultText(text, "").trim();
     if (normalized.isBlank()) {
       return fallback;
     }
+    String numeric = normalized.replaceAll("[^0-9.]", "");
+    if (numeric.isBlank()) {
+      return fallback;
+    }
     try {
-      return Long.parseLong(normalized);
-    } catch (NumberFormatException ex) {
+      return new BigDecimal(numeric).longValue();
+    } catch (Exception ex) {
       return fallback;
     }
   }

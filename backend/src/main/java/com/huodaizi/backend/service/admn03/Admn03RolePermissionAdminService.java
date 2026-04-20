@@ -150,6 +150,7 @@ public class Admn03RolePermissionAdminService {
       case "ADMN13_CREDIT_MODEL_VERSION_MANAGE" -> "信用模型版本管理";
       case "ADMN14_AB_EXPERIMENT_MANAGE" -> "A/B实验中心";
       case "ADMN15_RISK_ALERT_TICKET_MANAGE" -> "风险预警工单中心";
+      case "ADMN16_DATA_API_SUBSCRIPTION_MANAGE" -> "数据API订阅管理";
       default -> "权限-" + safeText(permissionCode);
     };
   }
