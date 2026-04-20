@@ -189,6 +189,10 @@ function goQuickLogin() {
   router.push('/h5/login-quick')
 }
 
+function goAfterSaleCreate() {
+  router.push('/h5/after-sale-create')
+}
+
 onMounted(() => {
   loadReconciles()
 })
@@ -203,6 +207,7 @@ onMounted(() => {
         <button class="btn" @click="goH5Home">返回H5首页</button>
         <button class="btn" @click="goOrderDetail">前往H5-N05订单详情</button>
         <button class="btn" @click="goPickupScan">前往H5-N06扫码提货</button>
+        <button class="btn" @click="goAfterSaleCreate">前往H5-N08售后发起</button>
         <button class="btn" @click="goQuickLogin">返回H5-N01快捷登录</button>
       </div>
     </section>

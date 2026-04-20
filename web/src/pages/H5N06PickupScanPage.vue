@@ -223,6 +223,10 @@ function goReconcileDetail() {
   router.push('/h5/reconcile-detail')
 }
 
+function goAfterSaleCreate() {
+  router.push('/h5/after-sale-create')
+}
+
 function goQuoteSession() {
   router.push('/h5/quote-session')
 }
@@ -247,6 +251,7 @@ onMounted(() => {
         <button class="btn" @click="goQuoteSession">前往H5-N04报价会话</button>
         <button class="btn" @click="goOrderDetail">前往H5-N05订单详情</button>
         <button class="btn" @click="goReconcileDetail">前往H5-N07对账详情</button>
+        <button class="btn" @click="goAfterSaleCreate">前往H5-N08售后发起</button>
       </div>
     </section>
 

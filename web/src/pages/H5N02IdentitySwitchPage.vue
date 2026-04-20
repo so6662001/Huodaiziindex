@@ -114,6 +114,10 @@ function goReconcileDetail() {
   router.push('/h5/reconcile-detail')
 }
 
+function goAfterSaleCreate() {
+  router.push('/h5/after-sale-create')
+}
+
 onMounted(() => {
   loadIdentities()
 })
@@ -131,6 +135,7 @@ onMounted(() => {
         <button class="btn" @click="goOrderDetail">订单详情</button>
         <button class="btn" @click="goPickupScan">扫码提货</button>
         <button class="btn" @click="goReconcileDetail">对账详情</button>
+        <button class="btn" @click="goAfterSaleCreate">售后发起</button>
         <button class="btn" @click="goH5Home">返回H5首页</button>
       </div>
     </section>

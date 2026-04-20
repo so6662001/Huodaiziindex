@@ -28,6 +28,7 @@ import H5N04QuoteSessionPage from '../pages/H5N04QuoteSessionPage.vue'
 import H5N05OrderDetailPage from '../pages/H5N05OrderDetailPage.vue'
 import H5N06PickupScanPage from '../pages/H5N06PickupScanPage.vue'
 import H5N07ReconcileDetailPage from '../pages/H5N07ReconcileDetailPage.vue'
+import H5N08AfterSaleCreatePage from '../pages/H5N08AfterSaleCreatePage.vue'
 import A01DashboardPage from '../pages/A01DashboardPage.vue'
 import A02LeadOpsPage from '../pages/A02LeadOpsPage.vue'
 import A03QuoteEfficiencyPage from '../pages/A03QuoteEfficiencyPage.vue'
@@ -118,6 +119,14 @@ const routes = [
     component: H5N07ReconcileDetailPage,
     meta: {
       title: 'H5-N07对账详情页_移动端对账单与回款进度-货袋子'
+    }
+  },
+  {
+    path: '/h5/after-sale-create',
+    name: 'h5N08AfterSaleCreate',
+    component: H5N08AfterSaleCreatePage,
+    meta: {
+      title: 'H5-N08售后发起页_移动端售后争议提交与处理-货袋子'
     }
   },
   {

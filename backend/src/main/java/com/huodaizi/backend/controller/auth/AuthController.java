@@ -23,6 +23,10 @@ import com.huodaizi.backend.dto.auth.H5N06PickupOrderDetailResponse;
 import com.huodaizi.backend.dto.auth.H5N06PickupOrderListResponse;
 import com.huodaizi.backend.dto.auth.H5N06PickupOrderScanRequest;
 import com.huodaizi.backend.dto.auth.H5N06PickupOrderStatusUpdateRequest;
+import com.huodaizi.backend.dto.auth.H5N08AfterSaleCreateRequest;
+import com.huodaizi.backend.dto.auth.H5N08AfterSaleDetailResponse;
+import com.huodaizi.backend.dto.auth.H5N08AfterSaleListResponse;
+import com.huodaizi.backend.dto.auth.H5N08AfterSaleStatusUpdateRequest;
 import com.huodaizi.backend.dto.auth.H5N07ReconcileDetailResponse;
 import com.huodaizi.backend.dto.auth.H5N07ReconcileListResponse;
 import com.huodaizi.backend.dto.auth.H5N07ReconcileStatusUpdateRequest;
@@ -289,6 +293,38 @@ public class AuthController {
       @PathVariable("reconcileId") String reconcileId,
       @Valid @RequestBody H5N07ReconcileStatusUpdateRequest request) {
     return ApiResponse.success(service.h5ReconcileStatusUpdate(token, reconcileId, request));
+  }
+
+  @GetMapping("/h5/after-sales")
+  public ApiResponse<H5N08AfterSaleListResponse> h5AfterSaleList(
+      @RequestHeader(name = AUTH_HEADER, required = false) String token,
+      @RequestParam(name = "status", required = false) String status,
+      @RequestParam(name = "keyword", required = false) String keyword,
+      @RequestParam(name = "pageNo", required = false, defaultValue = "1") int pageNo,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "10") int pageSize) {
+    return ApiResponse.success(service.h5AfterSaleList(token, status, keyword, pageNo, pageSize));
+  }
+
+  @GetMapping("/h5/after-sales/{disputeId}")
+  public ApiResponse<H5N08AfterSaleDetailResponse> h5AfterSaleDetail(
+      @RequestHeader(name = AUTH_HEADER, required = false) String token,
+      @PathVariable("disputeId") String disputeId) {
+    return ApiResponse.success(service.h5AfterSaleDetail(token, disputeId));
+  }
+
+  @PostMapping("/h5/after-sales")
+  public ApiResponse<H5N08AfterSaleDetailResponse> h5CreateAfterSale(
+      @RequestHeader(name = AUTH_HEADER, required = false) String token,
+      @Valid @RequestBody H5N08AfterSaleCreateRequest request) {
+    return ApiResponse.success(service.h5CreateAfterSale(token, request));
+  }
+
+  @PostMapping("/h5/after-sales/{disputeId}/status")
+  public ApiResponse<H5N08AfterSaleDetailResponse> h5AfterSaleStatusUpdate(
+      @RequestHeader(name = AUTH_HEADER, required = false) String token,
+      @PathVariable("disputeId") String disputeId,
+      @Valid @RequestBody H5N08AfterSaleStatusUpdateRequest request) {
+    return ApiResponse.success(service.h5UpdateAfterSaleStatus(token, disputeId, request));
   }
 
   @GetMapping("/negotiations")

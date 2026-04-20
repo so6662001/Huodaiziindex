@@ -34,6 +34,11 @@ import com.huodaizi.backend.dto.auth.H5N07ReconcileDetailResponse;
 import com.huodaizi.backend.dto.auth.H5N07ReconcileListItemDTO;
 import com.huodaizi.backend.dto.auth.H5N07ReconcileListResponse;
 import com.huodaizi.backend.dto.auth.H5N07ReconcileStatusUpdateRequest;
+import com.huodaizi.backend.dto.auth.H5N08AfterSaleCreateRequest;
+import com.huodaizi.backend.dto.auth.H5N08AfterSaleDetailResponse;
+import com.huodaizi.backend.dto.auth.H5N08AfterSaleListItemDTO;
+import com.huodaizi.backend.dto.auth.H5N08AfterSaleListResponse;
+import com.huodaizi.backend.dto.auth.H5N08AfterSaleStatusUpdateRequest;
 import com.huodaizi.backend.dto.auth.N03EnterpriseCertificationDetailResponse;
 import com.huodaizi.backend.dto.auth.N03EnterpriseCertificationSubmitRequest;
 import com.huodaizi.backend.dto.auth.N04OnboardingProgressNodeDTO;
@@ -863,6 +868,71 @@ public class AuthService {
                 finalOperator,
                 fullRemark));
     return toH5ReconcileDetail(updated, "对账状态已更新");
+  }
+
+  public H5N08AfterSaleListResponse h5AfterSaleList(
+      String token, String status, String keyword, int pageNo, int pageSize) {
+    int safePageNo = Math.max(1, pageNo);
+    int safePageSize = Math.min(Math.max(1, pageSize), 50);
+    N08AfterSaleQuery query = new N08AfterSaleQuery(status, keyword, safePageNo, safePageSize);
+    List<N08AfterSaleDisputeEntity> all = repository.listAfterSaleDisputes(token, query);
+    int from = Math.min((safePageNo - 1) * safePageSize, all.size());
+    int to = Math.min(from + safePageSize, all.size());
+    List<N08AfterSaleDisputeEntity> paged = all.subList(from, to);
+    List<H5N08AfterSaleListItemDTO> records =
+        paged.stream()
+            .map(
+                item ->
+                    new H5N08AfterSaleListItemDTO(
+                        item.getDisputeId(),
+                        item.getOrderId(),
+                        item.getOrderNo(),
+                        item.getInquiryNo(),
+                        item.getSupplierName(),
+                        item.getIssueType(),
+                        item.getIssueTypeText(),
+                        item.getIssueSummary(),
+                        item.getStatus(),
+                        item.getStatusText(),
+                        h5AfterSaleQuickActionText(item.getStatus()),
+                        toText(item.getUpdatedAt())))
+            .toList();
+    String activeDisputeId = records.isEmpty() ? "" : records.get(0).disputeId();
+    return new H5N08AfterSaleListResponse(
+        safePageNo, safePageSize, all.size(), "H5", activeDisputeId, records);
+  }
+
+  public H5N08AfterSaleDetailResponse h5AfterSaleDetail(String token, String disputeId) {
+    N08AfterSaleDisputeEntity item = repository.getAfterSaleDisputeDetail(token, disputeId);
+    return toH5AfterSaleDetail(item, "可继续补充证据并推进处理状态");
+  }
+
+  public H5N08AfterSaleDetailResponse h5CreateAfterSale(
+      String token, H5N08AfterSaleCreateRequest request) {
+    N08AfterSaleDisputeEntity created =
+        repository.createAfterSaleDispute(
+            token,
+            safeText(request.orderId()),
+            safeText(request.issueType()),
+            safeText(request.issueSummary()),
+            safeText(request.issueDescription()),
+            safeText(request.expectedResolution()),
+            safeText(request.contactName()),
+            safeText(request.contactPhone()),
+            safeText(request.evidenceFiles()),
+            safeText(request.operator()));
+    return toH5AfterSaleDetail(created, "售后争议已发起，等待平台处理");
+  }
+
+  public H5N08AfterSaleDetailResponse h5UpdateAfterSaleStatus(
+      String token, String disputeId, H5N08AfterSaleStatusUpdateRequest request) {
+    String targetStatus = mapAfterSaleActionToStatus(request.action());
+    String operator = safeText(request.operator());
+    String remark = safeText(request.remark());
+    String finalOperator = operator.isBlank() ? "h5-n08-after-sale" : operator;
+    String fullRemark = remark.isBlank() ? finalOperator : remark + "（" + finalOperator + "）";
+    repository.updateAfterSaleDisputeStatus(token, disputeId, targetStatus, finalOperator, fullRemark);
+    return h5AfterSaleDetail(token, disputeId);
   }
 
   public N06OrderListResponse orderList(
@@ -2026,6 +2096,54 @@ public class AuthService {
       case "DISPUTED" -> List.of("CONFIRMED", "CLOSED");
       case "CLOSED" -> List.of();
       default -> List.of();
+    };
+  }
+
+  private H5N08AfterSaleDetailResponse toH5AfterSaleDetail(
+      N08AfterSaleDisputeEntity item, String tipText) {
+    List<String> availableActions = h5AfterSaleAvailableActions(item.getStatus());
+    return new H5N08AfterSaleDetailResponse(
+        item.getDisputeId(),
+        item.getOrderId(),
+        item.getOrderNo(),
+        item.getInquiryNo(),
+        item.getBuyerCompany(),
+        item.getSupplierName(),
+        item.getIssueType(),
+        item.getIssueTypeText(),
+        item.getIssueSummary(),
+        item.getIssueDescription(),
+        item.getExpectedResolution(),
+        item.getContactName(),
+        item.getContactPhoneMasked(),
+        item.getEvidenceFiles(),
+        item.getStatus(),
+        item.getStatusText(),
+        "H5",
+        availableActions,
+        item.getLatestRemark(),
+        tipText,
+        toText(item.getCreatedAt()),
+        toText(item.getUpdatedAt()));
+  }
+
+  private List<String> h5AfterSaleAvailableActions(String status) {
+    return switch (safeText(status).toUpperCase()) {
+      case "SUBMITTED" -> List.of("MARK_PROCESSING", "MARK_CLOSED");
+      case "PROCESSING" -> List.of("MARK_RESOLVED", "MARK_CLOSED");
+      case "RESOLVED" -> List.of("MARK_CLOSED", "REOPEN");
+      case "CLOSED" -> List.of("REOPEN");
+      default -> List.of("MARK_PROCESSING");
+    };
+  }
+
+  private String h5AfterSaleQuickActionText(String status) {
+    return switch (safeText(status).toUpperCase()) {
+      case "SUBMITTED" -> "转处理中";
+      case "PROCESSING" -> "标记已解决";
+      case "RESOLVED" -> "关闭争议";
+      case "CLOSED" -> "重新打开";
+      default -> "查看详情";
     };
   }
 

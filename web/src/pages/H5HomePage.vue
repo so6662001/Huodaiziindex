@@ -126,6 +126,10 @@ function goH5ReconcileDetail() {
   router.push('/h5/reconcile-detail')
 }
 
+function goH5AfterSaleCreate() {
+  router.push('/h5/after-sale-create')
+}
+
 function colorClass(item) {
   const text = String(item?.changeRate || '')
   if (text.startsWith('+')) return 'up'
@@ -156,6 +160,7 @@ onMounted(() => {
         <button class="btn" @click="goH5OrderDetail">H5-N05 订单详情</button>
         <button class="btn" @click="goH5PickupScan">H5-N06 扫码提货</button>
         <button class="btn" @click="goH5ReconcileDetail">H5-N07 对账详情</button>
+        <button class="btn" @click="goH5AfterSaleCreate">H5-N08 售后发起</button>
       </div>
       <div class="filters">
         <label>
