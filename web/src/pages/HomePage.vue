@@ -158,7 +158,7 @@ function goH5N03EnterpriseCertificationPage() {
 }
 
 function goH5N04NegotiationSessionPage() {
-  router.push('/h5/negotiation-session')
+  router.push('/h5/quote-session')
 }
 
 function goA01DashboardPage() {
@@ -440,7 +440,7 @@ function onSearch() {
         <button class="btn" @click="goH5N01QuickLoginPage">H5-N01快捷登录</button>
         <button class="btn" @click="goH5N02IdentitySwitchPage">H5-N02身份切换</button>
         <button class="btn" @click="goH5N03EnterpriseCertificationPage">H5-N03企业认证</button>
-        <button class="btn" @click="goH5N04NegotiationSessionPage">H5-N04议价会话</button>
+        <button class="btn" @click="goH5N04NegotiationSessionPage">H5-N04报价会话</button>
         <button class="btn" @click="goA01DashboardPage">A01经营总看板</button>
         <button class="btn" @click="goA02LeadOpsPage">A02线索运营中心</button>
         <button class="btn" @click="goA03QuoteEfficiencyPage">A03报价效率中心</button>

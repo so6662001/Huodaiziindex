@@ -82,7 +82,7 @@ class H5N04NegotiationSessionIntegrationTest {
     String listResp =
         mockMvc
             .perform(
-                get("/api/v1/auth/h5/negotiations")
+                get("/api/v1/auth/h5/quote-sessions")
                     .header("X-Auth-Token", token)
                     .param("pageNo", "1")
                     .param("pageSize", "10"))
@@ -104,7 +104,9 @@ class H5N04NegotiationSessionIntegrationTest {
     String sessionId = String.valueOf(first.get("sessionId"));
 
     mockMvc
-        .perform(get("/api/v1/auth/h5/negotiations/{sessionId}", sessionId).header("X-Auth-Token", token))
+        .perform(
+            get("/api/v1/auth/h5/quote-sessions/{sessionId}", sessionId)
+                .header("X-Auth-Token", token))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.code").value("0"))
         .andExpect(jsonPath("$.data.sessionId").value(sessionId))
@@ -113,14 +115,13 @@ class H5N04NegotiationSessionIntegrationTest {
 
     mockMvc
         .perform(
-            post("/api/v1/auth/h5/negotiations/{sessionId}/messages", sessionId)
+            post("/api/v1/auth/h5/quote-sessions/{sessionId}/messages", sessionId)
                 .header("X-Auth-Token", token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(
                     """
                     {
                       "senderRole":"BUYER",
-                      "messageType":"TEXT",
                       "content":"H5 端确认明早可到港，请给最终价。",
                       "operator":"h5-n04-test"
                     }
@@ -132,7 +133,7 @@ class H5N04NegotiationSessionIntegrationTest {
 
     mockMvc
         .perform(
-            post("/api/v1/auth/h5/negotiations/{sessionId}/status", sessionId)
+            post("/api/v1/auth/h5/quote-sessions/{sessionId}/status", sessionId)
                 .header("X-Auth-Token", token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(
@@ -151,7 +152,7 @@ class H5N04NegotiationSessionIntegrationTest {
   @Test
   void h5NegotiationListShouldRejectWhenMissingToken() throws Exception {
     mockMvc
-        .perform(get("/api/v1/auth/h5/negotiations"))
+        .perform(get("/api/v1/auth/h5/quote-sessions"))
         .andExpect(status().isUnauthorized())
         .andExpect(jsonPath("$.code").value("UNAUTHORIZED"));
   }

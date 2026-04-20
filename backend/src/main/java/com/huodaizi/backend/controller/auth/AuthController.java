@@ -166,6 +166,39 @@ public class AuthController {
     return ApiResponse.success(service.h5UpdateNegotiationStatus(token, sessionId, request));
   }
 
+  @GetMapping("/h5/quote-sessions")
+  public ApiResponse<H5N04NegotiationSessionListResponse> h5QuoteSessions(
+      @RequestHeader(name = AUTH_HEADER, required = false) String token,
+      @RequestParam(name = "status", required = false) String status,
+      @RequestParam(name = "keyword", required = false) String keyword,
+      @RequestParam(name = "pageNo", required = false, defaultValue = "1") int pageNo,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "10") int pageSize) {
+    return ApiResponse.success(service.h5NegotiationSessions(token, status, keyword, pageNo, pageSize));
+  }
+
+  @GetMapping("/h5/quote-sessions/{sessionId}")
+  public ApiResponse<H5N04NegotiationDetailResponse> h5QuoteSessionDetail(
+      @RequestHeader(name = AUTH_HEADER, required = false) String token,
+      @PathVariable("sessionId") String sessionId) {
+    return ApiResponse.success(service.h5NegotiationDetail(token, sessionId));
+  }
+
+  @PostMapping("/h5/quote-sessions/{sessionId}/messages")
+  public ApiResponse<H5N04NegotiationDetailResponse> h5QuoteSessionMessage(
+      @RequestHeader(name = AUTH_HEADER, required = false) String token,
+      @PathVariable("sessionId") String sessionId,
+      @Valid @RequestBody H5N04NegotiationSendMessageRequest request) {
+    return ApiResponse.success(service.h5SendNegotiationMessage(token, sessionId, request));
+  }
+
+  @PostMapping("/h5/quote-sessions/{sessionId}/status")
+  public ApiResponse<H5N04NegotiationDetailResponse> h5QuoteSessionStatus(
+      @RequestHeader(name = AUTH_HEADER, required = false) String token,
+      @PathVariable("sessionId") String sessionId,
+      @Valid @RequestBody H5N04NegotiationStatusUpdateRequest request) {
+    return ApiResponse.success(service.h5UpdateNegotiationStatus(token, sessionId, request));
+  }
+
   @GetMapping("/negotiations")
   public ApiResponse<N05NegotiationSessionListResponse> negotiationSessions(
       @RequestHeader(name = AUTH_HEADER, required = false) String token,

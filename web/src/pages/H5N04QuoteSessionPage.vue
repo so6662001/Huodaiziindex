@@ -30,7 +30,7 @@ const statusRemark = ref('')
 const form = reactive({
   senderRole: 'BUYER',
   content: '',
-  operator: 'h5-n04-ui'
+  operator: 'h5-n04-quote-ui'
 })
 
 const token = computed(() => localStorage.getItem('H5_N01_AUTH_TOKEN') || localStorage.getItem('N01_AUTH_TOKEN') || '')
@@ -42,7 +42,7 @@ const messages = computed(() => (detail.value?.messages && Array.isArray(detail.
 async function loadSessions() {
   if (!hasSession.value || loading.value) {
     if (!hasSession.value) {
-      errorMsg.value = '请先登录后查看议价会话'
+      errorMsg.value = '请先登录后查看报价会话'
     }
     return
   }
@@ -56,7 +56,7 @@ async function loadSessions() {
     })
     if (statusFilter.value) params.set('status', statusFilter.value)
     if (keyword.value.trim()) params.set('keyword', keyword.value.trim())
-    const resp = await fetch(`/api/v1/auth/h5/negotiations?${params.toString()}`, {
+    const resp = await fetch(`/api/v1/auth/h5/quote-sessions?${params.toString()}`, {
       headers: { 'X-Auth-Token': token.value }
     })
     const json = await resp.json()
@@ -97,7 +97,7 @@ async function loadDetail() {
   detailLoading.value = true
   errorMsg.value = ''
   try {
-    const resp = await fetch(`/api/v1/auth/h5/negotiations/${selectedId.value}`, {
+    const resp = await fetch(`/api/v1/auth/h5/quote-sessions/${selectedId.value}`, {
       headers: { 'X-Auth-Token': token.value }
     })
     const json = await resp.json()
@@ -125,9 +125,9 @@ async function sendMessage() {
     const payload = {
       senderRole: form.senderRole,
       content: form.content.trim(),
-      operator: form.operator.trim() || 'h5-n04-ui'
+      operator: form.operator.trim() || 'h5-n04-quote-ui'
     }
-    const resp = await fetch(`/api/v1/auth/h5/negotiations/${selectedId.value}/messages`, {
+    const resp = await fetch(`/api/v1/auth/h5/quote-sessions/${selectedId.value}/messages`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -141,7 +141,7 @@ async function sendMessage() {
     }
     detail.value = json.data || null
     form.content = ''
-    successMsg.value = '消息发送成功'
+    successMsg.value = '报价消息发送成功'
     await loadSessions()
   } catch (error) {
     errorMsg.value = error.message || '消息发送失败'
@@ -159,9 +159,9 @@ async function updateStatus() {
     const payload = {
       action: statusAction.value,
       remark: statusRemark.value.trim() || null,
-      operator: form.operator.trim() || 'h5-n04-ui'
+      operator: form.operator.trim() || 'h5-n04-quote-ui'
     }
-    const resp = await fetch(`/api/v1/auth/h5/negotiations/${selectedId.value}/status`, {
+    const resp = await fetch(`/api/v1/auth/h5/quote-sessions/${selectedId.value}/status`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -174,7 +174,7 @@ async function updateStatus() {
       throw new Error(json.message || `状态更新失败(${resp.status})`)
     }
     detail.value = json.data || null
-    successMsg.value = '会话状态更新成功'
+    successMsg.value = '报价会话状态更新成功'
     await loadSessions()
   } catch (error) {
     errorMsg.value = error.message || '会话状态更新失败'
@@ -208,8 +208,8 @@ onMounted(() => {
 <template>
   <main class="h5-n04-page">
     <section class="card hero">
-      <h1>H5-N04 议价会话页</h1>
-      <p>移动端查看报价沟通进展，支持会话消息发送与状态流转。</p>
+      <h1>H5-N04 报价会话页</h1>
+      <p>移动端查看报价沟通进展，支持报价消息发送与状态流转。</p>
       <div class="hero-actions">
         <button class="btn" @click="goH5Home">返回H5首页</button>
         <button class="btn" @click="goIdentitySwitch">前往身份切换</button>
@@ -219,13 +219,13 @@ onMounted(() => {
 
     <section class="card">
       <div class="head">
-        <h2>会话列表</h2>
+        <h2>报价会话列表</h2>
         <button class="btn" :disabled="loading" @click="loadSessions">{{ loading ? '刷新中...' : '刷新' }}</button>
       </div>
       <div class="filters">
         <select v-model="statusFilter">
           <option value="">全部状态</option>
-          <option value="ONGOING">议价中</option>
+          <option value="ONGOING">报价中</option>
           <option value="WAIT_CONFIRM">待确认</option>
           <option value="DEAL">已达成</option>
           <option value="CLOSED">已关闭</option>
@@ -247,7 +247,7 @@ onMounted(() => {
             <span>{{ item.statusText }}</span>
           </div>
           <p>{{ item.specText }} ｜ 对手方：{{ item.counterpartyName }}</p>
-          <p>最新价：{{ item.latestQuotedPrice || '-' }} ｜ {{ item.lastMessagePreview || '-' }}</p>
+          <p>最新报价：{{ item.latestQuotedPrice || '-' }} ｜ {{ item.lastMessagePreview || '-' }}</p>
         </li>
       </ul>
     </section>
@@ -282,13 +282,13 @@ onMounted(() => {
         </ul>
 
         <div class="composer">
-          <h3>发送消息</h3>
+          <h3>发送报价消息</h3>
           <div class="row">
             <select v-model="form.senderRole">
               <option value="BUYER">采购方</option>
               <option value="SUPPLIER">供应方</option>
             </select>
-            <input v-model="form.content" placeholder="请输入沟通内容" />
+            <input v-model="form.content" placeholder="请输入报价沟通内容" />
             <button class="btn btn--primary" :disabled="!canSend" @click="sendMessage">
               {{ sending ? '发送中...' : '发送' }}
             </button>
@@ -299,7 +299,7 @@ onMounted(() => {
           <h3>状态流转</h3>
           <div class="row">
             <select v-model="statusAction">
-              <option value="ONGOING">恢复议价</option>
+              <option value="ONGOING">恢复报价</option>
               <option value="WAIT_CONFIRM">转待确认</option>
               <option value="DEAL">标记达成</option>
               <option value="CLOSED">关闭会话</option>

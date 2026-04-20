@@ -129,7 +129,7 @@ function goH5EnterpriseCertification() {
 }
 
 function goH5NegotiationSession() {
-  router.push('/h5/negotiation-session')
+  router.push('/h5/quote-session')
 }
 
 onMounted(() => {
@@ -149,7 +149,7 @@ onMounted(() => {
         <button class="btn" @click="goH5Home">前往H5首页</button>
         <button class="btn" @click="goH5IdentitySwitch">前往H5-N02身份切换</button>
         <button class="btn" @click="goH5EnterpriseCertification">前往H5-N03企业认证</button>
-        <button class="btn" @click="goH5NegotiationSession">前往H5-N04议价会话</button>
+        <button class="btn" @click="goH5NegotiationSession">前往H5-N04报价会话</button>
       </div>
     </section>
 

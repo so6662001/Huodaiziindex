@@ -99,7 +99,7 @@ function goCertification() {
 }
 
 function goNegotiation() {
-  router.push('/h5/negotiation-session')
+  router.push('/h5/quote-session')
 }
 
 onMounted(() => {
