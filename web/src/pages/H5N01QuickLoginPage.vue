@@ -120,6 +120,10 @@ function goH5Home() {
   router.push('/h5?city=唐山')
 }
 
+function goH5IdentitySwitch() {
+  router.push('/h5/identity-switch')
+}
+
 onMounted(() => {
   const cached = localStorage.getItem('H5_N01_AUTH_TOKEN') || localStorage.getItem('N01_AUTH_TOKEN') || ''
   if (cached) {
@@ -135,6 +139,7 @@ onMounted(() => {
       <p>手机号验证码一键登录，快速进入移动端交易流程。</p>
       <div class="hero-actions">
         <button class="btn" @click="goH5Home">前往H5首页</button>
+        <button class="btn" @click="goH5IdentitySwitch">前往H5-N02身份切换</button>
       </div>
     </section>
 

@@ -95,7 +95,11 @@ function goto(url) {
 }
 
 function goQuickLogin() {
-  router.push('/h5/auth/quick-login')
+  router.push('/h5/login-quick')
+}
+
+function goIdentitySwitch() {
+  router.push('/h5/identity-switch')
 }
 
 function colorClass(item) {
@@ -122,6 +126,7 @@ onMounted(() => {
       <p class="muted">更新时间：{{ home.updateTime || '-' }}</p>
       <div class="hero-actions">
         <button class="btn primary" @click="goQuickLogin">H5-N01 快捷登录</button>
+        <button class="btn" @click="goIdentitySwitch">H5-N02 身份切换</button>
       </div>
       <div class="filters">
         <label>

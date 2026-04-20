@@ -1,6 +1,9 @@
 package com.huodaizi.backend.controller.identity;
 
 import com.huodaizi.backend.common.ApiResponse;
+import com.huodaizi.backend.dto.identity.H5N02IdentityListResponse;
+import com.huodaizi.backend.dto.identity.H5N02IdentitySwitchRequest;
+import com.huodaizi.backend.dto.identity.H5N02IdentitySwitchResponse;
 import com.huodaizi.backend.dto.identity.N02IdentityListResponse;
 import com.huodaizi.backend.dto.identity.N02IdentitySwitchRequest;
 import com.huodaizi.backend.dto.identity.N02IdentitySwitchResponse;
@@ -34,5 +37,18 @@ public class N02IdentityController {
       @RequestHeader(name = AUTH_HEADER, required = false) String token,
       @Valid @RequestBody N02IdentitySwitchRequest request) {
     return ApiResponse.success(service.switchIdentity(token, request));
+  }
+
+  @GetMapping("/h5/options")
+  public ApiResponse<H5N02IdentityListResponse> h5Options(
+      @RequestHeader(name = AUTH_HEADER, required = false) String token) {
+    return ApiResponse.success(service.h5List(token));
+  }
+
+  @PostMapping("/h5/switch")
+  public ApiResponse<H5N02IdentitySwitchResponse> h5SwitchIdentity(
+      @RequestHeader(name = AUTH_HEADER, required = false) String token,
+      @Valid @RequestBody H5N02IdentitySwitchRequest request) {
+    return ApiResponse.success(service.h5SwitchIdentity(token, request));
   }
 }

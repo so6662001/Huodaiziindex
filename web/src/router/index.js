@@ -22,6 +22,7 @@ import H5PickupOrderPage from '../pages/H5PickupOrderPage.vue'
 import H5ReconcileOrderPage from '../pages/H5ReconcileOrderPage.vue'
 import H5MemberPage from '../pages/H5MemberPage.vue'
 import H5N01QuickLoginPage from '../pages/H5N01QuickLoginPage.vue'
+import H5N02IdentitySwitchPage from '../pages/H5N02IdentitySwitchPage.vue'
 import A01DashboardPage from '../pages/A01DashboardPage.vue'
 import A02LeadOpsPage from '../pages/A02LeadOpsPage.vue'
 import A03QuoteEfficiencyPage from '../pages/A03QuoteEfficiencyPage.vue'
@@ -64,6 +65,14 @@ const routes = [
     component: H5N01QuickLoginPage,
     meta: {
       title: 'H5-N01快捷登录页_移动端短信验证码登录-货袋子'
+    }
+  },
+  {
+    path: '/h5/identity-switch',
+    name: 'h5N02IdentitySwitch',
+    component: H5N02IdentitySwitchPage,
+    meta: {
+      title: 'H5-N02身份切换页_移动端身份切换-货袋子'
     }
   },
   {
