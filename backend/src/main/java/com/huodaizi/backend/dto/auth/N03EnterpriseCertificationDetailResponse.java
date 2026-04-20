@@ -1,0 +1,27 @@
+package com.huodaizi.backend.dto.auth;
+
+public record N03EnterpriseCertificationDetailResponse(
+    String certificationId,
+    String userId,
+    String account,
+    String status,
+    String companyName,
+    String unifiedSocialCreditCode,
+    String legalPersonName,
+    String legalPersonIdNoMasked,
+    String contactName,
+    String contactMobileMasked,
+    String businessLicenseUrl,
+    String legalIdFrontUrl,
+    String legalIdBackUrl,
+    String bankAccountName,
+    String bankAccountNoMasked,
+    String bankName,
+    String province,
+    String city,
+    String address,
+    String remark,
+    String operator,
+    String createdAt,
+    String submittedAt,
+    String updatedAt) {}
