@@ -134,12 +134,16 @@ public class Admn04AuditLogAdminService {
       case "ADMN11" -> "/api/admin/payment-refunds";
       case "ADMN12" -> "/api/admin/ad-slot-schedules";
       case "ADMN13" -> "/api/admin/credit-model-versions";
+      case "ADMN14" -> "/api/admin/ab-experiments";
       default -> "/api/admin/unknown";
     };
   }
 
   private String requestMethodByAction(String actionCode) {
     if ("CREDIT_MODEL_VERSION_UPSERT".equals(actionCode)) {
+      return "PUT";
+    }
+    if ("AB_EXPERIMENT_UPSERT".equals(actionCode)) {
       return "PUT";
     }
     if (actionCode.contains("QUERY")) {

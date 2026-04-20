@@ -269,6 +269,10 @@ function goAdmn13CreditModelVersionManagePage() {
   router.push('/admin/credit-model-version-manage/admn13')
 }
 
+function goAdmn14AbExperimentCenterPage() {
+  router.push('/admin/ab-experiment-center/admn14')
+}
+
 function goN01LoginRegisterPage() {
   router.push('/account/login-register')
 }
@@ -544,6 +548,7 @@ function onSearch() {
         <button class="btn" @click="goAdmn11PaymentRefundManagePage">ADM-N11支付与退款管理</button>
         <button class="btn" @click="goAdmn12AdSlotScheduleCenterPage">ADM-N12广告位排期中心</button>
         <button class="btn" @click="goAdmn13CreditModelVersionManagePage">ADM-N13信用模型版本管理</button>
+        <button class="btn" @click="goAdmn14AbExperimentCenterPage">ADM-N14 A/B实验中心</button>
         <button class="btn" @click="goN01LoginRegisterPage">PC-N01登录/注册</button>
         <button class="btn" @click="goN02IdentitySelectPage">PC-N02身份选择</button>
         <button class="btn" @click="goN03EnterpriseCertificationPage">PC-N03企业认证提交</button>

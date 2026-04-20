@@ -59,6 +59,8 @@ public class InMemoryAuthRepository {
       new ConcurrentHashMap<>();
   private final ConcurrentMap<String, Admn13CreditModelVersionEntity> admn13CreditModelVersionStore =
       new ConcurrentHashMap<>();
+  private final ConcurrentMap<String, Admn14AbExperimentEntity> admn14AbExperimentStore =
+      new ConcurrentHashMap<>();
 
   public InMemoryAuthRepository() {
     seed();
@@ -582,6 +584,7 @@ public class InMemoryAuthRepository {
       case "ADMN11_PAYMENT_REFUND_MANAGE" -> "支付与退款管理";
       case "ADMN12_AD_SLOT_SCHEDULE_MANAGE" -> "广告位排期中心";
       case "ADMN13_CREDIT_MODEL_VERSION_MANAGE" -> "信用模型版本管理";
+      case "ADMN14_AB_EXPERIMENT_MANAGE" -> "A/B实验中心";
       default -> "未命名权限";
     };
   }
@@ -2163,6 +2166,7 @@ public class InMemoryAuthRepository {
       case "ADMN11" -> "支付与退款管理";
       case "ADMN12" -> "广告位排期中心";
       case "ADMN13" -> "信用模型版本管理";
+      case "ADMN14" -> "A/B实验中心";
       default -> "其他模块";
     };
   }
@@ -2190,6 +2194,8 @@ public class InMemoryAuthRepository {
       case "AD_SLOT_SCHEDULE_QUERY" -> "广告位排期查询";
       case "CREDIT_MODEL_VERSION_UPSERT" -> "信用模型版本新增/更新";
       case "CREDIT_MODEL_VERSION_QUERY" -> "信用模型版本查询";
+      case "AB_EXPERIMENT_UPSERT" -> "A/B实验新增/更新";
+      case "AB_EXPERIMENT_QUERY" -> "A/B实验查询";
       default -> "通用操作";
     };
   }
@@ -2248,6 +2254,7 @@ public class InMemoryAuthRepository {
     seedAdmn10BillingRules();
     seedAdmn12AdSlotSchedules();
     seedAdmn13CreditModelVersions();
+    seedAdmn14AbExperiments();
     seedNegotiation(seed);
     seedOrders(seed);
     seedTradeTerms(seed);
@@ -2350,7 +2357,8 @@ public class InMemoryAuthRepository {
                 "ADMN10_BILLING_RULE_MANAGE",
                 "ADMN11_PAYMENT_REFUND_MANAGE",
                 "ADMN12_AD_SLOT_SCHEDULE_MANAGE",
-                "ADMN13_CREDIT_MODEL_VERSION_MANAGE"),
+                "ADMN13_CREDIT_MODEL_VERSION_MANAGE",
+                "ADMN14_AB_EXPERIMENT_MANAGE"),
             "seed",
             now.minusDays(30),
             now.minusDays(1));
@@ -2375,7 +2383,8 @@ public class InMemoryAuthRepository {
                 "ADMN10_BILLING_RULE_MANAGE",
                 "ADMN11_PAYMENT_REFUND_MANAGE",
                 "ADMN12_AD_SLOT_SCHEDULE_MANAGE",
-                "ADMN13_CREDIT_MODEL_VERSION_MANAGE"),
+                "ADMN13_CREDIT_MODEL_VERSION_MANAGE",
+                "ADMN14_AB_EXPERIMENT_MANAGE"),
             "seed",
             now.minusDays(20),
             now.minusDays(2));
@@ -3301,6 +3310,300 @@ public class InMemoryAuthRepository {
       return "MEDIUM";
     }
     return "LOW";
+  }
+
+  private void seedAdmn14AbExperiments() {
+    LocalDateTime now = LocalDateTime.now();
+    Admn14AbExperimentEntity first =
+        new Admn14AbExperimentEntity(
+            "ABX000001",
+            "AB_LEAD_DISPATCH_BIAS_2026Q2",
+            "线索分发权重偏置优化实验",
+            "LEAD_DISPATCH",
+            "SCALING",
+            "RUNNING",
+            "35",
+            "QUOTE_TO_DEAL_RATE",
+            "23.8%",
+            "27.1%",
+            "99.1%",
+            "VARIANT_B",
+            "13.87%",
+            "2026-04-20",
+            "2026-05-31",
+            "算法策略组",
+            "经营分析组",
+            "第二阶段扩大流量观察成交稳定性",
+            "admn14-seed",
+            now.minusDays(12),
+            now.minusHours(6),
+            List.of(
+                new Admn14AbExperimentEntity.MetricSnapshot(
+                    "QUOTE_TO_DEAL_RATE", "报价转成交率", "23.8%", "27.1%", "13.87%", "99.1%"),
+                new Admn14AbExperimentEntity.MetricSnapshot(
+                    "LEAD_RESPONSE_SPEED", "线索响应时效", "11.2分钟", "9.7分钟", "13.39%", "97.8%"),
+                new Admn14AbExperimentEntity.MetricSnapshot(
+                    "DISPUTE_RATE", "争议率", "2.6%", "2.4%", "7.69%", "92.4%")));
+    admn14AbExperimentStore.put(first.getExperimentId(), first);
+
+    Admn14AbExperimentEntity second =
+        new Admn14AbExperimentEntity(
+            "ABX000002",
+            "AB_RECON_REMIND_POLICY_2026Q2",
+            "对账提醒节奏优化实验",
+            "RECONCILE_FLOW",
+            "DRAFTING",
+            "DRAFT",
+            "20",
+            "ON_TIME_RECON_RATE",
+            "68.2%",
+            "74.0%",
+            "95.0%",
+            "UNKNOWN",
+            "8.50%",
+            "2026-05-01",
+            "2026-06-15",
+            "结算产品组",
+            "运营治理组",
+            "待上线，先灰度到华北区域",
+            "admn14-seed",
+            now.minusDays(7),
+            now.minusDays(1),
+            List.of(
+                new Admn14AbExperimentEntity.MetricSnapshot(
+                    "ON_TIME_RECON_RATE", "按时对账率", "68.2%", "74.0%", "8.50%", "95.0%"),
+                new Admn14AbExperimentEntity.MetricSnapshot(
+                    "DSO_DAYS", "平均回款天数", "19.4天", "17.8天", "8.25%", "90.3%")));
+    admn14AbExperimentStore.put(second.getExperimentId(), second);
+
+    Admn14AbExperimentEntity third =
+        new Admn14AbExperimentEntity(
+            "ABX000003",
+            "AB_AFTERSALE_CHANNEL_OPT_2026Q1",
+            "售后入口分流优化实验",
+            "AFTER_SALE_FLOW",
+            "RELEASED",
+            "COMPLETED",
+            "40",
+            "AFTERSALE_RESOLVE_TIME",
+            "32.0小时",
+            "25.6小时",
+            "98.2%",
+            "VARIANT_A",
+            "20.00%",
+            "2026-02-10",
+            "2026-03-25",
+            "售后产品组",
+            "服务质量组",
+            "实验结束并已全量发布",
+            "admn14-seed",
+            now.minusDays(45),
+            now.minusDays(20),
+            List.of(
+                new Admn14AbExperimentEntity.MetricSnapshot(
+                    "AFTERSALE_RESOLVE_TIME", "售后平均处理时长", "32.0小时", "25.6小时", "20.00%", "98.2%"),
+                new Admn14AbExperimentEntity.MetricSnapshot(
+                    "AFTERSALE_SATISFACTION", "售后满意度", "81.0%", "86.5%", "6.79%", "96.7%")));
+    admn14AbExperimentStore.put(third.getExperimentId(), third);
+  }
+
+  public List<Admn14AbExperimentEntity> listAbExperimentsForAdmin(
+      String experimentStatus, String scenarioCode, String optimizationStage, String keyword) {
+    String statusFilter = defaultText(experimentStatus, "").toUpperCase(Locale.ROOT);
+    String scenarioFilter = defaultText(scenarioCode, "").toUpperCase(Locale.ROOT);
+    String stageFilter = defaultText(optimizationStage, "").toUpperCase(Locale.ROOT);
+    String keywordFilter = defaultText(keyword, "").toLowerCase(Locale.ROOT);
+    return admn14AbExperimentStore.values().stream()
+        .filter(
+            item ->
+                statusFilter.isBlank()
+                    || statusFilter.equals(
+                        defaultText(item.getExperimentStatus(), "").toUpperCase(Locale.ROOT)))
+        .filter(
+            item ->
+                scenarioFilter.isBlank()
+                    || scenarioFilter.equals(
+                        defaultText(item.getScenarioCode(), "").toUpperCase(Locale.ROOT)))
+        .filter(
+            item ->
+                stageFilter.isBlank()
+                    || stageFilter.equals(
+                        defaultText(item.getOptimizationStage(), "").toUpperCase(Locale.ROOT)))
+        .filter(
+            item -> {
+              if (keywordFilter.isBlank()) {
+                return true;
+              }
+              return defaultText(item.getExperimentId(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                  || defaultText(item.getExperimentCode(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                  || defaultText(item.getExperimentName(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                  || defaultText(item.getTargetMetricCode(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                  || defaultText(item.getOwner(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                  || defaultText(item.getRemark(), "").toLowerCase(Locale.ROOT).contains(keywordFilter);
+            })
+        .sorted(Comparator.comparing(Admn14AbExperimentEntity::getUpdatedAt).reversed())
+        .toList();
+  }
+
+  public Admn14AbExperimentEntity getAbExperimentForAdmin(String experimentId) {
+    String normalized = defaultText(experimentId, "");
+    if (normalized.isBlank()) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "experimentId 不能为空");
+    }
+    Admn14AbExperimentEntity entity = admn14AbExperimentStore.get(normalized);
+    if (entity == null) {
+      throw new BaseException(ErrorCode.NOT_FOUND.getCode(), "A/B实验不存在");
+    }
+    return entity;
+  }
+
+  public Admn14AbExperimentEntity upsertAbExperimentForAdmin(
+      String experimentCode,
+      String experimentName,
+      String scenarioCode,
+      String experimentStatus,
+      String optimizationStage,
+      String trafficPercent,
+      String targetMetricCode,
+      String baselineValue,
+      String targetValue,
+      String startDate,
+      String endDate,
+      String owner,
+      List<Admn14AbExperimentEntity.MetricSnapshot> metrics,
+      String remark,
+      String operator) {
+    String safeCode = defaultText(experimentCode, "").toUpperCase(Locale.ROOT);
+    String safeName = defaultText(experimentName, "");
+    String safeScenario = defaultText(scenarioCode, "").toUpperCase(Locale.ROOT);
+    if (safeCode.isBlank() || safeName.isBlank() || safeScenario.isBlank()) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "experimentCode/experimentName/scenarioCode 不能为空");
+    }
+    LocalDateTime now = LocalDateTime.now();
+    Admn14AbExperimentEntity existing =
+        admn14AbExperimentStore.values().stream()
+            .filter(item -> safeCode.equalsIgnoreCase(defaultText(item.getExperimentCode(), "")))
+            .findFirst()
+            .orElse(null);
+    List<Admn14AbExperimentEntity.MetricSnapshot> safeMetrics = metrics == null ? List.of() : metrics;
+    String computedConfidence =
+        safeMetrics.isEmpty() ? "95.0%" : defaultText(safeMetrics.get(0).confidenceLevel(), "95.0%");
+    String computedGain =
+        safeMetrics.isEmpty() ? "0%" : defaultText(safeMetrics.get(0).upliftRate(), "0%");
+    String computedWinner = "UNKNOWN";
+    if (safeMetrics.stream().anyMatch(item -> parsePercent(item.upliftRate()) > 0)) {
+      computedWinner = "VARIANT_B";
+    }
+    if (safeMetrics.stream().anyMatch(item -> parsePercent(item.upliftRate()) < 0)) {
+      computedWinner = "VARIANT_A";
+    }
+    if (existing == null) {
+      String experimentId =
+          "ABX"
+              + UUID.randomUUID().toString().replace("-", "").substring(0, 8).toUpperCase(Locale.ROOT);
+      Admn14AbExperimentEntity created =
+          new Admn14AbExperimentEntity(
+              experimentId,
+              safeCode,
+              safeName,
+              safeScenario,
+              defaultText(optimizationStage, "DRAFTING").toUpperCase(Locale.ROOT),
+              defaultText(experimentStatus, "DRAFT").toUpperCase(Locale.ROOT),
+              defaultText(trafficPercent, "10"),
+              defaultText(targetMetricCode, "CORE_METRIC"),
+              defaultText(baselineValue, "0"),
+              defaultText(targetValue, "0"),
+              computedConfidence,
+              computedWinner,
+              computedGain,
+              defaultText(startDate, LocalDate.now().toString()),
+              defaultText(endDate, LocalDate.now().plusDays(30).toString()),
+              defaultText(owner, defaultText(operator, "admn14-upsert")),
+              "实验评审组",
+              defaultText(remark, ""),
+              defaultText(operator, "admn14-upsert"),
+              now,
+              now,
+              safeMetrics);
+      admn14AbExperimentStore.put(created.getExperimentId(), created);
+      return created;
+    }
+    existing.update(
+        safeName,
+        safeScenario,
+        defaultText(optimizationStage, existing.getOptimizationStage()).toUpperCase(Locale.ROOT),
+        defaultText(experimentStatus, existing.getExperimentStatus()).toUpperCase(Locale.ROOT),
+        defaultText(trafficPercent, existing.getTrafficPercent()),
+        defaultText(targetMetricCode, existing.getTargetMetricCode()),
+        defaultText(baselineValue, existing.getBaselineValue()),
+        defaultText(targetValue, existing.getTargetValue()),
+        computedConfidence,
+        computedWinner,
+        computedGain,
+        defaultText(startDate, existing.getStartDate()),
+        defaultText(endDate, existing.getEndDate()),
+        defaultText(owner, existing.getOwner()),
+        existing.getReviewer(),
+        defaultText(remark, existing.getRemark()),
+        defaultText(operator, existing.getOperator()),
+        safeMetrics,
+        now);
+    admn14AbExperimentStore.put(existing.getExperimentId(), existing);
+    return existing;
+  }
+
+  public String admn14ScenarioText(String scenarioCode) {
+    return switch (defaultText(scenarioCode, "").toUpperCase(Locale.ROOT)) {
+      case "LEAD_DISPATCH" -> "线索分发";
+      case "RECONCILE_FLOW" -> "对账流程";
+      case "AFTER_SALE_FLOW" -> "售后流程";
+      case "PAYMENT_ROUTE" -> "支付路由";
+      default -> "其他场景";
+    };
+  }
+
+  public String admn14ExperimentStatusText(String experimentStatus) {
+    return switch (defaultText(experimentStatus, "").toUpperCase(Locale.ROOT)) {
+      case "RUNNING" -> "运行中";
+      case "DRAFT" -> "草稿";
+      case "PAUSED" -> "已暂停";
+      case "COMPLETED" -> "已完成";
+      default -> "未知";
+    };
+  }
+
+  public String admn14OptimizationStageText(String optimizationStage) {
+    return switch (defaultText(optimizationStage, "").toUpperCase(Locale.ROOT)) {
+      case "DRAFTING" -> "方案草拟";
+      case "SCALING" -> "持续放量";
+      case "RELEASED" -> "全量发布";
+      case "ROLLBACK" -> "回滚观察";
+      default -> "其他阶段";
+    };
+  }
+
+  public String admn14AuditRiskLevel(String experimentStatus, String optimizationStage) {
+    String status = defaultText(experimentStatus, "").toUpperCase(Locale.ROOT);
+    String stage = defaultText(optimizationStage, "").toUpperCase(Locale.ROOT);
+    if ("RUNNING".equals(status) && "SCALING".equals(stage)) {
+      return "HIGH";
+    }
+    if ("RUNNING".equals(status) || "PAUSED".equals(status)) {
+      return "MEDIUM";
+    }
+    return "LOW";
+  }
+
+  private double parsePercent(String raw) {
+    String text = defaultText(raw, "").replace("%", "").trim();
+    if (text.isBlank()) {
+      return 0D;
+    }
+    try {
+      return Double.parseDouble(text);
+    } catch (NumberFormatException ex) {
+      return 0D;
+    }
   }
 
   private void seedNegotiation(AuthUserEntity user) {

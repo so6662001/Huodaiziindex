@@ -52,6 +52,7 @@ import Admn10BillingRuleConfigPage from '../pages/Admn10BillingRuleConfigPage.vu
 import Admn11PaymentRefundManagePage from '../pages/Admn11PaymentRefundManagePage.vue'
 import Admn12AdSlotScheduleCenterPage from '../pages/Admn12AdSlotScheduleCenterPage.vue'
 import Admn13CreditModelVersionManagePage from '../pages/Admn13CreditModelVersionManagePage.vue'
+import Admn14AbExperimentCenterPage from '../pages/Admn14AbExperimentCenterPage.vue'
 import N01LoginRegisterPage from '../pages/N01LoginRegisterPage.vue'
 import N02IdentitySelectPage from '../pages/N02IdentitySelectPage.vue'
 import N03EnterpriseCertificationPage from '../pages/N03EnterpriseCertificationPage.vue'
@@ -406,6 +407,14 @@ const routes = [
     component: Admn13CreditModelVersionManagePage,
     meta: {
       title: 'ADM-N13信用模型版本管理_管理端信用模型版本治理与生效控制-货袋子'
+    }
+  },
+  {
+    path: '/admin/ab-experiment-center/admn14',
+    name: 'admn14AbExperimentCenter',
+    component: Admn14AbExperimentCenterPage,
+    meta: {
+      title: 'ADM-N14A/B实验中心_管理端实验持续优化与灰度治理-货袋子'
     }
   },
   {
