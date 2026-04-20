@@ -1,0 +1,28 @@
+package com.huodaizi.backend.dto.dashboard;
+
+public record A01DashboardOverviewDTO(
+    int inquiryTotal,
+    int inquiryOpenCount,
+    int inquiryQuotingCount,
+    int inquiryDealDoneCount,
+    int inquiryClosedCount,
+    int merchantLeadTotal,
+    int merchantLeadNewCount,
+    int merchantLeadQuotedCount,
+    int merchantLeadWonCount,
+    int pickupOrderTotal,
+    int pickupInTransitCount,
+    int pickupCompletedCount,
+    int reconcileOrderTotal,
+    int reconcilePartialPaidCount,
+    int reconcilePaidCount,
+    int subscriptionActiveCount,
+    int subscriptionExpiringSoonCount,
+    int billingOutstandingCount,
+    String billingOutstandingAmountYuan,
+    int adLeadTotal,
+    int adLeadConvertedCount,
+    String leadToDealRate,
+    String dealToFulfillmentRate,
+    String paidRate,
+    String adLeadConvertedRate) {}
