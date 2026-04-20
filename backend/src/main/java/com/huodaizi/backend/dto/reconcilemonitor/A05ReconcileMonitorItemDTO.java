@@ -1,0 +1,26 @@
+package com.huodaizi.backend.dto.reconcilemonitor;
+
+public record A05ReconcileMonitorItemDTO(
+    String reconcileId,
+    String reconcileNo,
+    String pickupOrderId,
+    String pickupOrderNo,
+    String inquiryId,
+    String inquiryNo,
+    String quoteId,
+    String supplierId,
+    String supplierName,
+    String buyerCompany,
+    String statementMonth,
+    String dueDate,
+    String invoiceAmount,
+    String receivableAmount,
+    String paidAmount,
+    String outstandingAmount,
+    String status,
+    String statusText,
+    String riskLevel,
+    long agingHours,
+    String latestRemark,
+    String createdAt,
+    String updatedAt) {}
