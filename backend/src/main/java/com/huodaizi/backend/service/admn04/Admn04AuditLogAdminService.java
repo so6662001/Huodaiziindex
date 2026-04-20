@@ -132,6 +132,7 @@ public class Admn04AuditLogAdminService {
       case "ADMN09" -> "/api/admin/arbitration-tickets";
       case "ADMN10" -> "/api/admin/billing-rules";
       case "ADMN11" -> "/api/admin/payment-refunds";
+      case "ADMN12" -> "/api/admin/ad-slot-schedules";
       default -> "/api/admin/unknown";
     };
   }

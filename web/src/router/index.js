@@ -50,6 +50,7 @@ import Admn08DealFunnelAnalysisPage from '../pages/Admn08DealFunnelAnalysisPage.
 import Admn09ArbitrationTicketCenterPage from '../pages/Admn09ArbitrationTicketCenterPage.vue'
 import Admn10BillingRuleConfigPage from '../pages/Admn10BillingRuleConfigPage.vue'
 import Admn11PaymentRefundManagePage from '../pages/Admn11PaymentRefundManagePage.vue'
+import Admn12AdSlotScheduleCenterPage from '../pages/Admn12AdSlotScheduleCenterPage.vue'
 import N01LoginRegisterPage from '../pages/N01LoginRegisterPage.vue'
 import N02IdentitySelectPage from '../pages/N02IdentitySelectPage.vue'
 import N03EnterpriseCertificationPage from '../pages/N03EnterpriseCertificationPage.vue'
@@ -388,6 +389,14 @@ const routes = [
     component: Admn11PaymentRefundManagePage,
     meta: {
       title: 'ADM-N11支付与退款管理_管理端支付退款审核与资金追踪-货袋子'
+    }
+  },
+  {
+    path: '/admin/ad-slot-schedule-center/admn12',
+    name: 'admn12AdSlotScheduleCenter',
+    component: Admn12AdSlotScheduleCenterPage,
+    meta: {
+      title: 'ADM-N12广告位排期中心_管理端广告位排期管理与窗口编排-货袋子'
     }
   },
   {

@@ -55,6 +55,8 @@ public class InMemoryAuthRepository {
       new ConcurrentHashMap<>();
   private final ConcurrentMap<String, Admn11PaymentRefundEntity> admn11PaymentRefundStore =
       new ConcurrentHashMap<>();
+  private final ConcurrentMap<String, Admn12AdSlotScheduleEntity> admn12AdSlotScheduleStore =
+      new ConcurrentHashMap<>();
 
   public InMemoryAuthRepository() {
     seed();
@@ -576,6 +578,7 @@ public class InMemoryAuthRepository {
       case "ADMN09_ARBITRATION_MANAGE" -> "仲裁工单中心";
       case "ADMN10_BILLING_RULE_MANAGE" -> "计费规则配置";
       case "ADMN11_PAYMENT_REFUND_MANAGE" -> "支付与退款管理";
+      case "ADMN12_AD_SLOT_SCHEDULE_MANAGE" -> "广告位排期中心";
       default -> "未命名权限";
     };
   }
@@ -2155,6 +2158,7 @@ public class InMemoryAuthRepository {
       case "ADMN09" -> "仲裁工单中心";
       case "ADMN10" -> "计费规则配置";
       case "ADMN11" -> "支付与退款管理";
+      case "ADMN12" -> "广告位排期中心";
       default -> "其他模块";
     };
   }
@@ -2178,6 +2182,8 @@ public class InMemoryAuthRepository {
       case "BILLING_RULE_QUERY" -> "计费规则查询";
       case "PAYMENT_REFUND_REVIEW" -> "退款审核处理";
       case "PAYMENT_REFUND_QUERY" -> "支付退款查询";
+      case "AD_SLOT_SCHEDULE_UPSERT" -> "广告位排期新增/更新";
+      case "AD_SLOT_SCHEDULE_QUERY" -> "广告位排期查询";
       default -> "通用操作";
     };
   }
@@ -2234,6 +2240,7 @@ public class InMemoryAuthRepository {
     seedAdmn06LeadQuality();
     seedAdmn09ArbitrationTickets();
     seedAdmn10BillingRules();
+    seedAdmn12AdSlotSchedules();
     seedNegotiation(seed);
     seedOrders(seed);
     seedTradeTerms(seed);
@@ -2334,7 +2341,8 @@ public class InMemoryAuthRepository {
                 "ADMN08_FUNNEL_VIEW",
                 "ADMN09_ARBITRATION_MANAGE",
                 "ADMN10_BILLING_RULE_MANAGE",
-                "ADMN11_PAYMENT_REFUND_MANAGE"),
+                "ADMN11_PAYMENT_REFUND_MANAGE",
+                "ADMN12_AD_SLOT_SCHEDULE_MANAGE"),
             "seed",
             now.minusDays(30),
             now.minusDays(1));
@@ -2357,7 +2365,8 @@ public class InMemoryAuthRepository {
                 "ADMN06_LEAD_QA_MANAGE",
                 "ADMN09_ARBITRATION_MANAGE",
                 "ADMN10_BILLING_RULE_MANAGE",
-                "ADMN11_PAYMENT_REFUND_MANAGE"),
+                "ADMN11_PAYMENT_REFUND_MANAGE",
+                "ADMN12_AD_SLOT_SCHEDULE_MANAGE"),
             "seed",
             now.minusDays(20),
             now.minusDays(2));
@@ -2770,6 +2779,262 @@ public class InMemoryAuthRepository {
         "款项已回退至原支付账户",
         now.minusDays(2).toString());
     admn11PaymentRefundStore.put(second.getRefundId(), second);
+  }
+
+  private void seedAdmn12AdSlotSchedules() {
+    LocalDateTime now = LocalDateTime.now();
+    Admn12AdSlotScheduleEntity first =
+        new Admn12AdSlotScheduleEntity(
+            "SCH000001",
+            "SLOT_HOME_FOCUS_01",
+            "首页焦点大图位",
+            "HOME_TOP_BANNER",
+            "NORTH_CHINA",
+            "唐山",
+            "ACTIVE",
+            "ON_SALE",
+            "2026-04-20",
+            "2026-05-20",
+            "1",
+            "1",
+            "¥12,000/天",
+            "https://cdn.huodaizi.com/ad/home-focus-01.png",
+            "唐山钢贸联合会",
+            "弘达钢贸 5.20 钢市采购节",
+            "李商务",
+            "主打螺纹钢采购节活动，支持跳转落地页",
+            now.minusDays(12),
+            now.minusDays(1));
+    first.appendWindow("2026-04-20", "2026-04-30", "SOLD", "已售", "唐山钢贸联合会");
+    first.appendWindow("2026-05-01", "2026-05-20", "SOLD", "已售", "唐山钢贸联合会");
+    admn12AdSlotScheduleStore.put(first.getScheduleId(), first);
+
+    Admn12AdSlotScheduleEntity second =
+        new Admn12AdSlotScheduleEntity(
+            "SCH000002",
+            "SLOT_CITY_RECO_03",
+            "城市推荐轮播位",
+            "CITY_RECOMMEND_CAROUSEL",
+            "EAST_CHINA",
+            "无锡",
+            "ACTIVE",
+            "PARTIAL",
+            "2026-04-18",
+            "2026-05-31",
+            "3",
+            "2",
+            "¥6,500/天",
+            "https://cdn.huodaizi.com/ad/city-reco-03.png",
+            "无锡板材联盟",
+            "无锡板材周特辑",
+            "周商务",
+            "轮播第三位，5月中旬有空档可售",
+            now.minusDays(9),
+            now.minusHours(20));
+    second.appendWindow("2026-04-18", "2026-05-10", "SOLD", "已售", "无锡板材联盟");
+    second.appendWindow("2026-05-11", "2026-05-18", "LOCKED", "锁定中", "待签约客户");
+    second.appendWindow("2026-05-19", "2026-05-31", "AVAILABLE", "可售", "");
+    admn12AdSlotScheduleStore.put(second.getScheduleId(), second);
+
+    Admn12AdSlotScheduleEntity third =
+        new Admn12AdSlotScheduleEntity(
+            "SCH000003",
+            "SLOT_LOGISTICS_02",
+            "仓配服务推荐位",
+            "LOGISTICS_SERVICE_TILE",
+            "SOUTH_CHINA",
+            "佛山",
+            "PAUSED",
+            "OFFLINE",
+            "2026-04-10",
+            "2026-04-30",
+            "2",
+            "0",
+            "¥4,800/天",
+            "",
+            "",
+            "",
+            "赵运营",
+            "版位素材整改中，暂不售卖",
+            now.minusDays(20),
+            now.minusDays(2));
+    third.appendWindow("2026-04-10", "2026-04-20", "OFFLINE", "下线", "");
+    third.appendWindow("2026-04-21", "2026-04-30", "OFFLINE", "下线", "");
+    admn12AdSlotScheduleStore.put(third.getScheduleId(), third);
+  }
+
+  public List<Admn12AdSlotScheduleEntity> listAdSlotSchedulesForAdmin(
+      String scheduleStatus, String slotType, String cityCode, String keyword) {
+    String statusFilter = defaultText(scheduleStatus, "").toUpperCase(Locale.ROOT);
+    String slotTypeFilter = defaultText(slotType, "").toUpperCase(Locale.ROOT);
+    String cityFilter = defaultText(cityCode, "").toUpperCase(Locale.ROOT);
+    String keywordFilter = defaultText(keyword, "").toLowerCase(Locale.ROOT);
+    return admn12AdSlotScheduleStore.values().stream()
+        .filter(
+            item ->
+                statusFilter.isBlank()
+                    || statusFilter.equals(defaultText(item.getScheduleStatus(), "").toUpperCase(Locale.ROOT)))
+        .filter(
+            item ->
+                slotTypeFilter.isBlank()
+                    || slotTypeFilter.equals(defaultText(item.getSlotType(), "").toUpperCase(Locale.ROOT)))
+        .filter(
+            item ->
+                cityFilter.isBlank()
+                    || cityFilter.equals(defaultText(item.getCityCode(), "").toUpperCase(Locale.ROOT)))
+        .filter(
+            item -> {
+              if (keywordFilter.isBlank()) {
+                return true;
+              }
+              return defaultText(item.getScheduleId(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                  || defaultText(item.getSlotCode(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                  || defaultText(item.getSlotName(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                  || defaultText(item.getAdvertiserName(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                  || defaultText(item.getCampaignName(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                  || defaultText(item.getOperator(), "").toLowerCase(Locale.ROOT).contains(keywordFilter);
+            })
+        .sorted(Comparator.comparing(Admn12AdSlotScheduleEntity::getUpdatedAt).reversed())
+        .toList();
+  }
+
+  public Admn12AdSlotScheduleEntity getAdSlotScheduleForAdmin(String scheduleId) {
+    String normalizedId = defaultText(scheduleId, "");
+    if (normalizedId.isBlank()) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "scheduleId 不能为空");
+    }
+    Admn12AdSlotScheduleEntity entity = admn12AdSlotScheduleStore.get(normalizedId);
+    if (entity == null) {
+      throw new BaseException(ErrorCode.NOT_FOUND.getCode(), "排期记录不存在");
+    }
+    return entity;
+  }
+
+  public Admn12AdSlotScheduleEntity upsertAdSlotScheduleForAdmin(
+      String slotCode,
+      String slotName,
+      String slotType,
+      String cityCode,
+      String cityName,
+      String scheduleStatus,
+      String scheduleFillStatus,
+      String startDate,
+      String endDate,
+      String totalSlots,
+      String soldSlots,
+      String pricePerDay,
+      String creativeUrl,
+      String advertiserName,
+      String campaignName,
+      String operator,
+      String remark,
+      List<Admn12AdSlotScheduleEntity.ScheduleWindow> windows) {
+    String safeSlotCode = defaultText(slotCode, "").toUpperCase(Locale.ROOT);
+    String safeSlotName = defaultText(slotName, "");
+    String safeSlotType = defaultText(slotType, "").toUpperCase(Locale.ROOT);
+    String safeCityCode = defaultText(cityCode, "").toUpperCase(Locale.ROOT);
+    if (safeSlotCode.isBlank() || safeSlotName.isBlank() || safeSlotType.isBlank() || safeCityCode.isBlank()) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "slotCode/slotName/slotType/cityCode 不能为空");
+    }
+    LocalDateTime now = LocalDateTime.now();
+    Admn12AdSlotScheduleEntity existing =
+        admn12AdSlotScheduleStore.values().stream()
+            .filter(
+                item ->
+                    safeSlotCode.equalsIgnoreCase(defaultText(item.getSlotCode(), ""))
+                        && safeCityCode.equalsIgnoreCase(defaultText(item.getCityCode(), "")))
+            .findFirst()
+            .orElse(null);
+    if (existing == null) {
+      String scheduleId =
+          "SCH"
+              + UUID.randomUUID().toString().replace("-", "").substring(0, 8).toUpperCase(Locale.ROOT);
+      Admn12AdSlotScheduleEntity created =
+          new Admn12AdSlotScheduleEntity(
+              scheduleId,
+              safeSlotCode,
+              safeSlotName,
+              safeSlotType,
+              safeCityCode,
+              defaultText(cityName, admn12CityText(safeCityCode)),
+              defaultText(scheduleStatus, "ACTIVE").toUpperCase(Locale.ROOT),
+              defaultText(scheduleFillStatus, "ON_SALE").toUpperCase(Locale.ROOT),
+              defaultText(startDate, LocalDate.now().toString()),
+              defaultText(endDate, LocalDate.now().plusDays(30).toString()),
+              defaultText(totalSlots, "1"),
+              defaultText(soldSlots, "0"),
+              defaultText(pricePerDay, "¥0/天"),
+              defaultText(creativeUrl, ""),
+              defaultText(advertiserName, ""),
+              defaultText(campaignName, ""),
+              defaultText(operator, "admn12-create"),
+              defaultText(remark, ""),
+              now,
+              now);
+      if (windows != null) {
+        windows.forEach(
+            item ->
+                created.appendWindow(
+                    defaultText(item.startDate(), ""),
+                    defaultText(item.endDate(), ""),
+                    defaultText(item.windowStatus(), ""),
+                    defaultText(item.windowStatusText(), ""),
+                    defaultText(item.bookedBy(), "")));
+      }
+      admn12AdSlotScheduleStore.put(created.getScheduleId(), created);
+      return created;
+    }
+    existing.update(
+        safeSlotName,
+        safeSlotType,
+        safeCityCode,
+        defaultText(cityName, existing.getCityName()),
+        defaultText(scheduleStatus, existing.getScheduleStatus()).toUpperCase(Locale.ROOT),
+        defaultText(scheduleFillStatus, existing.getScheduleFillStatus()).toUpperCase(Locale.ROOT),
+        defaultText(startDate, existing.getStartDate()),
+        defaultText(endDate, existing.getEndDate()),
+        defaultText(totalSlots, existing.getTotalSlots()),
+        defaultText(soldSlots, existing.getSoldSlots()),
+        defaultText(pricePerDay, existing.getPricePerDay()),
+        defaultText(creativeUrl, existing.getCreativeUrl()),
+        defaultText(advertiserName, existing.getAdvertiserName()),
+        defaultText(campaignName, existing.getCampaignName()),
+        defaultText(operator, "admn12-update"),
+        defaultText(remark, existing.getRemark()),
+        windows,
+        now);
+    admn12AdSlotScheduleStore.put(existing.getScheduleId(), existing);
+    return existing;
+  }
+
+  public String admn12SlotTypeText(String slotType) {
+    return switch (defaultText(slotType, "").toUpperCase(Locale.ROOT)) {
+      case "HOME_TOP_BANNER" -> "首页焦点大图位";
+      case "CITY_RECOMMEND_CAROUSEL" -> "城市推荐轮播位";
+      case "LOGISTICS_SERVICE_TILE" -> "仓配服务推荐位";
+      case "NEWS_FEED_INSERT" -> "资讯流插播位";
+      default -> "其他广告位";
+    };
+  }
+
+  public String admn12ScheduleStatusText(String scheduleStatus) {
+    return switch (defaultText(scheduleStatus, "").toUpperCase(Locale.ROOT)) {
+      case "ACTIVE" -> "投放中";
+      case "PAUSED" -> "暂停";
+      case "EXPIRED" -> "已到期";
+      default -> "未知状态";
+    };
+  }
+
+  public String admn12CityText(String cityCode) {
+    return switch (defaultText(cityCode, "").toUpperCase(Locale.ROOT)) {
+      case "NORTH_CHINA" -> "华北";
+      case "EAST_CHINA" -> "华东";
+      case "SOUTH_CHINA" -> "华南";
+      case "CENTRAL_CHINA" -> "华中";
+      case "WEST_CHINA" -> "西南";
+      default -> "其他区域";
+    };
   }
 
   private void seedNegotiation(AuthUserEntity user) {

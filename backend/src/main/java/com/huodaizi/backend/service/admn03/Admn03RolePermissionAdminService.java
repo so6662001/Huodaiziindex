@@ -146,6 +146,7 @@ public class Admn03RolePermissionAdminService {
       case "ADMN09_ARBITRATION_MANAGE" -> "仲裁工单中心";
       case "ADMN10_BILLING_RULE_MANAGE" -> "计费规则配置";
       case "ADMN11_PAYMENT_REFUND_MANAGE" -> "支付与退款管理";
+      case "ADMN12_AD_SLOT_SCHEDULE_MANAGE" -> "广告位排期中心";
       default -> "权限-" + safeText(permissionCode);
     };
   }
