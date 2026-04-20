@@ -41,6 +41,7 @@ import N09AfterSaleProgressPage from '../pages/N09AfterSaleProgressPage.vue'
 import N10CashierPage from '../pages/N10CashierPage.vue'
 import N11PaymentResultPage from '../pages/N11PaymentResultPage.vue'
 import N12InvoiceManagePage from '../pages/N12InvoiceManagePage.vue'
+import N13CreditScoreDetailPage from '../pages/N13CreditScoreDetailPage.vue'
 import InquiryMerchantLeadManagePage from '../pages/InquiryMerchantLeadManagePage.vue'
 import InquiryQuoteWorkbenchPage from '../pages/InquiryQuoteWorkbenchPage.vue'
 import SiteAdLeadMinePage from '../pages/SiteAdLeadMinePage.vue'
@@ -293,6 +294,14 @@ const routes = [
     component: N12InvoiceManagePage,
     meta: {
       title: 'PC-N12发票与抬头管理_货袋子账号中心'
+    }
+  },
+  {
+    path: '/account/credit-score-detail',
+    name: 'n13CreditScoreDetail',
+    component: N13CreditScoreDetailPage,
+    meta: {
+      title: 'PC-N13信用评分明细页_货袋子账号中心'
     }
   },
   {

@@ -292,6 +292,10 @@ function goPaymentResult() {
   router.push('/account/payment-result')
 }
 
+function goCreditScoreDetail() {
+  router.push('/account/credit-score-detail')
+}
+
 function goCashier() {
   router.push('/account/cashier')
 }
@@ -313,6 +317,7 @@ onMounted(async () => {
       <p>统一管理企业发票抬头、开票申请与开票进度，支持默认抬头设置与申请记录追踪。</p>
       <div class="hero-actions">
         <button class="btn" @click="goPaymentResult">返回支付结果页</button>
+        <button class="btn" @click="goCreditScoreDetail">信用评分明细</button>
         <button class="btn" @click="goCashier">返回收银台</button>
         <button class="btn" @click="goHome">返回首页</button>
       </div>

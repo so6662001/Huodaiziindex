@@ -36,6 +36,8 @@ import com.huodaizi.backend.dto.auth.N12InvoiceTitleListResponse;
 import com.huodaizi.backend.dto.auth.N12InvoiceTitleSetDefaultRequest;
 import com.huodaizi.backend.dto.auth.N12InvoiceTitleSetStatusRequest;
 import com.huodaizi.backend.dto.auth.N12InvoiceTitleUpsertRequest;
+import com.huodaizi.backend.dto.auth.N13CreditScoreDetailResponse;
+import com.huodaizi.backend.dto.auth.N13CreditScoreListResponse;
 import com.huodaizi.backend.service.auth.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -297,6 +299,23 @@ public class AuthController {
       @RequestHeader(name = AUTH_HEADER, required = false) String token,
       @Valid @RequestBody N12InvoiceApplicationCreateRequest request) {
     return ApiResponse.success(service.createInvoiceApplication(token, request));
+  }
+
+  @GetMapping("/credit-scores")
+  public ApiResponse<N13CreditScoreListResponse> creditScoreList(
+      @RequestHeader(name = AUTH_HEADER, required = false) String token,
+      @RequestParam(name = "grade", required = false) String grade,
+      @RequestParam(name = "keyword", required = false) String keyword,
+      @RequestParam(name = "pageNo", required = false, defaultValue = "1") int pageNo,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "10") int pageSize) {
+    return ApiResponse.success(service.creditScoreList(token, grade, keyword, pageNo, pageSize));
+  }
+
+  @GetMapping("/credit-scores/{scoreId}")
+  public ApiResponse<N13CreditScoreDetailResponse> creditScoreDetail(
+      @RequestHeader(name = AUTH_HEADER, required = false) String token,
+      @PathVariable("scoreId") String scoreId) {
+    return ApiResponse.success(service.creditScoreDetail(token, scoreId));
   }
 
   @PostMapping("/logout")

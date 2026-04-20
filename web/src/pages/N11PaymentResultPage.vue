@@ -56,6 +56,10 @@ function goInvoiceManage() {
   router.push('/account/invoice-manage')
 }
 
+function goCreditScoreDetail() {
+  router.push('/account/credit-score-detail')
+}
+
 onMounted(() => {
   loadPaymentResult()
 })
@@ -70,6 +74,7 @@ onMounted(() => {
         <button class="btn" @click="goCashier">返回收银台</button>
         <button class="btn" @click="goOrderDetail">查看订单详情</button>
         <button class="btn" @click="goInvoiceManage">发票与抬头管理</button>
+        <button class="btn" @click="goCreditScoreDetail">信用评分明细</button>
         <button class="btn" @click="goHome">返回首页</button>
       </div>
     </section>

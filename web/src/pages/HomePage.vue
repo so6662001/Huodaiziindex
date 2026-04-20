@@ -225,6 +225,10 @@ function goN12InvoiceManagePage() {
   router.push('/account/invoice-manage')
 }
 
+function goN13CreditScoreDetailPage() {
+  router.push('/account/credit-score-detail')
+}
+
 function onSearch() {
   if (!keyword.value.trim()) {
     return
@@ -433,6 +437,7 @@ function onSearch() {
         <button class="btn" @click="goN10CashierPage">PC-N10收银台</button>
         <button class="btn" @click="goN11PaymentResultPage">PC-N11支付结果页</button>
         <button class="btn" @click="goN12InvoiceManagePage">PC-N12发票与抬头管理</button>
+        <button class="btn" @click="goN13CreditScoreDetailPage">PC-N13信用评分明细页</button>
         <button class="btn" @click="goSubscriptionPage">套餐与订阅</button>
         <button class="btn" @click="goBillingPage">计费与账单</button>
         <button class="btn primary" @click="goInquiry">立即体验AI询价</button>

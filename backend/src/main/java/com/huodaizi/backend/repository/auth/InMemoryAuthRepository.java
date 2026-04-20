@@ -32,6 +32,7 @@ public class InMemoryAuthRepository {
   private final ConcurrentMap<String, N12InvoiceTitleEntity> invoiceTitleStore = new ConcurrentHashMap<>();
   private final ConcurrentMap<String, N12InvoiceApplicationEntity> invoiceApplicationStore =
       new ConcurrentHashMap<>();
+  private final ConcurrentMap<String, N13CreditScoreEntity> creditScoreStore = new ConcurrentHashMap<>();
 
   public InMemoryAuthRepository() {
     seed();
@@ -766,6 +767,39 @@ public class InMemoryAuthRepository {
     return created;
   }
 
+  public List<N13CreditScoreEntity> listCreditScores(String token, N13CreditScoreQuery query) {
+    SessionEntity session = requireSession(token);
+    AuthUserEntity user = userStore.get(session.getAccount());
+    if (user == null) {
+      throw new BaseException(ErrorCode.UNAUTHORIZED.getCode(), "登录态无效");
+    }
+    String keyword = query == null ? "" : defaultText(query.keyword(), "");
+    return creditScoreStore.values().stream()
+        .filter(item -> user.getUserId().equals(item.getUserId()))
+        .filter(
+            item ->
+                keyword.isBlank()
+                    || item.getScoreId().contains(keyword)
+                    || item.getMerchantName().contains(keyword)
+                    || item.getMerchantId().contains(keyword)
+                    || item.getScoreVersion().contains(keyword))
+        .sorted(Comparator.comparing(N13CreditScoreEntity::getUpdatedAt).reversed())
+        .toList();
+  }
+
+  public N13CreditScoreEntity getCreditScoreDetail(String token, String scoreId) {
+    SessionEntity session = requireSession(token);
+    AuthUserEntity user = userStore.get(session.getAccount());
+    if (user == null) {
+      throw new BaseException(ErrorCode.UNAUTHORIZED.getCode(), "登录态无效");
+    }
+    N13CreditScoreEntity entity = creditScoreStore.get(defaultText(scoreId, ""));
+    if (entity == null || !user.getUserId().equals(entity.getUserId())) {
+      throw new BaseException(ErrorCode.NOT_FOUND.getCode(), "信用评分记录不存在");
+    }
+    return entity;
+  }
+
   public void logout(String token) {
     sessionStore.remove(defaultText(token, ""));
   }
@@ -847,6 +881,7 @@ public class InMemoryAuthRepository {
     seedCashierOrders(seed);
     seedInvoiceTitles(seed);
     seedInvoiceApplications(seed);
+    seedCreditScores(seed);
   }
 
   private void seedNegotiation(AuthUserEntity user) {
@@ -1379,6 +1414,97 @@ public class InMemoryAuthRepository {
             now.minusDays(3),
             now.minusDays(1));
     invoiceApplicationStore.put(first.getApplicationId(), first);
+  }
+
+  private void seedCreditScores(AuthUserEntity user) {
+    LocalDateTime now = LocalDateTime.now();
+    N13CreditScoreEntity first =
+        new N13CreditScoreEntity(
+            "CR00000001",
+            user.getUserId(),
+            "S001",
+            "唐山弘达钢贸",
+            "2026-04",
+            "A+",
+            "92",
+            "TOP 18%",
+            "LOW",
+            "低风险",
+            "v2026.04",
+            "90",
+            "+2",
+            "UP",
+            "98.1%",
+            "1.2%",
+            "7",
+            "99.2%",
+            List.of("低风险", "履约稳健"),
+            List.of("保持回款登记时效在 T+1 内", "将争议工单平均关闭时长压缩到 24h", "提高电子回单上传完整率至 99%"),
+            List.of(
+                new N13CreditScoreEntity.FactorItem(
+                    "FULFILLMENT", "履约稳定性", 98, 40, "39.2", "UP", "逾期率持续低位", "维持仓库排产提前量"),
+                new N13CreditScoreEntity.FactorItem(
+                    "RESPONSE", "响应效率", 95, 25, "23.8", "FLAT", "平均响应 7 分钟", "高峰期保持7分钟内响应"),
+                new N13CreditScoreEntity.FactorItem(
+                    "PAYMENT", "回款质量", 89, 25, "22.3", "UP", "回款周期稳定", "持续推进T+1回款登记"),
+                new N13CreditScoreEntity.FactorItem(
+                    "DISPUTE", "争议率", 90, 10, "9.0", "UP", "争议结案时长下降", "将争议处理SLA压缩至24小时内")),
+            List.of(
+                new N13CreditScoreEntity.TimelineItem(
+                    "2026-01", "月度评分", "86", "96.2%", "1.8%", "10"),
+                new N13CreditScoreEntity.TimelineItem(
+                    "2026-02", "月度评分", "88", "97.1%", "1.6%", "9"),
+                new N13CreditScoreEntity.TimelineItem(
+                    "2026-03", "月度评分", "90", "97.8%", "1.4%", "8"),
+                new N13CreditScoreEntity.TimelineItem(
+                    "2026-04", "月度评分", "92", "98.1%", "1.2%", "7")),
+            now.minusDays(3),
+            now.minusHours(2));
+    creditScoreStore.put(first.getScoreId(), first);
+
+    N13CreditScoreEntity second =
+        new N13CreditScoreEntity(
+            "CR00000002",
+            user.getUserId(),
+            "S001",
+            "唐山弘达钢贸",
+            "2026-03",
+            "A",
+            "90",
+            "TOP 21%",
+            "LOW",
+            "低风险",
+            "v2026.03",
+            "88",
+            "+2",
+            "UP",
+            "97.8%",
+            "1.4%",
+            "8",
+            "98.6%",
+            List.of("低风险", "回款稳定"),
+            List.of("保持稳定履约表现", "优化高峰时段报价响应"),
+            List.of(
+                new N13CreditScoreEntity.FactorItem(
+                    "FULFILLMENT", "履约稳定性", 97, 40, "38.8", "UP", "履约率持续提升", "持续稳定仓储协同"),
+                new N13CreditScoreEntity.FactorItem(
+                    "RESPONSE", "响应效率", 92, 25, "23.0", "UP", "高峰期响应改善", "建立值班分时机制"),
+                new N13CreditScoreEntity.FactorItem(
+                    "PAYMENT", "回款质量", 87, 25, "21.8", "FLAT", "回款质量稳定", "加强逾期预警"),
+                new N13CreditScoreEntity.FactorItem(
+                    "DISPUTE", "争议率", 88, 10, "8.8", "UP", "争议率低位", "保持争议闭环复盘")),
+            List.of(
+                new N13CreditScoreEntity.TimelineItem(
+                    "2025-12", "月度评分", "84", "95.9%", "2.1%", "11"),
+                new N13CreditScoreEntity.TimelineItem(
+                    "2026-01", "月度评分", "86", "96.4%", "1.9%", "10"),
+                new N13CreditScoreEntity.TimelineItem(
+                    "2026-02", "月度评分", "88", "97.1%", "1.7%", "9"),
+                new N13CreditScoreEntity.TimelineItem(
+                    "2026-03", "月度评分", "90", "97.8%", "1.4%", "8")),
+            now.minusDays(33),
+            now.minusDays(30));
+    creditScoreStore.put(second.getScoreId(), second);
   }
 
   private String issueTypeText(String type) {

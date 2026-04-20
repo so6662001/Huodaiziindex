@@ -52,6 +52,11 @@ import com.huodaizi.backend.dto.auth.N12InvoiceTitleListResponse;
 import com.huodaizi.backend.dto.auth.N12InvoiceTitleSetDefaultRequest;
 import com.huodaizi.backend.dto.auth.N12InvoiceTitleSetStatusRequest;
 import com.huodaizi.backend.dto.auth.N12InvoiceTitleUpsertRequest;
+import com.huodaizi.backend.dto.auth.N13CreditScoreDetailResponse;
+import com.huodaizi.backend.dto.auth.N13CreditScoreFactorDTO;
+import com.huodaizi.backend.dto.auth.N13CreditScoreListItemDTO;
+import com.huodaizi.backend.dto.auth.N13CreditScoreListResponse;
+import com.huodaizi.backend.dto.auth.N13CreditScoreTrendPointDTO;
 import com.huodaizi.backend.repository.auth.AuthUserEntity;
 import com.huodaizi.backend.repository.auth.EnterpriseCertificationDraft;
 import com.huodaizi.backend.repository.auth.EnterpriseCertificationEntity;
@@ -71,6 +76,8 @@ import com.huodaizi.backend.repository.auth.N10CashierQuery;
 import com.huodaizi.backend.repository.auth.N12InvoiceApplicationEntity;
 import com.huodaizi.backend.repository.auth.N12InvoiceApplicationQuery;
 import com.huodaizi.backend.repository.auth.N12InvoiceTitleEntity;
+import com.huodaizi.backend.repository.auth.N13CreditScoreEntity;
+import com.huodaizi.backend.repository.auth.N13CreditScoreQuery;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -880,6 +887,75 @@ public class AuthService {
             safeText(request.remark()),
             safeText(request.operator()));
     return invoiceApplicationDetail(token, created.getApplicationId());
+  }
+
+  public N13CreditScoreListResponse creditScoreList(
+      String token, String grade, String keyword, int pageNo, int pageSize) {
+    int safePageNo = Math.max(1, pageNo);
+    int safePageSize = Math.min(Math.max(1, pageSize), 50);
+    N13CreditScoreQuery query = new N13CreditScoreQuery(safeText(grade), keyword, safePageNo, safePageSize);
+    List<N13CreditScoreEntity> all = repository.listCreditScores(token, query);
+    int from = Math.min((safePageNo - 1) * safePageSize, all.size());
+    int to = Math.min(from + safePageSize, all.size());
+    List<N13CreditScoreEntity> paged = all.subList(from, to);
+    List<N13CreditScoreListItemDTO> records =
+        paged.stream()
+            .map(
+                item ->
+                    new N13CreditScoreListItemDTO(
+                        item.getScoreId(),
+                        item.getMerchantId(),
+                        item.getMerchantName(),
+                        item.getScoreVersion(),
+                        item.getTotalScore(),
+                        item.getGrade(),
+                        item.getRankPercent(),
+                        item.getRiskLevel(),
+                        toText(item.getUpdatedAt())))
+            .toList();
+    return new N13CreditScoreListResponse(safePageNo, safePageSize, all.size(), records);
+  }
+
+  public N13CreditScoreDetailResponse creditScoreDetail(String token, String scoreId) {
+    N13CreditScoreEntity item = repository.getCreditScoreDetail(token, scoreId);
+    List<N13CreditScoreFactorDTO> factors =
+        item.getFactors().stream()
+            .map(
+                factor ->
+                    new N13CreditScoreFactorDTO(
+                        factor.getFactorCode(),
+                        factor.getFactorName(),
+                        factor.getScore(),
+                        factor.getWeight(),
+                        factor.getTrend(),
+                        factor.getSummary()))
+            .toList();
+    List<N13CreditScoreTrendPointDTO> trend =
+        item.getTimeline().stream()
+            .map(
+                point ->
+                    new N13CreditScoreTrendPointDTO(
+                        point.getNodeCode(),
+                        point.getImpactScore(),
+                        point.getImpactDirection(),
+                        point.getDescription(),
+                        point.getHappenedAt()))
+            .toList();
+    return new N13CreditScoreDetailResponse(
+        item.getScoreId(),
+        item.getMerchantId(),
+        item.getMerchantName(),
+        item.getScoreMonth(),
+        item.getTotalScore(),
+        item.getGrade(),
+        item.getRankPercent(),
+        item.getRiskLevel(),
+        String.join("、", item.getTags()),
+        item.getScoreVersion(),
+        item.getRiskSummary(),
+        toText(item.getUpdatedAt()),
+        factors,
+        trend);
   }
 
   private N07TradeTermsDetailResponse toTradeTermsDetail(N07TradeTermsEntity entity) {
