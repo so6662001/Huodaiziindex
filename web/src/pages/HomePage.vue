@@ -221,6 +221,10 @@ function goA08RiskAlertPage() {
   router.push('/admin/risk-alert/a08')
 }
 
+function goAdmn01MerchantCertificationReviewPage() {
+  router.push('/admin/merchant-cert-review/admn01')
+}
+
 function goN01LoginRegisterPage() {
   router.push('/account/login-register')
 }
@@ -484,6 +488,7 @@ function onSearch() {
         <button class="btn" @click="goA06DispatchStrategyPage">A06分发策略配置</button>
         <button class="btn" @click="goA07PlanPricingPage">A07套餐与定价管理</button>
         <button class="btn" @click="goA08RiskAlertPage">A08风险预警中心</button>
+        <button class="btn" @click="goAdmn01MerchantCertificationReviewPage">ADM-N01商家认证审核台</button>
         <button class="btn" @click="goN01LoginRegisterPage">PC-N01登录/注册</button>
         <button class="btn" @click="goN02IdentitySelectPage">PC-N02身份选择</button>
         <button class="btn" @click="goN03EnterpriseCertificationPage">PC-N03企业认证提交</button>

@@ -262,6 +262,93 @@ public class InMemoryAuthRepository {
     return Optional.ofNullable(certificationStore.get(user.getUserId()));
   }
 
+  public List<EnterpriseCertificationEntity> listAllCertifications(
+      String status, String keyword, int page, int pageSize) {
+    String statusFilter = defaultText(status, "").toUpperCase(Locale.ROOT);
+    String keywordFilter = defaultText(keyword, "").toLowerCase(Locale.ROOT);
+    return certificationStore.values().stream()
+        .filter(
+            item ->
+                statusFilter.isBlank() || statusFilter.equals(item.getStatus().toUpperCase(Locale.ROOT)))
+        .filter(
+            item ->
+                keywordFilter.isBlank()
+                    || defaultText(item.getCertificationId(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                    || defaultText(item.getCompanyName(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                    || defaultText(item.getUnifiedSocialCreditCode(), "")
+                        .toLowerCase(Locale.ROOT)
+                        .contains(keywordFilter)
+                    || defaultText(item.getUserId(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                    || defaultText(item.getAccount(), "").toLowerCase(Locale.ROOT).contains(keywordFilter))
+        .sorted(Comparator.comparing(EnterpriseCertificationEntity::getUpdatedAt).reversed())
+        .toList();
+  }
+
+  public EnterpriseCertificationEntity getCertificationById(String certificationId) {
+    String normalizedId = defaultText(certificationId, "");
+    if (normalizedId.isBlank()) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "certificationId 不能为空");
+    }
+    EnterpriseCertificationEntity entity =
+        certificationStore.values().stream()
+            .filter(item -> normalizedId.equals(item.getCertificationId()))
+            .findFirst()
+            .orElse(null);
+    if (entity == null) {
+      throw new BaseException(ErrorCode.NOT_FOUND.getCode(), "认证单不存在");
+    }
+    return entity;
+  }
+
+  public EnterpriseCertificationEntity reviewCertification(
+      String certificationId, String action, String remark, String operator) {
+    EnterpriseCertificationEntity target = getCertificationById(certificationId);
+    String normalizedAction = defaultText(action, "").toUpperCase(Locale.ROOT);
+    String nextStatus =
+        switch (normalizedAction) {
+          case "APPROVE" -> "APPROVED";
+          case "REJECT" -> "REJECTED";
+          default -> throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "action 仅支持 APPROVE/REJECT");
+        };
+    LocalDateTime now = LocalDateTime.now();
+    target.refreshFromSubmission(
+        nextStatus,
+        target.getCompanyName(),
+        target.getUnifiedSocialCreditCode(),
+        target.getLegalPersonName(),
+        target.getLegalPersonIdNo(),
+        target.getContactName(),
+        target.getContactMobile(),
+        target.getContactMobileMasked(),
+        target.getBusinessLicenseUrl(),
+        target.getLegalIdFrontUrl(),
+        target.getLegalIdBackUrl(),
+        target.getBankAccountName(),
+        target.getBankAccountNo(),
+        target.getBankName(),
+        target.getProvince(),
+        target.getCity(),
+        target.getAddress(),
+        defaultText(remark, target.getRemark()),
+        defaultText(operator, "admn01-review"),
+        now);
+    certificationStore.put(target.getUserId(), target);
+    return target;
+  }
+
+  public List<EnterpriseCertificationEntity> listCertificationsForAdmin(String status, String keyword) {
+    return listAllCertifications(status, keyword, 1, 500);
+  }
+
+  public EnterpriseCertificationEntity getCertificationByIdForAdmin(String certificationId) {
+    return getCertificationById(certificationId);
+  }
+
+  public EnterpriseCertificationEntity reviewCertificationForAdmin(
+      String certificationId, String action, String reviewRemark, String reviewer) {
+    return reviewCertification(certificationId, action, reviewRemark, reviewer);
+  }
+
   public Optional<AuthUserEntity> findUserByToken(String token) {
     return findByToken(token);
   }

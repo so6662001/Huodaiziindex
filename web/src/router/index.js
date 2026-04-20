@@ -40,6 +40,7 @@ import A05ReconcileMonitorPage from '../pages/A05ReconcileMonitorPage.vue'
 import A06DispatchStrategyConfigPage from '../pages/A06DispatchStrategyConfigPage.vue'
 import A07PlanPricingManagePage from '../pages/A07PlanPricingManagePage.vue'
 import A08RiskAlertCenterPage from '../pages/A08RiskAlertCenterPage.vue'
+import Admn01MerchantCertificationReviewPage from '../pages/Admn01MerchantCertificationReviewPage.vue'
 import N01LoginRegisterPage from '../pages/N01LoginRegisterPage.vue'
 import N02IdentitySelectPage from '../pages/N02IdentitySelectPage.vue'
 import N03EnterpriseCertificationPage from '../pages/N03EnterpriseCertificationPage.vue'
@@ -298,6 +299,14 @@ const routes = [
     component: A08RiskAlertCenterPage,
     meta: {
       title: 'A08风险预警中心_管理端全链路风险处置-货袋子'
+    }
+  },
+  {
+    path: '/admin/merchant-cert-review/admn01',
+    name: 'admn01MerchantCertificationReview',
+    component: Admn01MerchantCertificationReviewPage,
+    meta: {
+      title: 'ADM-N01商家认证审核台_管理端企业认证审核协同-货袋子'
     }
   },
   {
