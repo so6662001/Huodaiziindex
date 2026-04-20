@@ -18,6 +18,10 @@ import com.huodaizi.backend.dto.auth.N06OrderDetailResponse;
 import com.huodaizi.backend.dto.auth.N06OrderListResponse;
 import com.huodaizi.backend.dto.auth.N07TradeTermsConfirmRequest;
 import com.huodaizi.backend.dto.auth.N07TradeTermsDetailResponse;
+import com.huodaizi.backend.dto.auth.N08AfterSaleDisputeCreateRequest;
+import com.huodaizi.backend.dto.auth.N08AfterSaleDisputeDetailResponse;
+import com.huodaizi.backend.dto.auth.N08AfterSaleDisputeListResponse;
+import com.huodaizi.backend.dto.auth.N08AfterSaleDisputeStatusUpdateRequest;
 import com.huodaizi.backend.service.auth.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -145,6 +149,38 @@ public class AuthController {
       @PathVariable("orderId") String orderId,
       @Valid @RequestBody N07TradeTermsConfirmRequest request) {
     return ApiResponse.success(service.confirmTradeTerms(token, orderId, request));
+  }
+
+  @GetMapping("/after-sales/disputes")
+  public ApiResponse<N08AfterSaleDisputeListResponse> afterSaleDisputeList(
+      @RequestHeader(name = AUTH_HEADER, required = false) String token,
+      @RequestParam(name = "status", required = false) String status,
+      @RequestParam(name = "keyword", required = false) String keyword,
+      @RequestParam(name = "pageNo", required = false, defaultValue = "1") int pageNo,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "10") int pageSize) {
+    return ApiResponse.success(service.afterSaleDisputeList(token, status, keyword, pageNo, pageSize));
+  }
+
+  @GetMapping("/after-sales/disputes/{disputeId}")
+  public ApiResponse<N08AfterSaleDisputeDetailResponse> afterSaleDisputeDetail(
+      @RequestHeader(name = AUTH_HEADER, required = false) String token,
+      @PathVariable("disputeId") String disputeId) {
+    return ApiResponse.success(service.afterSaleDisputeDetail(token, disputeId));
+  }
+
+  @PostMapping("/after-sales/disputes")
+  public ApiResponse<N08AfterSaleDisputeDetailResponse> createAfterSaleDispute(
+      @RequestHeader(name = AUTH_HEADER, required = false) String token,
+      @Valid @RequestBody N08AfterSaleDisputeCreateRequest request) {
+    return ApiResponse.success(service.createAfterSaleDispute(token, request));
+  }
+
+  @PostMapping("/after-sales/disputes/{disputeId}/status")
+  public ApiResponse<N08AfterSaleDisputeDetailResponse> afterSaleDisputeStatus(
+      @RequestHeader(name = AUTH_HEADER, required = false) String token,
+      @PathVariable("disputeId") String disputeId,
+      @Valid @RequestBody N08AfterSaleDisputeStatusUpdateRequest request) {
+    return ApiResponse.success(service.updateAfterSaleDisputeStatus(token, disputeId, request));
   }
 
   @PostMapping("/logout")

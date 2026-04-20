@@ -129,6 +129,10 @@ function goNegotiation() {
   router.push('/account/negotiation-session')
 }
 
+function goAfterSale() {
+  router.push('/account/after-sale-dispute')
+}
+
 function goHome() {
   router.push('/')
 }
@@ -146,6 +150,7 @@ onMounted(() => {
       <div class="hero-actions">
         <button class="btn" @click="goOrderDetail">返回订单详情</button>
         <button class="btn" @click="goNegotiation">返回议价会话</button>
+        <button class="btn" @click="goAfterSale">售后/争议发起页</button>
         <button class="btn" @click="goHome">返回首页</button>
       </div>
     </section>

@@ -104,6 +104,10 @@ function goTradeTermsConfirm() {
   router.push('/account/trade-terms-confirm')
 }
 
+function goAfterSaleDispute() {
+  router.push('/account/after-sale-dispute')
+}
+
 function goTarget(identityCode) {
   if (identityCode === 'BUYER') {
     router.push('/inquiry/create')
@@ -212,6 +216,14 @@ onMounted(() => {
               @click="goTradeTermsConfirm"
             >
               交易条款确认页
+            </button>
+            <button
+              v-if="identity.identityCode === 'BUYER'"
+              class="btn"
+              :disabled="switching"
+              @click="goAfterSaleDispute"
+            >
+              售后/争议发起页
             </button>
             <button class="btn" :disabled="switching" @click="goTarget(identity.identityCode)">进入工作台</button>
           </div>

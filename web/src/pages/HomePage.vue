@@ -205,6 +205,10 @@ function goN07TradeTermsPage() {
   router.push('/account/trade-terms-confirm')
 }
 
+function goN08AfterSaleDisputePage() {
+  router.push('/account/after-sale-dispute')
+}
+
 function onSearch() {
   if (!keyword.value.trim()) {
     return
@@ -408,6 +412,7 @@ function onSearch() {
         <button class="btn" @click="goN05NegotiationSessionPage">PC-N05议价会话页</button>
         <button class="btn" @click="goN06OrderDetailPage">PC-N06订单详情页</button>
         <button class="btn" @click="goN07TradeTermsPage">PC-N07交易条款确认页</button>
+        <button class="btn" @click="goN08AfterSaleDisputePage">PC-N08售后/争议发起页</button>
         <button class="btn" @click="goSubscriptionPage">套餐与订阅</button>
         <button class="btn" @click="goBillingPage">计费与账单</button>
         <button class="btn primary" @click="goInquiry">立即体验AI询价</button>

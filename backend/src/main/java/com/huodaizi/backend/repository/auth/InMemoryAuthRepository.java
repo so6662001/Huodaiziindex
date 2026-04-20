@@ -27,6 +27,7 @@ public class InMemoryAuthRepository {
       new ConcurrentHashMap<>();
   private final ConcurrentMap<String, N06OrderEntity> orderStore = new ConcurrentHashMap<>();
   private final ConcurrentMap<String, N07TradeTermsEntity> tradeTermsStore = new ConcurrentHashMap<>();
+  private final ConcurrentMap<String, N08AfterSaleDisputeEntity> afterSaleStore = new ConcurrentHashMap<>();
 
   public InMemoryAuthRepository() {
     seed();
@@ -364,6 +365,104 @@ public class InMemoryAuthRepository {
     return entity;
   }
 
+  public List<N08AfterSaleDisputeEntity> listAfterSaleDisputes(String token, N08AfterSaleQuery query) {
+    SessionEntity session = requireSession(token);
+    AuthUserEntity user = userStore.get(session.getAccount());
+    if (user == null) {
+      throw new BaseException(ErrorCode.UNAUTHORIZED.getCode(), "登录态无效");
+    }
+    String statusFilter = query == null ? "" : defaultText(query.status(), "");
+    String keyword = query == null ? "" : defaultText(query.keyword(), "");
+    return afterSaleStore.values().stream()
+        .filter(item -> user.getUserId().equals(item.getUserId()))
+        .filter(item -> statusFilter.isBlank() || statusFilter.equalsIgnoreCase(item.getStatus()))
+        .filter(
+            item ->
+                keyword.isBlank()
+                    || item.getDisputeId().contains(keyword)
+                    || item.getOrderNo().contains(keyword)
+                    || item.getInquiryNo().contains(keyword)
+                    || item.getIssueSummary().contains(keyword)
+                    || item.getSupplierName().contains(keyword))
+        .sorted(Comparator.comparing(N08AfterSaleDisputeEntity::getUpdatedAt).reversed())
+        .toList();
+  }
+
+  public N08AfterSaleDisputeEntity getAfterSaleDisputeDetail(String token, String disputeId) {
+    SessionEntity session = requireSession(token);
+    AuthUserEntity user = userStore.get(session.getAccount());
+    if (user == null) {
+      throw new BaseException(ErrorCode.UNAUTHORIZED.getCode(), "登录态无效");
+    }
+    N08AfterSaleDisputeEntity entity = afterSaleStore.get(defaultText(disputeId, ""));
+    if (entity == null || !user.getUserId().equals(entity.getUserId())) {
+      throw new BaseException(ErrorCode.NOT_FOUND.getCode(), "售后争议单不存在");
+    }
+    return entity;
+  }
+
+  public N08AfterSaleDisputeEntity createAfterSaleDispute(
+      String token,
+      String orderId,
+      String issueType,
+      String issueSummary,
+      String issueDescription,
+      String expectedResolution,
+      String contactName,
+      String contactPhone,
+      String evidenceFiles,
+      String operator) {
+    N06OrderEntity order = getOrderDetail(token, orderId);
+    String normalizedIssueType = defaultText(issueType, "").trim().toUpperCase(Locale.ROOT);
+    if (!normalizedIssueType.matches("QUALITY|DELIVERY_DELAY|INVOICE|PAYMENT|OTHER")) {
+      throw new BaseException(
+          ErrorCode.BAD_REQUEST.getCode(), "issueType 仅支持 QUALITY/DELIVERY_DELAY/INVOICE/PAYMENT/OTHER");
+    }
+    String normalizedPhone = defaultText(contactPhone, "").replaceAll("\\D", "");
+    if (!normalizedPhone.matches("^1\\d{10}$")) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "contactPhone 必须为11位手机号");
+    }
+    LocalDateTime now = LocalDateTime.now();
+    String disputeId = "AS" + UUID.randomUUID().toString().replace("-", "").substring(0, 10).toUpperCase(Locale.ROOT);
+    N08AfterSaleDisputeEntity entity =
+        new N08AfterSaleDisputeEntity(
+            disputeId,
+            order.getUserId(),
+            order.getOrderId(),
+            order.getOrderNo(),
+            order.getInquiryNo(),
+            order.getBuyerCompany(),
+            order.getSupplierName(),
+            normalizedIssueType,
+            issueTypeText(normalizedIssueType),
+            defaultText(issueSummary, ""),
+            defaultText(issueDescription, ""),
+            defaultText(expectedResolution, ""),
+            defaultText(contactName, ""),
+            maskPhone(normalizedPhone),
+            defaultText(evidenceFiles, ""),
+            "SUBMITTED",
+            "已提交",
+            "争议已提交，待平台处理",
+            now,
+            now);
+    afterSaleStore.put(entity.getDisputeId(), entity);
+    return entity;
+  }
+
+  public N08AfterSaleDisputeEntity updateAfterSaleDisputeStatus(
+      String token, String disputeId, String status, String operator, String remark) {
+    N08AfterSaleDisputeEntity entity = getAfterSaleDisputeDetail(token, disputeId);
+    String normalized = defaultText(status, "").trim().toUpperCase(Locale.ROOT);
+    if (!normalized.matches("SUBMITTED|PROCESSING|RESOLVED|CLOSED")) {
+      throw new BaseException(
+          ErrorCode.BAD_REQUEST.getCode(), "status 仅支持 SUBMITTED/PROCESSING/RESOLVED/CLOSED");
+    }
+    String normalizedRemark = defaultText(remark, "");
+    entity.updateStatus(normalized, disputeStatusText(normalized), normalizedRemark, LocalDateTime.now());
+    return entity;
+  }
+
   public void logout(String token) {
     sessionStore.remove(defaultText(token, ""));
   }
@@ -441,6 +540,7 @@ public class InMemoryAuthRepository {
     seedNegotiation(seed);
     seedOrders(seed);
     seedTradeTerms(seed);
+    seedAfterSaleDisputes(seed);
   }
 
   private void seedNegotiation(AuthUserEntity user) {
@@ -778,6 +878,77 @@ public class InMemoryAuthRepository {
             now.minusDays(2),
             now.minusDays(4));
     tradeTermsStore.put(second.getOrderId(), second);
+  }
+
+  private void seedAfterSaleDisputes(AuthUserEntity user) {
+    LocalDateTime now = LocalDateTime.now();
+    N08AfterSaleDisputeEntity first =
+        new N08AfterSaleDisputeEntity(
+            "AS00000001",
+            user.getUserId(),
+            "OD0001",
+            "OD-20260418-0001",
+            "INQ-20260419-3301",
+            "演示钢贸有限公司",
+            "唐山弘达钢贸",
+            "DELIVERY_DELAY",
+            "交付延迟",
+            "提货窗口延迟导致无法按计划发车",
+            "原定今日提货，仓库反馈需顺延1天，影响下游工地排产。",
+            "希望优先释放明日早班窗口并减免部分滞车费用。",
+            "王经理",
+            "138****8000",
+            "https://cdn.huodaizi.com/dispute/as-0001-evidence.png",
+            "PROCESSING",
+            "处理中",
+            "平台已联系仓库协调排期",
+            now.minusHours(10),
+            now.minusHours(2));
+    afterSaleStore.put(first.getDisputeId(), first);
+
+    N08AfterSaleDisputeEntity second =
+        new N08AfterSaleDisputeEntity(
+            "AS00000002",
+            user.getUserId(),
+            "OD0002",
+            "OD-20260416-0008",
+            "INQ-20260418-2210",
+            "演示钢贸有限公司",
+            "无锡铭泰供应链",
+            "QUALITY",
+            "质量异议",
+            "部分卷板厚度偏差超出约定范围",
+            "抽检发现2卷板厚度偏差超0.6%，超过合同约定±0.5%。",
+            "申请补差并由第三方复检确认。",
+            "李主管",
+            "138****8000",
+            "https://cdn.huodaizi.com/dispute/as-0002-report.pdf",
+            "RESOLVED",
+            "已解决",
+            "双方确认补差方案并已执行",
+            now.minusDays(2),
+            now.minusDays(1));
+    afterSaleStore.put(second.getDisputeId(), second);
+  }
+
+  private String issueTypeText(String type) {
+    return switch (type) {
+      case "QUALITY" -> "质量异议";
+      case "DELIVERY_DELAY" -> "交付延迟";
+      case "INVOICE" -> "发票问题";
+      case "PAYMENT" -> "结算问题";
+      default -> "其他问题";
+    };
+  }
+
+  private String disputeStatusText(String status) {
+    return switch (status) {
+      case "SUBMITTED" -> "已提交";
+      case "PROCESSING" -> "处理中";
+      case "RESOLVED" -> "已解决";
+      case "CLOSED" -> "已关闭";
+      default -> "处理中";
+    };
   }
 
   public static final class SessionEntity {

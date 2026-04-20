@@ -186,6 +186,10 @@ function goTradeTerms() {
   router.push('/account/trade-terms-confirm')
 }
 
+function goAfterSaleDispute() {
+  router.push('/account/after-sale-dispute')
+}
+
 function goIdentity() {
   router.push('/account/identity-select')
 }
@@ -208,6 +212,7 @@ onMounted(() => {
         <button class="btn" @click="goOnboarding">返回入驻进度</button>
         <button class="btn" @click="goOrderDetail">订单详情页</button>
         <button class="btn" @click="goTradeTerms">交易条款确认页</button>
+        <button class="btn" @click="goAfterSaleDispute">售后争议发起页</button>
         <button class="btn" @click="goIdentity">返回身份选择</button>
         <button class="btn" @click="goHome">返回首页</button>
       </div>

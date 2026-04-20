@@ -27,6 +27,11 @@ import com.huodaizi.backend.dto.auth.N07TradeTermAttachmentDTO;
 import com.huodaizi.backend.dto.auth.N07TradeTermClauseDTO;
 import com.huodaizi.backend.dto.auth.N07TradeTermsConfirmRequest;
 import com.huodaizi.backend.dto.auth.N07TradeTermsDetailResponse;
+import com.huodaizi.backend.dto.auth.N08AfterSaleDisputeCreateRequest;
+import com.huodaizi.backend.dto.auth.N08AfterSaleDisputeDetailResponse;
+import com.huodaizi.backend.dto.auth.N08AfterSaleDisputeListItemDTO;
+import com.huodaizi.backend.dto.auth.N08AfterSaleDisputeListResponse;
+import com.huodaizi.backend.dto.auth.N08AfterSaleDisputeStatusUpdateRequest;
 import com.huodaizi.backend.repository.auth.AuthUserEntity;
 import com.huodaizi.backend.repository.auth.EnterpriseCertificationDraft;
 import com.huodaizi.backend.repository.auth.EnterpriseCertificationEntity;
@@ -39,6 +44,8 @@ import com.huodaizi.backend.repository.auth.N05NegotiationSessionEntity;
 import com.huodaizi.backend.repository.auth.N06OrderEntity;
 import com.huodaizi.backend.repository.auth.N06OrderQuery;
 import com.huodaizi.backend.repository.auth.N07TradeTermsEntity;
+import com.huodaizi.backend.repository.auth.N08AfterSaleDisputeEntity;
+import com.huodaizi.backend.repository.auth.N08AfterSaleQuery;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -448,6 +455,85 @@ public class AuthService {
     return toTradeTermsDetail(updated);
   }
 
+  public N08AfterSaleDisputeListResponse afterSaleDisputeList(
+      String token, String status, String keyword, int pageNo, int pageSize) {
+    int safePageNo = Math.max(1, pageNo);
+    int safePageSize = Math.min(Math.max(1, pageSize), 50);
+    N08AfterSaleQuery query = new N08AfterSaleQuery(status, keyword, safePageNo, safePageSize);
+    List<N08AfterSaleDisputeEntity> all = repository.listAfterSaleDisputes(token, query);
+    int from = Math.min((safePageNo - 1) * safePageSize, all.size());
+    int to = Math.min(from + safePageSize, all.size());
+    List<N08AfterSaleDisputeEntity> paged = all.subList(from, to);
+    List<N08AfterSaleDisputeListItemDTO> records =
+        paged.stream()
+            .map(
+                item ->
+                    new N08AfterSaleDisputeListItemDTO(
+                        item.getDisputeId(),
+                        item.getOrderId(),
+                        item.getOrderNo(),
+                        item.getInquiryNo(),
+                        item.getSupplierName(),
+                        item.getIssueType(),
+                        item.getIssueTypeText(),
+                        item.getIssueSummary(),
+                        item.getStatus(),
+                        item.getStatusText(),
+                        toText(item.getCreatedAt()),
+                        toText(item.getUpdatedAt())))
+            .toList();
+    return new N08AfterSaleDisputeListResponse(safePageNo, safePageSize, all.size(), records);
+  }
+
+  public N08AfterSaleDisputeDetailResponse afterSaleDisputeDetail(String token, String disputeId) {
+    N08AfterSaleDisputeEntity item = repository.getAfterSaleDisputeDetail(token, disputeId);
+    return new N08AfterSaleDisputeDetailResponse(
+        item.getDisputeId(),
+        item.getOrderId(),
+        item.getOrderNo(),
+        item.getInquiryNo(),
+        item.getBuyerCompany(),
+        item.getSupplierName(),
+        item.getIssueType(),
+        item.getIssueTypeText(),
+        item.getIssueSummary(),
+        item.getIssueDescription(),
+        item.getExpectedResolution(),
+        item.getContactName(),
+        item.getContactPhoneMasked(),
+        item.getEvidenceFiles(),
+        item.getStatus(),
+        item.getStatusText(),
+        item.getLatestRemark(),
+        toText(item.getCreatedAt()),
+        toText(item.getUpdatedAt()));
+  }
+
+  public N08AfterSaleDisputeDetailResponse createAfterSaleDispute(
+      String token, N08AfterSaleDisputeCreateRequest request) {
+    N08AfterSaleDisputeEntity created =
+        repository.createAfterSaleDispute(
+            token,
+            safeText(request.orderId()),
+            safeText(request.issueType()),
+            safeText(request.issueSummary()),
+            safeText(request.issueDescription()),
+            safeText(request.expectedResolution()),
+            safeText(request.contactName()),
+            safeText(request.contactPhone()),
+            safeText(request.evidenceFiles()),
+            safeText(request.operator()));
+    return afterSaleDisputeDetail(token, created.getDisputeId());
+  }
+
+  public N08AfterSaleDisputeDetailResponse updateAfterSaleDisputeStatus(
+      String token, String disputeId, N08AfterSaleDisputeStatusUpdateRequest request) {
+    String targetStatus = mapAfterSaleActionToStatus(request.action());
+    repository.updateAfterSaleDisputeStatus(
+        token, disputeId, targetStatus, safeText(request.operator()), safeText(request.remark()));
+    return afterSaleDisputeDetail(token, disputeId);
+  }
+
   private N07TradeTermsDetailResponse toTradeTermsDetail(N07TradeTermsEntity entity) {
     List<N07TradeTermClauseDTO> clauses =
         entity.getClauses().stream()
@@ -739,6 +825,16 @@ public class AuthService {
       case "PAID" -> "已回款";
       case "DISPUTED" -> "异常";
       default -> "处理中";
+    };
+  }
+
+  private String mapAfterSaleActionToStatus(String action) {
+    return switch (safeText(action).toUpperCase()) {
+      case "MARK_PROCESSING", "PROCESSING" -> "PROCESSING";
+      case "MARK_RESOLVED", "RESOLVED" -> "RESOLVED";
+      case "MARK_CLOSED", "CLOSED" -> "CLOSED";
+      case "REOPEN", "SUBMITTED" -> "SUBMITTED";
+      default -> throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "action 不支持");
     };
   }
 }
