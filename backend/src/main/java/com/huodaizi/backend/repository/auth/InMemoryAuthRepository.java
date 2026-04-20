@@ -29,6 +29,9 @@ public class InMemoryAuthRepository {
   private final ConcurrentMap<String, N07TradeTermsEntity> tradeTermsStore = new ConcurrentHashMap<>();
   private final ConcurrentMap<String, N08AfterSaleDisputeEntity> afterSaleStore = new ConcurrentHashMap<>();
   private final ConcurrentMap<String, N10CashierOrderEntity> cashierStore = new ConcurrentHashMap<>();
+  private final ConcurrentMap<String, N12InvoiceTitleEntity> invoiceTitleStore = new ConcurrentHashMap<>();
+  private final ConcurrentMap<String, N12InvoiceApplicationEntity> invoiceApplicationStore =
+      new ConcurrentHashMap<>();
 
   public InMemoryAuthRepository() {
     seed();
@@ -534,6 +537,235 @@ public class InMemoryAuthRepository {
     return entity;
   }
 
+  public List<N12InvoiceTitleEntity> listInvoiceTitles(String token, String status) {
+    SessionEntity session = requireSession(token);
+    AuthUserEntity user = userStore.get(session.getAccount());
+    if (user == null) {
+      throw new BaseException(ErrorCode.UNAUTHORIZED.getCode(), "登录态无效");
+    }
+    String statusFilter = defaultText(status, "");
+    return invoiceTitleStore.values().stream()
+        .filter(item -> user.getUserId().equals(item.getUserId()))
+        .filter(item -> statusFilter.isBlank() || statusFilter.equalsIgnoreCase(item.getStatus()))
+        .sorted(Comparator.comparing(N12InvoiceTitleEntity::getUpdatedAt).reversed())
+        .toList();
+  }
+
+  public N12InvoiceTitleEntity getInvoiceTitle(String token, String titleId) {
+    SessionEntity session = requireSession(token);
+    AuthUserEntity user = userStore.get(session.getAccount());
+    if (user == null) {
+      throw new BaseException(ErrorCode.UNAUTHORIZED.getCode(), "登录态无效");
+    }
+    N12InvoiceTitleEntity entity = invoiceTitleStore.get(defaultText(titleId, ""));
+    if (entity == null || !user.getUserId().equals(entity.getUserId())) {
+      throw new BaseException(ErrorCode.NOT_FOUND.getCode(), "发票抬头不存在");
+    }
+    return entity;
+  }
+
+  public N12InvoiceTitleEntity saveInvoiceTitle(
+      String token,
+      String titleId,
+      String titleName,
+      String taxNo,
+      String registerAddress,
+      String registerPhone,
+      String bankName,
+      String bankAccountNo,
+      boolean defaultTitle,
+      String operator) {
+    SessionEntity session = requireSession(token);
+    AuthUserEntity user = userStore.get(session.getAccount());
+    if (user == null) {
+      throw new BaseException(ErrorCode.UNAUTHORIZED.getCode(), "登录态无效");
+    }
+
+    String normalizedName = defaultText(titleName, "");
+    if (normalizedName.isBlank()) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "titleName 不能为空");
+    }
+    String normalizedTaxNo = defaultText(taxNo, "").trim().toUpperCase(Locale.ROOT);
+    if (normalizedTaxNo.isBlank()) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "taxNo 不能为空");
+    }
+    String normalizedAddress = defaultText(registerAddress, "");
+    if (normalizedAddress.isBlank()) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "address 不能为空");
+    }
+    String normalizedPhone = defaultText(registerPhone, "").replaceAll("\\D", "");
+    if (!normalizedPhone.matches("^1\\d{10}$")) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "phone 必须为11位手机号");
+    }
+
+    N12InvoiceTitleEntity current =
+        titleId == null || titleId.isBlank() ? null : invoiceTitleStore.get(titleId.trim());
+    if (current != null && !user.getUserId().equals(current.getUserId())) {
+      throw new BaseException(ErrorCode.NOT_FOUND.getCode(), "发票抬头不存在");
+    }
+
+    LocalDateTime now = LocalDateTime.now();
+    String finalId =
+        current == null
+            ? "IT" + UUID.randomUUID().toString().replace("-", "").substring(0, 10).toUpperCase(Locale.ROOT)
+            : current.getTitleId();
+    boolean finalDefault = defaultTitle || (current != null && current.isDefaultTitle());
+    String status = current == null ? "ACTIVE" : current.getStatus();
+
+    N12InvoiceTitleEntity saved =
+        new N12InvoiceTitleEntity(
+            finalId,
+            user.getUserId(),
+            "COMPANY",
+            "企业抬头",
+            normalizedName,
+            normalizedTaxNo,
+            defaultText(bankName, ""),
+            defaultText(bankAccountNo, ""),
+            normalizedAddress,
+            normalizedPhone,
+            current == null ? "" : current.getEmail(),
+            finalDefault,
+            status,
+            titleStatusText(status),
+            defaultText(operator, "n12-save-title"),
+            current == null ? now : current.getCreatedAt(),
+            now);
+    invoiceTitleStore.put(saved.getTitleId(), saved);
+
+    if (finalDefault) {
+      invoiceTitleStore.values().stream()
+          .filter(item -> user.getUserId().equals(item.getUserId()))
+          .filter(item -> !item.getTitleId().equals(saved.getTitleId()))
+          .forEach(item -> item.setDefaultTitle(false, now));
+    }
+
+    boolean hasDefault =
+        invoiceTitleStore.values().stream()
+            .anyMatch(item -> user.getUserId().equals(item.getUserId()) && item.isDefaultTitle());
+    if (!hasDefault) {
+      saved.setDefaultTitle(true, now);
+    }
+    return saved;
+  }
+
+  public N12InvoiceTitleEntity setInvoiceTitleDefault(String token, String titleId, String operator) {
+    N12InvoiceTitleEntity target = getInvoiceTitle(token, titleId);
+    if (!"ACTIVE".equalsIgnoreCase(target.getStatus())) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "仅启用中的抬头可设为默认");
+    }
+    SessionEntity session = requireSession(token);
+    AuthUserEntity user = userStore.get(session.getAccount());
+    LocalDateTime now = LocalDateTime.now();
+    invoiceTitleStore.values().stream()
+        .filter(item -> user.getUserId().equals(item.getUserId()))
+        .forEach(item -> item.setDefaultTitle(item.getTitleId().equals(target.getTitleId()), now));
+    target.setStatus(target.getStatus(), target.getStatusText(), defaultText(operator, "n12-set-default"), now);
+    return target;
+  }
+
+  public N12InvoiceTitleEntity updateInvoiceTitleStatus(
+      String token, String titleId, String status, String operator) {
+    N12InvoiceTitleEntity target = getInvoiceTitle(token, titleId);
+    String normalizedStatus = defaultText(status, "").trim().toUpperCase(Locale.ROOT);
+    if (!normalizedStatus.matches("ACTIVE|INACTIVE")) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "status 仅支持 ACTIVE/INACTIVE");
+    }
+    LocalDateTime now = LocalDateTime.now();
+    target.setStatus(
+        normalizedStatus, titleStatusText(normalizedStatus), defaultText(operator, "n12-update-status"), now);
+    if ("INACTIVE".equals(normalizedStatus)) {
+      target.setDefaultTitle(false, now);
+      SessionEntity session = requireSession(token);
+      AuthUserEntity user = userStore.get(session.getAccount());
+      invoiceTitleStore.values().stream()
+          .filter(item -> user.getUserId().equals(item.getUserId()))
+          .filter(item -> "ACTIVE".equalsIgnoreCase(item.getStatus()))
+          .findFirst()
+          .ifPresent(item -> item.setDefaultTitle(true, now));
+    }
+    return target;
+  }
+
+  public List<N12InvoiceApplicationEntity> listInvoiceApplications(
+      String token, N12InvoiceApplicationQuery query) {
+    SessionEntity session = requireSession(token);
+    AuthUserEntity user = userStore.get(session.getAccount());
+    if (user == null) {
+      throw new BaseException(ErrorCode.UNAUTHORIZED.getCode(), "登录态无效");
+    }
+    String statusFilter = query == null ? "" : defaultText(query.status(), "");
+    String keyword = query == null ? "" : defaultText(query.keyword(), "");
+    return invoiceApplicationStore.values().stream()
+        .filter(item -> user.getUserId().equals(item.getUserId()))
+        .filter(item -> statusFilter.isBlank() || statusFilter.equalsIgnoreCase(item.getStatus()))
+        .filter(
+            item ->
+                keyword.isBlank()
+                    || item.getApplicationId().contains(keyword)
+                    || item.getOrderNo().contains(keyword)
+                    || item.getInquiryNo().contains(keyword)
+                    || item.getInvoiceTypeText().contains(keyword))
+        .sorted(Comparator.comparing(N12InvoiceApplicationEntity::getUpdatedAt).reversed())
+        .toList();
+  }
+
+  public N12InvoiceApplicationEntity getInvoiceApplicationDetail(String token, String applicationId) {
+    SessionEntity session = requireSession(token);
+    AuthUserEntity user = userStore.get(session.getAccount());
+    if (user == null) {
+      throw new BaseException(ErrorCode.UNAUTHORIZED.getCode(), "登录态无效");
+    }
+    N12InvoiceApplicationEntity entity = invoiceApplicationStore.get(defaultText(applicationId, ""));
+    if (entity == null || !user.getUserId().equals(entity.getUserId())) {
+      throw new BaseException(ErrorCode.NOT_FOUND.getCode(), "发票申请不存在");
+    }
+    return entity;
+  }
+
+  public N12InvoiceApplicationEntity createInvoiceApplication(
+      String token, String orderId, String titleId, String invoiceContent, String remark, String operator) {
+    N06OrderEntity order = getOrderDetail(token, orderId);
+    N12InvoiceTitleEntity title = getInvoiceTitle(token, titleId);
+    if (!"ACTIVE".equalsIgnoreCase(title.getStatus())) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "发票抬头未启用");
+    }
+
+    SessionEntity session = requireSession(token);
+    AuthUserEntity user = userStore.get(session.getAccount());
+    LocalDateTime now = LocalDateTime.now();
+    String applicationId =
+        "IA" + UUID.randomUUID().toString().replace("-", "").substring(0, 10).toUpperCase(Locale.ROOT);
+    String normalizedRemark = defaultText(remark, "");
+    String normalizedContent = defaultText(invoiceContent, "货款");
+    String latestRemark =
+        normalizedRemark.isBlank()
+            ? "发票申请已提交，开票内容：" + normalizedContent
+            : normalizedRemark;
+    N12InvoiceApplicationEntity created =
+        new N12InvoiceApplicationEntity(
+            applicationId,
+            user.getUserId(),
+            order.getOrderId(),
+            order.getOrderNo(),
+            order.getInquiryNo(),
+            order.getSupplierName(),
+            order.getDealTotalAmount(),
+            "13%",
+            "VAT_SPECIAL",
+            invoiceTypeText("VAT_SPECIAL"),
+            title.getTitleId(),
+            "SUBMITTED",
+            invoiceApplyStatusText("SUBMITTED"),
+            latestRemark,
+            title.getEmail(),
+            title.getRegisteredPhone(),
+            now,
+            now);
+    invoiceApplicationStore.put(created.getApplicationId(), created);
+    return created;
+  }
+
   public void logout(String token) {
     sessionStore.remove(defaultText(token, ""));
   }
@@ -613,6 +845,8 @@ public class InMemoryAuthRepository {
     seedTradeTerms(seed);
     seedAfterSaleDisputes(seed);
     seedCashierOrders(seed);
+    seedInvoiceTitles(seed);
+    seedInvoiceApplications(seed);
   }
 
   private void seedNegotiation(AuthUserEntity user) {
@@ -1077,6 +1311,76 @@ public class InMemoryAuthRepository {
     cashierStore.put(second.getCashierId(), second);
   }
 
+  private void seedInvoiceTitles(AuthUserEntity user) {
+    LocalDateTime now = LocalDateTime.now();
+    N12InvoiceTitleEntity company =
+        new N12InvoiceTitleEntity(
+            "IT00000001",
+            user.getUserId(),
+            "COMPANY",
+            "企业抬头",
+            "演示钢贸有限公司",
+            "91350211MA2Y9X8E7L",
+            "招商银行厦门分行",
+            "123456789012345678",
+            "厦门市思明区软件园二期观日路58号",
+            "13800138000",
+            "finance@huodaizi.com",
+            true,
+            "ACTIVE",
+            "启用",
+            "n12-seed",
+            now.minusDays(10),
+            now.minusDays(1));
+    invoiceTitleStore.put(company.getTitleId(), company);
+
+    N12InvoiceTitleEntity personal =
+        new N12InvoiceTitleEntity(
+            "IT00000002",
+            user.getUserId(),
+            "COMPANY",
+            "企业抬头",
+            "演示钢贸有限公司分部",
+            "91350211MA2Y9X8E8M",
+            "中国银行厦门分行",
+            "6225888888888888",
+            "厦门市湖里区金山街道",
+            "13900139000",
+            "buyer@demo.com",
+            false,
+            "ACTIVE",
+            "启用",
+            "n12-seed",
+            now.minusDays(8),
+            now.minusDays(2));
+    invoiceTitleStore.put(personal.getTitleId(), personal);
+  }
+
+  private void seedInvoiceApplications(AuthUserEntity user) {
+    LocalDateTime now = LocalDateTime.now();
+    N12InvoiceApplicationEntity first =
+        new N12InvoiceApplicationEntity(
+            "IA00000001",
+            user.getUserId(),
+            "OD0002",
+            "OD-20260416-0008",
+            "INQ-20260418-2210",
+            "无锡铭泰供应链",
+            "1104000",
+            "13%",
+            "VAT_SPECIAL",
+            "增值税专票",
+            "IT00000001",
+            "DELIVERED",
+            invoiceApplyStatusText("DELIVERED"),
+            "发票已开具并寄出（顺丰SF12345678）",
+            "finance@huodaizi.com",
+            "13800138000",
+            now.minusDays(3),
+            now.minusDays(1));
+    invoiceApplicationStore.put(first.getApplicationId(), first);
+  }
+
   private String issueTypeText(String type) {
     return switch (type) {
       case "QUALITY" -> "质量异议";
@@ -1104,6 +1408,33 @@ public class InMemoryAuthRepository {
       case "WECHAT" -> "微信支付";
       case "UNIONPAY" -> "银联";
       default -> "其他";
+    };
+  }
+
+  private String invoiceTypeText(String invoiceType) {
+    return switch (invoiceType) {
+      case "VAT_SPECIAL" -> "增值税专票";
+      case "VAT_NORMAL" -> "增值税普票";
+      default -> "其他";
+    };
+  }
+
+  private String invoiceApplyStatusText(String status) {
+    return switch (defaultText(status, "").toUpperCase(Locale.ROOT)) {
+      case "SUBMITTED" -> "已提交";
+      case "PROCESSING" -> "开票中";
+      case "ISSUED" -> "已开票";
+      case "DELIVERED" -> "已寄出";
+      case "VOID" -> "已作废";
+      default -> "处理中";
+    };
+  }
+
+  private String titleStatusText(String status) {
+    return switch (defaultText(status, "").toUpperCase(Locale.ROOT)) {
+      case "ACTIVE" -> "启用";
+      case "INACTIVE" -> "停用";
+      default -> "未知";
     };
   }
 

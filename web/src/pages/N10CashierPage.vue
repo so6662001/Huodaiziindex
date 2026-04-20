@@ -164,6 +164,10 @@ function goPaymentResult() {
   router.push('/account/payment-result')
 }
 
+function goInvoiceManage() {
+  router.push('/account/invoice-manage')
+}
+
 function goHome() {
   router.push('/')
 }
@@ -183,6 +187,7 @@ onMounted(() => {
         <button class="btn" @click="goAfterSaleDispute">售后/争议发起页</button>
         <button class="btn" @click="goAfterSaleProgress">售后处理进度页</button>
         <button class="btn" @click="goPaymentResult">支付结果页</button>
+        <button class="btn" @click="goInvoiceManage">发票与抬头管理</button>
         <button class="btn" @click="goHome">返回首页</button>
       </div>
     </section>

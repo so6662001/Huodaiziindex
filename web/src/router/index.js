@@ -40,6 +40,7 @@ import N08AfterSaleDisputePage from '../pages/N08AfterSaleDisputePage.vue'
 import N09AfterSaleProgressPage from '../pages/N09AfterSaleProgressPage.vue'
 import N10CashierPage from '../pages/N10CashierPage.vue'
 import N11PaymentResultPage from '../pages/N11PaymentResultPage.vue'
+import N12InvoiceManagePage from '../pages/N12InvoiceManagePage.vue'
 import InquiryMerchantLeadManagePage from '../pages/InquiryMerchantLeadManagePage.vue'
 import InquiryQuoteWorkbenchPage from '../pages/InquiryQuoteWorkbenchPage.vue'
 import SiteAdLeadMinePage from '../pages/SiteAdLeadMinePage.vue'
@@ -284,6 +285,14 @@ const routes = [
     component: N11PaymentResultPage,
     meta: {
       title: 'PC-N11支付结果页_货袋子账号中心'
+    }
+  },
+  {
+    path: '/account/invoice-manage',
+    name: 'n12InvoiceManage',
+    component: N12InvoiceManagePage,
+    meta: {
+      title: 'PC-N12发票与抬头管理_货袋子账号中心'
     }
   },
   {

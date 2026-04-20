@@ -43,6 +43,15 @@ import com.huodaizi.backend.dto.auth.N10CashierPayRequest;
 import com.huodaizi.backend.dto.auth.N10CashierTimelineNodeDTO;
 import com.huodaizi.backend.dto.auth.N11PaymentResultNodeDTO;
 import com.huodaizi.backend.dto.auth.N11PaymentResultResponse;
+import com.huodaizi.backend.dto.auth.N12InvoiceApplicationCreateRequest;
+import com.huodaizi.backend.dto.auth.N12InvoiceApplicationDetailResponse;
+import com.huodaizi.backend.dto.auth.N12InvoiceApplicationListItemDTO;
+import com.huodaizi.backend.dto.auth.N12InvoiceApplicationListResponse;
+import com.huodaizi.backend.dto.auth.N12InvoiceTitleDTO;
+import com.huodaizi.backend.dto.auth.N12InvoiceTitleListResponse;
+import com.huodaizi.backend.dto.auth.N12InvoiceTitleSetDefaultRequest;
+import com.huodaizi.backend.dto.auth.N12InvoiceTitleSetStatusRequest;
+import com.huodaizi.backend.dto.auth.N12InvoiceTitleUpsertRequest;
 import com.huodaizi.backend.repository.auth.AuthUserEntity;
 import com.huodaizi.backend.repository.auth.EnterpriseCertificationDraft;
 import com.huodaizi.backend.repository.auth.EnterpriseCertificationEntity;
@@ -59,6 +68,9 @@ import com.huodaizi.backend.repository.auth.N08AfterSaleDisputeEntity;
 import com.huodaizi.backend.repository.auth.N08AfterSaleQuery;
 import com.huodaizi.backend.repository.auth.N10CashierOrderEntity;
 import com.huodaizi.backend.repository.auth.N10CashierQuery;
+import com.huodaizi.backend.repository.auth.N12InvoiceApplicationEntity;
+import com.huodaizi.backend.repository.auth.N12InvoiceApplicationQuery;
+import com.huodaizi.backend.repository.auth.N12InvoiceTitleEntity;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -757,6 +769,119 @@ public class AuthService {
         nodes);
   }
 
+  public N12InvoiceTitleListResponse invoiceTitleList(String token) {
+    List<N12InvoiceTitleDTO> records =
+        repository.listInvoiceTitles(token, "").stream().map(this::toInvoiceTitleDTO).toList();
+    return new N12InvoiceTitleListResponse(records);
+  }
+
+  public N12InvoiceTitleDTO upsertInvoiceTitle(String token, N12InvoiceTitleUpsertRequest request) {
+    N12InvoiceTitleEntity saved =
+        repository.saveInvoiceTitle(
+            token,
+            safeText(request.titleId()),
+            safeText(request.titleName()),
+            safeText(request.taxNo()),
+            safeText(request.address()),
+            safeText(request.phone()),
+            safeText(request.bankName()),
+            safeText(request.bankAccountNo()),
+            parseDefaultFlag(request.defaultTitle()),
+            safeText(request.operator()));
+    return toInvoiceTitleDTO(saved);
+  }
+
+  public N12InvoiceTitleDTO setDefaultInvoiceTitle(
+      String token, String titleId, N12InvoiceTitleSetDefaultRequest request) {
+    N12InvoiceTitleEntity updated =
+        repository.setInvoiceTitleDefault(token, titleId, safeText(request.operator()));
+    return toInvoiceTitleDTO(updated);
+  }
+
+  public N12InvoiceTitleDTO setInvoiceTitleStatus(
+      String token, String titleId, N12InvoiceTitleSetStatusRequest request) {
+    N12InvoiceTitleEntity updated =
+        repository.updateInvoiceTitleStatus(
+            token, titleId, safeText(request.status()), safeText(request.operator()));
+    return toInvoiceTitleDTO(updated);
+  }
+
+  public N12InvoiceApplicationListResponse invoiceApplicationList(
+      String token, String status, String keyword, int pageNo, int pageSize) {
+    int safePageNo = Math.max(1, pageNo);
+    int safePageSize = Math.min(Math.max(1, pageSize), 50);
+    N12InvoiceApplicationQuery query = new N12InvoiceApplicationQuery(status, keyword, safePageNo, safePageSize);
+    List<N12InvoiceApplicationEntity> all = repository.listInvoiceApplications(token, query);
+    int from = Math.min((safePageNo - 1) * safePageSize, all.size());
+    int to = Math.min(from + safePageSize, all.size());
+    List<N12InvoiceApplicationEntity> paged = all.subList(from, to);
+    List<N12InvoiceApplicationListItemDTO> records =
+        paged.stream()
+            .map(
+                item ->
+                    new N12InvoiceApplicationListItemDTO(
+                        item.getApplicationId(),
+                        item.getOrderId(),
+                        item.getOrderNo(),
+                        item.getInvoiceType(),
+                        item.getInvoiceTypeText(),
+                        item.getStatus(),
+                        item.getStatusText(),
+                        item.getAmount(),
+                        invoiceTitleName(token, item.getTitleId()),
+                        toText(item.getCreatedAt()),
+                        toText(item.getUpdatedAt())))
+            .toList();
+    return new N12InvoiceApplicationListResponse(safePageNo, safePageSize, all.size(), records);
+  }
+
+  public N12InvoiceApplicationDetailResponse invoiceApplicationDetail(String token, String applicationId) {
+    N12InvoiceApplicationEntity item = repository.getInvoiceApplicationDetail(token, applicationId);
+    N06OrderEntity order = repository.getOrderDetail(token, item.getOrderId());
+    N12InvoiceTitleEntity title = repository.getInvoiceTitle(token, item.getTitleId());
+    return new N12InvoiceApplicationDetailResponse(
+        item.getApplicationId(),
+        item.getOrderId(),
+        item.getOrderNo(),
+        order.getInquiryNo(),
+        order.getBuyerCompany(),
+        order.getSupplierName(),
+        item.getAmount(),
+        item.getInvoiceType(),
+        item.getInvoiceTypeText(),
+        item.getStatus(),
+        item.getStatusText(),
+        title.getTitleId(),
+        title.getTitleName(),
+        title.getTaxNo(),
+        title.getRegisteredAddress(),
+        maskPhoneOptional(title.getRegisteredPhone()),
+        title.getBankName(),
+        maskBankNo(title.getBankAccountNo()),
+        "收票联系人",
+        maskPhoneOptional(item.getRecipientMobile()),
+        title.getRegisteredAddress(),
+        item.getRecipientEmail(),
+        "",
+        "",
+        item.getLatestRemark(),
+        toText(item.getCreatedAt()),
+        toText(item.getUpdatedAt()));
+  }
+
+  public N12InvoiceApplicationDetailResponse createInvoiceApplication(
+      String token, N12InvoiceApplicationCreateRequest request) {
+    N12InvoiceApplicationEntity created =
+        repository.createInvoiceApplication(
+            token,
+            safeText(request.orderId()),
+            safeText(request.titleId()),
+            safeText(request.invoiceContent()),
+            safeText(request.remark()),
+            safeText(request.operator()));
+    return invoiceApplicationDetail(token, created.getApplicationId());
+  }
+
   private N07TradeTermsDetailResponse toTradeTermsDetail(N07TradeTermsEntity entity) {
     List<N07TradeTermClauseDTO> clauses =
         entity.getClauses().stream()
@@ -847,6 +972,45 @@ public class AuthService {
 
   private String safeText(String text) {
     return text == null ? "" : text.trim();
+  }
+
+  private N12InvoiceTitleDTO toInvoiceTitleDTO(N12InvoiceTitleEntity item) {
+    return new N12InvoiceTitleDTO(
+        item.getTitleId(),
+        item.getTitleType(),
+        item.getTitleTypeText(),
+        item.getTitleName(),
+        item.getTaxNo(),
+        item.getBankName(),
+        maskBankNo(item.getBankAccountNo()),
+        item.getRegisteredAddress(),
+        maskPhoneOptional(item.getRegisteredPhone()),
+        item.getEmail(),
+        item.isDefaultTitle(),
+        item.getStatus(),
+        item.getStatusText(),
+        toText(item.getUpdatedAt()));
+  }
+
+  private String invoiceTitleName(String token, String titleId) {
+    try {
+      return repository.getInvoiceTitle(token, titleId).getTitleName();
+    } catch (BaseException ignore) {
+      return "";
+    }
+  }
+
+  private boolean parseDefaultFlag(String value) {
+    String normalized = safeText(value).toUpperCase();
+    return "Y".equals(normalized) || "YES".equals(normalized) || "TRUE".equals(normalized);
+  }
+
+  private String maskPhoneOptional(String phone) {
+    String value = safeText(phone);
+    if (value.isBlank()) {
+      return "";
+    }
+    return repository.maskPhone(value);
   }
 
   private String maskIdentityNo(String idNo) {

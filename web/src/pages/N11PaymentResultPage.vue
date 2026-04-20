@@ -52,6 +52,10 @@ function goHome() {
   router.push('/')
 }
 
+function goInvoiceManage() {
+  router.push('/account/invoice-manage')
+}
+
 onMounted(() => {
   loadPaymentResult()
 })
@@ -65,6 +69,7 @@ onMounted(() => {
       <div class="hero-actions">
         <button class="btn" @click="goCashier">返回收银台</button>
         <button class="btn" @click="goOrderDetail">查看订单详情</button>
+        <button class="btn" @click="goInvoiceManage">发票与抬头管理</button>
         <button class="btn" @click="goHome">返回首页</button>
       </div>
     </section>

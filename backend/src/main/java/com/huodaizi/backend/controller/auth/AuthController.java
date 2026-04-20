@@ -28,6 +28,14 @@ import com.huodaizi.backend.dto.auth.N10CashierOrderDetailResponse;
 import com.huodaizi.backend.dto.auth.N10CashierOrderListResponse;
 import com.huodaizi.backend.dto.auth.N10CashierPayRequest;
 import com.huodaizi.backend.dto.auth.N11PaymentResultResponse;
+import com.huodaizi.backend.dto.auth.N12InvoiceApplicationCreateRequest;
+import com.huodaizi.backend.dto.auth.N12InvoiceApplicationDetailResponse;
+import com.huodaizi.backend.dto.auth.N12InvoiceApplicationListResponse;
+import com.huodaizi.backend.dto.auth.N12InvoiceTitleDTO;
+import com.huodaizi.backend.dto.auth.N12InvoiceTitleListResponse;
+import com.huodaizi.backend.dto.auth.N12InvoiceTitleSetDefaultRequest;
+import com.huodaizi.backend.dto.auth.N12InvoiceTitleSetStatusRequest;
+import com.huodaizi.backend.dto.auth.N12InvoiceTitleUpsertRequest;
 import com.huodaizi.backend.service.auth.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -236,6 +244,59 @@ public class AuthController {
       @RequestHeader(name = AUTH_HEADER, required = false) String token,
       @PathVariable("cashierOrderId") String cashierOrderId) {
     return ApiResponse.success(service.paymentResult(token, cashierOrderId));
+  }
+
+  @GetMapping("/invoices/titles")
+  public ApiResponse<N12InvoiceTitleListResponse> invoiceTitleList(
+      @RequestHeader(name = AUTH_HEADER, required = false) String token) {
+    return ApiResponse.success(service.invoiceTitleList(token));
+  }
+
+  @PostMapping("/invoices/titles")
+  public ApiResponse<N12InvoiceTitleDTO> upsertInvoiceTitle(
+      @RequestHeader(name = AUTH_HEADER, required = false) String token,
+      @Valid @RequestBody N12InvoiceTitleUpsertRequest request) {
+    return ApiResponse.success(service.upsertInvoiceTitle(token, request));
+  }
+
+  @PostMapping("/invoices/titles/{titleId}/default")
+  public ApiResponse<N12InvoiceTitleDTO> setDefaultInvoiceTitle(
+      @RequestHeader(name = AUTH_HEADER, required = false) String token,
+      @PathVariable("titleId") String titleId,
+      @Valid @RequestBody N12InvoiceTitleSetDefaultRequest request) {
+    return ApiResponse.success(service.setDefaultInvoiceTitle(token, titleId, request));
+  }
+
+  @PostMapping("/invoices/titles/{titleId}/status")
+  public ApiResponse<N12InvoiceTitleDTO> setInvoiceTitleStatus(
+      @RequestHeader(name = AUTH_HEADER, required = false) String token,
+      @PathVariable("titleId") String titleId,
+      @Valid @RequestBody N12InvoiceTitleSetStatusRequest request) {
+    return ApiResponse.success(service.setInvoiceTitleStatus(token, titleId, request));
+  }
+
+  @GetMapping("/invoices/applications")
+  public ApiResponse<N12InvoiceApplicationListResponse> invoiceApplicationList(
+      @RequestHeader(name = AUTH_HEADER, required = false) String token,
+      @RequestParam(name = "status", required = false) String status,
+      @RequestParam(name = "keyword", required = false) String keyword,
+      @RequestParam(name = "pageNo", required = false, defaultValue = "1") int pageNo,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "10") int pageSize) {
+    return ApiResponse.success(service.invoiceApplicationList(token, status, keyword, pageNo, pageSize));
+  }
+
+  @GetMapping("/invoices/applications/{applicationId}")
+  public ApiResponse<N12InvoiceApplicationDetailResponse> invoiceApplicationDetail(
+      @RequestHeader(name = AUTH_HEADER, required = false) String token,
+      @PathVariable("applicationId") String applicationId) {
+    return ApiResponse.success(service.invoiceApplicationDetail(token, applicationId));
+  }
+
+  @PostMapping("/invoices/applications")
+  public ApiResponse<N12InvoiceApplicationDetailResponse> createInvoiceApplication(
+      @RequestHeader(name = AUTH_HEADER, required = false) String token,
+      @Valid @RequestBody N12InvoiceApplicationCreateRequest request) {
+    return ApiResponse.success(service.createInvoiceApplication(token, request));
   }
 
   @PostMapping("/logout")
