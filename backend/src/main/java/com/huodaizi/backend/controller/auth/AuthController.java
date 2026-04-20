@@ -23,6 +23,9 @@ import com.huodaizi.backend.dto.auth.H5N06PickupOrderDetailResponse;
 import com.huodaizi.backend.dto.auth.H5N06PickupOrderListResponse;
 import com.huodaizi.backend.dto.auth.H5N06PickupOrderScanRequest;
 import com.huodaizi.backend.dto.auth.H5N06PickupOrderStatusUpdateRequest;
+import com.huodaizi.backend.dto.auth.H5N07ReconcileDetailResponse;
+import com.huodaizi.backend.dto.auth.H5N07ReconcileListResponse;
+import com.huodaizi.backend.dto.auth.H5N07ReconcileStatusUpdateRequest;
 import com.huodaizi.backend.dto.auth.N04OnboardingProgressResponse;
 import com.huodaizi.backend.dto.auth.N03EnterpriseCertificationDetailResponse;
 import com.huodaizi.backend.dto.auth.N03EnterpriseCertificationSubmitRequest;
@@ -261,6 +264,31 @@ public class AuthController {
       @PathVariable("pickupId") String pickupId,
       @Valid @RequestBody H5N06PickupOrderStatusUpdateRequest request) {
     return ApiResponse.success(service.h5PickupOrderStatusUpdate(token, pickupId, request));
+  }
+
+  @GetMapping("/h5/reconciles")
+  public ApiResponse<H5N07ReconcileListResponse> h5ReconcileList(
+      @RequestHeader(name = AUTH_HEADER, required = false) String token,
+      @RequestParam(name = "status", required = false) String status,
+      @RequestParam(name = "keyword", required = false) String keyword,
+      @RequestParam(name = "pageNo", required = false, defaultValue = "1") int pageNo,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "10") int pageSize) {
+    return ApiResponse.success(service.h5ReconcileList(token, status, keyword, pageNo, pageSize));
+  }
+
+  @GetMapping("/h5/reconciles/{reconcileId}")
+  public ApiResponse<H5N07ReconcileDetailResponse> h5ReconcileDetail(
+      @RequestHeader(name = AUTH_HEADER, required = false) String token,
+      @PathVariable("reconcileId") String reconcileId) {
+    return ApiResponse.success(service.h5ReconcileDetail(token, reconcileId));
+  }
+
+  @PostMapping("/h5/reconciles/{reconcileId}/status")
+  public ApiResponse<H5N07ReconcileDetailResponse> h5ReconcileStatusUpdate(
+      @RequestHeader(name = AUTH_HEADER, required = false) String token,
+      @PathVariable("reconcileId") String reconcileId,
+      @Valid @RequestBody H5N07ReconcileStatusUpdateRequest request) {
+    return ApiResponse.success(service.h5ReconcileStatusUpdate(token, reconcileId, request));
   }
 
   @GetMapping("/negotiations")

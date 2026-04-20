@@ -30,6 +30,10 @@ import com.huodaizi.backend.dto.auth.H5N06PickupOrderListItemDTO;
 import com.huodaizi.backend.dto.auth.H5N06PickupOrderListResponse;
 import com.huodaizi.backend.dto.auth.H5N06PickupOrderScanRequest;
 import com.huodaizi.backend.dto.auth.H5N06PickupOrderStatusUpdateRequest;
+import com.huodaizi.backend.dto.auth.H5N07ReconcileDetailResponse;
+import com.huodaizi.backend.dto.auth.H5N07ReconcileListItemDTO;
+import com.huodaizi.backend.dto.auth.H5N07ReconcileListResponse;
+import com.huodaizi.backend.dto.auth.H5N07ReconcileStatusUpdateRequest;
 import com.huodaizi.backend.dto.auth.N03EnterpriseCertificationDetailResponse;
 import com.huodaizi.backend.dto.auth.N03EnterpriseCertificationSubmitRequest;
 import com.huodaizi.backend.dto.auth.N04OnboardingProgressNodeDTO;
@@ -111,6 +115,7 @@ import com.huodaizi.backend.repository.auth.N14DispatchAppealQuery;
 import com.huodaizi.backend.dto.inquiry.InquiryPickupOrderStatusUpdateRequest;
 import com.huodaizi.backend.repository.inquiry.InMemoryInquiryRepository;
 import com.huodaizi.backend.repository.inquiry.InquiryPickupOrderEntity;
+import com.huodaizi.backend.repository.inquiry.InquiryReconcileOrderEntity;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -774,6 +779,90 @@ public class AuthService {
             new InquiryPickupOrderStatusUpdateRequest(
                 user.getAccount(), normalizedStatus, "h5-n06-scan", fullRemark));
     return toH5PickupOrderDetail(updated, user.getAccount(), "提货状态已更新");
+  }
+
+  public H5N07ReconcileListResponse h5ReconcileList(
+      String token, String status, String keyword, int pageNo, int pageSize) {
+    AuthUserEntity user =
+        repository
+            .findUserByToken(token)
+            .orElseThrow(() -> new BaseException(ErrorCode.UNAUTHORIZED.getCode(), "登录态无效"));
+    int safePageNo = Math.max(1, pageNo);
+    int safePageSize = Math.min(Math.max(1, pageSize), 50);
+    String contactMobile = user.getAccount();
+
+    com.huodaizi.backend.dto.inquiry.InquiryReconcileOrderListRequest request =
+        new com.huodaizi.backend.dto.inquiry.InquiryReconcileOrderListRequest(
+            contactMobile, safeText(status), safeText(keyword), safePageNo, safePageSize);
+    List<InquiryReconcileOrderEntity> all = inquiryRepository.listReconcileOrders(request);
+    int from = Math.min((safePageNo - 1) * safePageSize, all.size());
+    int to = Math.min(from + safePageSize, all.size());
+    List<InquiryReconcileOrderEntity> paged = all.subList(from, to);
+
+    List<H5N07ReconcileListItemDTO> records =
+        paged.stream()
+            .map(
+                item ->
+                    new H5N07ReconcileListItemDTO(
+                        item.getReconcileId(),
+                        item.getReconcileNo(),
+                        item.getPickupOrderNo(),
+                        item.getSupplierName(),
+                        item.getGoodsSummary(),
+                        item.getReceivableAmount(),
+                        item.getPaidAmount(),
+                        item.getOutstandingAmount(),
+                        item.getStatus().name(),
+                        h5ReconcileStatusText(item.getStatus().name()),
+                        h5ReconcileQuickActionText(item.getStatus().name()),
+                        toText(item.getUpdatedAt())))
+            .toList();
+    String activeReconcileId = records.isEmpty() ? "" : records.get(0).reconcileId();
+    return new H5N07ReconcileListResponse(
+        safePageNo,
+        safePageSize,
+        all.size(),
+        "H5",
+        repository.maskPhone(contactMobile),
+        activeReconcileId,
+        records);
+  }
+
+  public H5N07ReconcileDetailResponse h5ReconcileDetail(String token, String reconcileId) {
+    AuthUserEntity user =
+        repository
+            .findUserByToken(token)
+            .orElseThrow(() -> new BaseException(ErrorCode.UNAUTHORIZED.getCode(), "登录态无效"));
+    InquiryReconcileOrderEntity item =
+        inquiryRepository.getReconcileOrderById(safeText(reconcileId), user.getAccount());
+    return toH5ReconcileDetail(item, "已定位对账单，可执行回款状态更新");
+  }
+
+  public H5N07ReconcileDetailResponse h5ReconcileStatusUpdate(
+      String token, String reconcileId, H5N07ReconcileStatusUpdateRequest request) {
+    AuthUserEntity user =
+        repository
+            .findUserByToken(token)
+            .orElseThrow(() -> new BaseException(ErrorCode.UNAUTHORIZED.getCode(), "登录态无效"));
+    String normalizedStatus = safeText(request.status()).toUpperCase();
+    if (!normalizedStatus.matches("CONFIRMED|PARTIAL_PAID|PAID|CLOSED|DISPUTED")) {
+      throw new BaseException(
+          ErrorCode.BAD_REQUEST.getCode(), "status 仅支持 CONFIRMED/PARTIAL_PAID/PAID/CLOSED/DISPUTED");
+    }
+    String operator = safeText(request.operator());
+    String remark = safeText(request.remark());
+    String finalOperator = operator.isBlank() ? "h5-n07-reconcile" : operator;
+    String fullRemark = remark.isBlank() ? finalOperator : remark + "（" + finalOperator + "）";
+    InquiryReconcileOrderEntity updated =
+        inquiryRepository.updateReconcileOrderStatus(
+            safeText(reconcileId),
+            new com.huodaizi.backend.dto.inquiry.InquiryReconcileOrderStatusUpdateRequest(
+                user.getAccount(),
+                normalizedStatus,
+                safeText(request.paidAmount()),
+                finalOperator,
+                fullRemark));
+    return toH5ReconcileDetail(updated, "对账状态已更新");
   }
 
   public N06OrderListResponse orderList(
@@ -1836,6 +1925,38 @@ public class AuthService {
         toText(item.getUpdatedAt()));
   }
 
+  private H5N07ReconcileDetailResponse toH5ReconcileDetail(
+      InquiryReconcileOrderEntity item, String tipText) {
+    List<String> availableActions = h5ReconcileAvailableActions(item.getStatus().name());
+    String invoiceStatus = h5ReconcileInvoiceStatus(item.getStatus().name());
+    return new H5N07ReconcileDetailResponse(
+        item.getReconcileId(),
+        item.getReconcileNo(),
+        item.getPickupOrderId(),
+        item.getPickupOrderNo(),
+        item.getInquiryId(),
+        item.getInquiryNo(),
+        item.getQuoteId(),
+        item.getSupplierName(),
+        item.getBuyerCompany(),
+        item.getGoodsSummary(),
+        item.getStatementMonth(),
+        item.getDueDate(),
+        item.getStatus().name(),
+        h5ReconcileStatusText(item.getStatus().name()),
+        invoiceStatus,
+        h5ReconcileInvoiceStatusText(invoiceStatus),
+        item.getReceivableAmount(),
+        item.getPaidAmount(),
+        item.getOutstandingAmount(),
+        repository.maskPhone(item.getContactMobile()),
+        "H5",
+        item.getLatestRemark(),
+        availableActions,
+        toText(item.getCreatedAt()),
+        toText(item.getUpdatedAt()));
+  }
+
   private String h5PickupStatusText(String status) {
     return switch (safeText(status).toUpperCase()) {
       case "CREATED" -> "待确认";
@@ -1867,6 +1988,62 @@ public class AuthService {
       case "SIGNED" -> List.of("COMPLETED");
       case "COMPLETED", "CANCELLED" -> List.of();
       default -> List.of();
+    };
+  }
+
+  private String h5ReconcileStatusText(String status) {
+    return switch (safeText(status).toUpperCase()) {
+      case "CREATED" -> "已创建";
+      case "INVOICE_PENDING" -> "待开票";
+      case "INVOICED" -> "已开票";
+      case "CONFIRMED" -> "已确认";
+      case "PARTIAL_PAID" -> "部分回款";
+      case "PAID" -> "已回款";
+      case "CLOSED" -> "已关闭";
+      case "DISPUTED" -> "争议中";
+      default -> "处理中";
+    };
+  }
+
+  private String h5ReconcileQuickActionText(String status) {
+    return switch (safeText(status).toUpperCase()) {
+      case "CREATED", "INVOICE_PENDING", "INVOICED" -> "标记已确认";
+      case "CONFIRMED" -> "登记部分回款";
+      case "PARTIAL_PAID" -> "标记已回款";
+      case "PAID" -> "关闭对账单";
+      case "DISPUTED" -> "恢复确认";
+      case "CLOSED" -> "查看详情";
+      default -> "查看详情";
+    };
+  }
+
+  private List<String> h5ReconcileAvailableActions(String status) {
+    return switch (safeText(status).toUpperCase()) {
+      case "CREATED", "INVOICE_PENDING", "INVOICED" -> List.of("CONFIRMED", "DISPUTED");
+      case "CONFIRMED" -> List.of("PARTIAL_PAID", "PAID", "DISPUTED");
+      case "PARTIAL_PAID" -> List.of("PAID", "DISPUTED");
+      case "PAID" -> List.of("CLOSED");
+      case "DISPUTED" -> List.of("CONFIRMED", "CLOSED");
+      case "CLOSED" -> List.of();
+      default -> List.of();
+    };
+  }
+
+  private String h5ReconcileInvoiceStatus(String status) {
+    return switch (safeText(status).toUpperCase()) {
+      case "CREATED", "INVOICE_PENDING" -> "UNISSUED";
+      case "INVOICED", "CONFIRMED", "PARTIAL_PAID", "PAID", "CLOSED" -> "ISSUED";
+      case "DISPUTED" -> "DISPUTED";
+      default -> "UNISSUED";
+    };
+  }
+
+  private String h5ReconcileInvoiceStatusText(String status) {
+    return switch (safeText(status).toUpperCase()) {
+      case "UNISSUED" -> "待开票";
+      case "ISSUED" -> "已开票";
+      case "DISPUTED" -> "争议中";
+      default -> "待开票";
     };
   }
 

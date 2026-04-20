@@ -27,6 +27,7 @@ import H5N03EnterpriseCertificationPage from '../pages/H5N03EnterpriseCertificat
 import H5N04QuoteSessionPage from '../pages/H5N04QuoteSessionPage.vue'
 import H5N05OrderDetailPage from '../pages/H5N05OrderDetailPage.vue'
 import H5N06PickupScanPage from '../pages/H5N06PickupScanPage.vue'
+import H5N07ReconcileDetailPage from '../pages/H5N07ReconcileDetailPage.vue'
 import A01DashboardPage from '../pages/A01DashboardPage.vue'
 import A02LeadOpsPage from '../pages/A02LeadOpsPage.vue'
 import A03QuoteEfficiencyPage from '../pages/A03QuoteEfficiencyPage.vue'
@@ -109,6 +110,14 @@ const routes = [
     component: H5N06PickupScanPage,
     meta: {
       title: 'H5-N06扫码提货页_移动端扫码核验与提货履约-货袋子'
+    }
+  },
+  {
+    path: '/h5/reconcile-detail',
+    name: 'h5N07ReconcileDetail',
+    component: H5N07ReconcileDetailPage,
+    meta: {
+      title: 'H5-N07对账详情页_移动端对账单与回款进度-货袋子'
     }
   },
   {

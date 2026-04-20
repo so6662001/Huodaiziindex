@@ -140,6 +140,10 @@ function goH5PickupScan() {
   router.push('/h5/pickup-scan')
 }
 
+function goH5ReconcileDetail() {
+  router.push('/h5/reconcile-detail')
+}
+
 onMounted(() => {
   const cached = localStorage.getItem('H5_N01_AUTH_TOKEN') || localStorage.getItem('N01_AUTH_TOKEN') || ''
   if (cached) {
@@ -160,6 +164,7 @@ onMounted(() => {
         <button class="btn" @click="goH5NegotiationSession">前往H5-N04报价会话</button>
         <button class="btn" @click="goH5OrderDetail">前往H5-N05订单详情</button>
         <button class="btn" @click="goH5PickupScan">前往H5-N06扫码提货</button>
+        <button class="btn" @click="goH5ReconcileDetail">前往H5-N07对账详情</button>
       </div>
     </section>
 

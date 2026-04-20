@@ -208,6 +208,10 @@ function goPickupScan() {
   router.push('/h5/pickup-scan')
 }
 
+function goReconcileDetail() {
+  router.push('/h5/reconcile-detail')
+}
+
 onMounted(() => {
   loadSessions()
 })
@@ -224,6 +228,7 @@ onMounted(() => {
         <button class="btn" @click="goEnterpriseCertification">前往企业认证</button>
         <button class="btn" @click="goOrderDetail">前往H5-N05订单详情</button>
         <button class="btn" @click="goPickupScan">前往H5-N06扫码提货</button>
+        <button class="btn" @click="goReconcileDetail">前往H5-N07对账详情</button>
       </div>
     </section>
 
