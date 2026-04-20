@@ -41,6 +41,8 @@ import com.huodaizi.backend.dto.auth.N10CashierOrderListItemDTO;
 import com.huodaizi.backend.dto.auth.N10CashierOrderListResponse;
 import com.huodaizi.backend.dto.auth.N10CashierPayRequest;
 import com.huodaizi.backend.dto.auth.N10CashierTimelineNodeDTO;
+import com.huodaizi.backend.dto.auth.N11PaymentResultNodeDTO;
+import com.huodaizi.backend.dto.auth.N11PaymentResultResponse;
 import com.huodaizi.backend.repository.auth.AuthUserEntity;
 import com.huodaizi.backend.repository.auth.EnterpriseCertificationDraft;
 import com.huodaizi.backend.repository.auth.EnterpriseCertificationEntity;
@@ -691,6 +693,63 @@ public class AuthService {
             safeText(request.remark()),
             safeText(request.operator()));
     return cashierOrderDetail(token, updated.getCashierId());
+  }
+
+  public N11PaymentResultResponse paymentResult(String token, String cashierId) {
+    N10CashierOrderEntity item = repository.getCashierOrderDetail(token, cashierId);
+    List<N11PaymentResultNodeDTO> timeline =
+        item.getTimeline().stream()
+            .map(
+                node ->
+                    new N11PaymentResultNodeDTO(
+                        node.getNodeCode(),
+                        node.getNodeName(),
+                        node.getStatus(),
+                        node.getStatusText(),
+                        node.getHandler(),
+                        node.getRemark(),
+                        node.getHappenedAt()))
+            .toList();
+    boolean success = "PAID".equalsIgnoreCase(item.getPayStatus());
+    String resultStatus = success ? "SUCCESS" : "PENDING";
+    String resultStatusText = success ? "支付成功" : "待支付";
+    String resultMessage =
+        success ? "货款支付已完成，系统已同步更新订单履约状态。" : "当前订单尚未完成支付，请返回收银台继续支付。";
+    String nextActionCode = success ? "GO_ORDER_DETAIL" : "GO_CASHIER";
+    String nextActionText = success ? "查看订单详情" : "返回收银台";
+    String orderStatus = "PAID";
+    String orderStatusText = "已回款";
+    try {
+      N06OrderEntity order = repository.getOrderDetail(token, item.getOrderId());
+      orderStatus = mapOrderToReconcile(order.getOrderStatus());
+      orderStatusText = reconcileStatusText(orderStatus);
+    } catch (BaseException ignore) {
+      // 支付结果页优先展示支付结果，不因订单详情缺失中断。
+    }
+    return new N11PaymentResultResponse(
+        item.getCashierId(),
+        item.getOrderId(),
+        item.getOrderNo(),
+        item.getInquiryNo(),
+        item.getBuyerCompany(),
+        item.getSupplierName(),
+        item.getGoodsName(),
+        item.getPayChannel(),
+        item.getPayChannelText(),
+        item.getAmountPayable(),
+        item.getAmountPaid(),
+        item.getAmountOutstanding(),
+        resultStatus,
+        resultStatusText,
+        resultMessage,
+        item.getLatestRemark(),
+        item.getPaidAt(),
+        toText(item.getUpdatedAt()),
+        orderStatus,
+        orderStatusText,
+        nextActionCode,
+        nextActionText,
+        timeline);
   }
 
   private N07TradeTermsDetailResponse toTradeTermsDetail(N07TradeTermsEntity entity) {

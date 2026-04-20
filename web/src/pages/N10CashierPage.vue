@@ -131,7 +131,11 @@ async function submitPay() {
     detail.value = json.data || null
     payForm.remark = ''
     successMsg.value = '支付成功，订单状态已联动更新'
+    const paidCashierOrderId = detail.value?.cashierOrderId || selectedCashierOrderId.value
     await loadCashierOrders()
+    if (paidCashierOrderId) {
+      router.push(`/account/payment-result?cashierOrderId=${encodeURIComponent(paidCashierOrderId)}`)
+    }
   } catch (error) {
     errorMsg.value = error.message || '支付提交失败'
   } finally {
@@ -156,6 +160,10 @@ function goAfterSaleProgress() {
   router.push('/account/after-sale-progress')
 }
 
+function goPaymentResult() {
+  router.push('/account/payment-result')
+}
+
 function goHome() {
   router.push('/')
 }
@@ -174,6 +182,7 @@ onMounted(() => {
         <button class="btn" @click="goOrderDetail">返回订单详情页</button>
         <button class="btn" @click="goAfterSaleDispute">售后/争议发起页</button>
         <button class="btn" @click="goAfterSaleProgress">售后处理进度页</button>
+        <button class="btn" @click="goPaymentResult">支付结果页</button>
         <button class="btn" @click="goHome">返回首页</button>
       </div>
     </section>

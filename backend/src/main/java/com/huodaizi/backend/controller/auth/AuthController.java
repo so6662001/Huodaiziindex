@@ -27,6 +27,7 @@ import com.huodaizi.backend.dto.auth.N09AfterSaleProgressListResponse;
 import com.huodaizi.backend.dto.auth.N10CashierOrderDetailResponse;
 import com.huodaizi.backend.dto.auth.N10CashierOrderListResponse;
 import com.huodaizi.backend.dto.auth.N10CashierPayRequest;
+import com.huodaizi.backend.dto.auth.N11PaymentResultResponse;
 import com.huodaizi.backend.service.auth.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -228,6 +229,13 @@ public class AuthController {
       @PathVariable("cashierOrderId") String cashierOrderId,
       @Valid @RequestBody N10CashierPayRequest request) {
     return ApiResponse.success(service.payCashierOrder(token, cashierOrderId, request));
+  }
+
+  @GetMapping("/cashier/orders/{cashierOrderId}/result")
+  public ApiResponse<N11PaymentResultResponse> paymentResult(
+      @RequestHeader(name = AUTH_HEADER, required = false) String token,
+      @PathVariable("cashierOrderId") String cashierOrderId) {
+    return ApiResponse.success(service.paymentResult(token, cashierOrderId));
   }
 
   @PostMapping("/logout")

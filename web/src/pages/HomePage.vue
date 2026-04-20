@@ -217,6 +217,10 @@ function goN10CashierPage() {
   router.push('/account/cashier')
 }
 
+function goN11PaymentResultPage() {
+  router.push('/account/payment-result')
+}
+
 function onSearch() {
   if (!keyword.value.trim()) {
     return
@@ -423,6 +427,7 @@ function onSearch() {
         <button class="btn" @click="goN08AfterSaleDisputePage">PC-N08售后/争议发起页</button>
         <button class="btn" @click="goN09AfterSaleProgressPage">PC-N09售后处理进度页</button>
         <button class="btn" @click="goN10CashierPage">PC-N10收银台</button>
+        <button class="btn" @click="goN11PaymentResultPage">PC-N11支付结果页</button>
         <button class="btn" @click="goSubscriptionPage">套餐与订阅</button>
         <button class="btn" @click="goBillingPage">计费与账单</button>
         <button class="btn primary" @click="goInquiry">立即体验AI询价</button>
