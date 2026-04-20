@@ -94,6 +94,10 @@ function goH5Home() {
   router.push('/h5?city=唐山')
 }
 
+function goCertification() {
+  router.push('/h5/enterprise-certification')
+}
+
 onMounted(() => {
   loadIdentities()
 })
@@ -106,6 +110,7 @@ onMounted(() => {
       <p>快速在采购方、供应方、运营方之间切换，直接进入对应移动工作台。</p>
       <div class="hero-actions">
         <button class="btn" @click="goQuickLogin">返回快捷登录</button>
+        <button class="btn" @click="goCertification">企业认证</button>
         <button class="btn" @click="goH5Home">返回H5首页</button>
       </div>
     </section>

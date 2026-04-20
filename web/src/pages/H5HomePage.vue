@@ -102,6 +102,10 @@ function goIdentitySwitch() {
   router.push('/h5/identity-switch')
 }
 
+function goEnterpriseCertification() {
+  router.push('/h5/enterprise-certification')
+}
+
 function colorClass(item) {
   const text = String(item?.changeRate || '')
   if (text.startsWith('+')) return 'up'
@@ -127,6 +131,7 @@ onMounted(() => {
       <div class="hero-actions">
         <button class="btn primary" @click="goQuickLogin">H5-N01 快捷登录</button>
         <button class="btn" @click="goIdentitySwitch">H5-N02 身份切换</button>
+        <button class="btn" @click="goEnterpriseCertification">H5-N03 企业认证</button>
       </div>
       <div class="filters">
         <label>

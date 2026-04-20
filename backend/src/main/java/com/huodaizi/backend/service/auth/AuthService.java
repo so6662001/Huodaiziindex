@@ -11,6 +11,8 @@ import com.huodaizi.backend.dto.auth.H5N01QuickLoginRequest;
 import com.huodaizi.backend.dto.auth.H5N01QuickLoginResponse;
 import com.huodaizi.backend.dto.auth.H5N01SendLoginCodeRequest;
 import com.huodaizi.backend.dto.auth.H5N01SendLoginCodeResponse;
+import com.huodaizi.backend.dto.auth.H5N03EnterpriseCertificationDetailResponse;
+import com.huodaizi.backend.dto.auth.H5N03EnterpriseCertificationSubmitRequest;
 import com.huodaizi.backend.dto.auth.N03EnterpriseCertificationDetailResponse;
 import com.huodaizi.backend.dto.auth.N03EnterpriseCertificationSubmitRequest;
 import com.huodaizi.backend.dto.auth.N04OnboardingProgressNodeDTO;
@@ -254,6 +256,73 @@ public class AuthService {
           null);
     }
     return toCertificationDetail(entity);
+  }
+
+  public H5N03EnterpriseCertificationDetailResponse h5EnterpriseCertificationDetail(String token) {
+    AuthUserEntity user =
+        repository
+            .findUserByToken(token)
+            .orElseThrow(() -> new BaseException(ErrorCode.UNAUTHORIZED.getCode(), "登录态无效"));
+    EnterpriseCertificationEntity entity = repository.findCertificationByToken(token).orElse(null);
+    if (entity == null) {
+      return new H5N03EnterpriseCertificationDetailResponse(
+          "",
+          user.getUserId(),
+          user.getAccount(),
+          "UNSUBMITTED",
+          certificationStatusText("UNSUBMITTED"),
+          user.getCompanyName(),
+          "",
+          "",
+          "",
+          user.getContactName(),
+          user.getPhoneMasked(),
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "H5",
+          true,
+          null,
+          null,
+          null);
+    }
+    return toH5CertificationDetail(entity);
+  }
+
+  public H5N03EnterpriseCertificationDetailResponse submitH5EnterpriseCertification(
+      String token, H5N03EnterpriseCertificationSubmitRequest request) {
+    validateH5CertificationRequest(request);
+    String operator = safeText(request.operator());
+    EnterpriseCertificationEntity saved =
+        repository.saveCertification(
+            token,
+            new EnterpriseCertificationDraft(
+                request.companyName().trim(),
+                request.unifiedSocialCreditCode().trim().toUpperCase(),
+                request.legalPersonName().trim(),
+                request.legalPersonIdNo().trim().toUpperCase(),
+                request.contactName().trim(),
+                request.contactMobile().trim(),
+                request.businessLicenseUrl().trim(),
+                request.legalIdFrontUrl().trim(),
+                request.legalIdBackUrl().trim(),
+                safeText(request.bankAccountName()),
+                safeText(request.bankAccountNo()),
+                safeText(request.bankName()),
+                request.province().trim(),
+                request.city().trim(),
+                request.address().trim(),
+                safeText(request.remark()),
+                operator.isBlank() ? "h5-n03-submit" : operator));
+    return toH5CertificationDetail(saved);
   }
 
   public N04OnboardingProgressResponse onboardingProgress(String token) {
@@ -1179,7 +1248,55 @@ public class AuthService {
         toText(entity.getUpdatedAt()));
   }
 
+  private H5N03EnterpriseCertificationDetailResponse toH5CertificationDetail(
+      EnterpriseCertificationEntity entity) {
+    String status = safeText(entity.getStatus());
+    return new H5N03EnterpriseCertificationDetailResponse(
+        entity.getCertificationId(),
+        entity.getUserId(),
+        entity.getAccount(),
+        status,
+        certificationStatusText(status),
+        entity.getCompanyName(),
+        entity.getUnifiedSocialCreditCode(),
+        entity.getLegalPersonName(),
+        maskIdentityNo(entity.getLegalPersonIdNo()),
+        entity.getContactName(),
+        entity.getContactMobileMasked(),
+        entity.getBusinessLicenseUrl(),
+        entity.getLegalIdFrontUrl(),
+        entity.getLegalIdBackUrl(),
+        entity.getBankAccountName(),
+        maskBankNo(entity.getBankAccountNo()),
+        entity.getBankName(),
+        entity.getProvince(),
+        entity.getCity(),
+        entity.getAddress(),
+        entity.getRemark(),
+        entity.getOperator(),
+        "H5",
+        canResubmitByStatus(status),
+        toText(entity.getCreatedAt()),
+        toText(entity.getSubmittedAt()),
+        toText(entity.getUpdatedAt()));
+  }
+
   private void validateCertificationRequest(N03EnterpriseCertificationSubmitRequest request) {
+    String socialCode = request.unifiedSocialCreditCode().trim().toUpperCase();
+    if (!socialCode.matches("^[0-9A-Z]{18}$")) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "统一社会信用代码需为18位数字或大写字母");
+    }
+    String legalId = request.legalPersonIdNo().trim().toUpperCase();
+    if (!legalId.matches("^[0-9X]{15,18}$")) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "法人证件号格式不正确");
+    }
+    String mobile = request.contactMobile().trim();
+    if (!mobile.matches("^1\\d{10}$")) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "联系人手机号必须为11位");
+    }
+  }
+
+  private void validateH5CertificationRequest(H5N03EnterpriseCertificationSubmitRequest request) {
     String socialCode = request.unifiedSocialCreditCode().trim().toUpperCase();
     if (!socialCode.matches("^[0-9A-Z]{18}$")) {
       throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "统一社会信用代码需为18位数字或大写字母");
@@ -1261,6 +1378,21 @@ public class AuthService {
 
   private String toText(LocalDateTime time) {
     return time == null || time.equals(LocalDateTime.MIN) ? null : time.toString();
+  }
+
+  private String certificationStatusText(String status) {
+    return switch (safeText(status).toUpperCase()) {
+      case "UNSUBMITTED" -> "待提交";
+      case "PENDING_REVIEW" -> "审核中";
+      case "REJECTED" -> "已驳回";
+      case "APPROVED" -> "已通过";
+      default -> "处理中";
+    };
+  }
+
+  private boolean canResubmitByStatus(String status) {
+    String normalized = safeText(status).toUpperCase();
+    return "UNSUBMITTED".equals(normalized) || "REJECTED".equals(normalized);
   }
 
   private String currentStepCodeByStatus(String certificationStatus) {
