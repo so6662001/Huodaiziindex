@@ -42,6 +42,7 @@ import A07PlanPricingManagePage from '../pages/A07PlanPricingManagePage.vue'
 import A08RiskAlertCenterPage from '../pages/A08RiskAlertCenterPage.vue'
 import Admn01MerchantCertificationReviewPage from '../pages/Admn01MerchantCertificationReviewPage.vue'
 import Admn02BuyerBlacklistPage from '../pages/Admn02BuyerBlacklistPage.vue'
+import Admn03RbacRolePermissionPage from '../pages/Admn03RbacRolePermissionPage.vue'
 import N01LoginRegisterPage from '../pages/N01LoginRegisterPage.vue'
 import N02IdentitySelectPage from '../pages/N02IdentitySelectPage.vue'
 import N03EnterpriseCertificationPage from '../pages/N03EnterpriseCertificationPage.vue'
@@ -316,6 +317,14 @@ const routes = [
     component: Admn02BuyerBlacklistPage,
     meta: {
       title: 'ADM-N02买家与黑名单管理_管理端买家风控名单管理-货袋子'
+    }
+  },
+  {
+    path: '/admin/rbac-role-permission/admn03',
+    name: 'admn03RbacRolePermission',
+    component: Admn03RbacRolePermissionPage,
+    meta: {
+      title: 'ADM-N03角色权限管理_管理端RBAC角色权限治理-货袋子'
     }
   },
   {

@@ -39,6 +39,8 @@ public class InMemoryAuthRepository {
       new ConcurrentHashMap<>();
   private final ConcurrentMap<String, Admn02BuyerBlacklistRecordEntity> buyerBlacklistStore =
       new ConcurrentHashMap<>();
+  private final ConcurrentMap<String, Admn03RolePermissionEntity> admn03RoleStore =
+      new ConcurrentHashMap<>();
 
   public InMemoryAuthRepository() {
     seed();
@@ -447,6 +449,114 @@ public class InMemoryAuthRepository {
             .max(LocalDateTime::compareTo)
             .orElse(null);
     return latest == null ? "" : latest.toString();
+  }
+
+  public List<Admn03RolePermissionEntity> listRolesForAdmin(String keyword, String status) {
+    String keywordFilter = defaultText(keyword, "").toLowerCase(Locale.ROOT);
+    String statusFilter = defaultText(status, "").toUpperCase(Locale.ROOT);
+    return admn03RoleStore.values().stream()
+        .filter(
+            item ->
+                statusFilter.isBlank()
+                    || statusFilter.equals(defaultText(item.getStatus(), "").toUpperCase(Locale.ROOT)))
+        .filter(
+            item ->
+                keywordFilter.isBlank()
+                    || defaultText(item.getRoleCode(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                    || defaultText(item.getRoleName(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                    || defaultText(item.getDescription(), "").toLowerCase(Locale.ROOT).contains(keywordFilter))
+        .sorted(Comparator.comparing(Admn03RolePermissionEntity::getUpdatedAt).reversed())
+        .toList();
+  }
+
+  public Admn03RolePermissionEntity getRoleForAdmin(String roleId) {
+    String normalizedRoleId = defaultText(roleId, "");
+    if (normalizedRoleId.isBlank()) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "roleId 不能为空");
+    }
+    Admn03RolePermissionEntity role = admn03RoleStore.get(normalizedRoleId);
+    if (role == null) {
+      throw new BaseException(ErrorCode.NOT_FOUND.getCode(), "角色不存在");
+    }
+    return role;
+  }
+
+  public Admn03RolePermissionEntity upsertRoleForAdmin(
+      String roleCode, String roleName, String description, List<String> permissionCodes, String operator) {
+    String safeRoleCode = defaultText(roleCode, "").toUpperCase(Locale.ROOT);
+    String safeRoleName = defaultText(roleName, "");
+    if (safeRoleCode.isBlank() || safeRoleName.isBlank()) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "roleCode/roleName 不能为空");
+    }
+    List<String> normalizedPermissions = normalizePermissionCodes(permissionCodes);
+    LocalDateTime now = LocalDateTime.now();
+    Admn03RolePermissionEntity existing =
+        admn03RoleStore.values().stream()
+            .filter(item -> safeRoleCode.equalsIgnoreCase(item.getRoleCode()))
+            .findFirst()
+            .orElse(null);
+    if (existing == null) {
+      String roleId = "RL" + UUID.randomUUID().toString().replace("-", "").substring(0, 10).toUpperCase(Locale.ROOT);
+      Admn03RolePermissionEntity created =
+          new Admn03RolePermissionEntity(
+              roleId,
+              safeRoleCode,
+              safeRoleName,
+              "CUSTOM",
+              "ACTIVE",
+              defaultText(description, ""),
+              normalizedPermissions,
+              defaultText(operator, "admn03-create"),
+              now,
+              now);
+      admn03RoleStore.put(created.getRoleId(), created);
+      return created;
+    }
+    existing.updateBasic(
+        safeRoleCode,
+        safeRoleName,
+        existing.getRoleType(),
+        defaultText(existing.getStatus(), "ACTIVE"),
+        defaultText(description, existing.getDescription()),
+        defaultText(operator, "admn03-update"),
+        now);
+    existing.updatePermissions(normalizedPermissions, defaultText(operator, "admn03-update"), now);
+    admn03RoleStore.put(existing.getRoleId(), existing);
+    return existing;
+  }
+
+  public Admn03RolePermissionEntity updateRolePermissionsForAdmin(
+      String roleId, List<String> permissionCodes, String operator) {
+    Admn03RolePermissionEntity role = getRoleForAdmin(roleId);
+    if ("SYSTEM".equalsIgnoreCase(defaultText(role.getRoleType(), ""))
+        && "SUPER_ADMIN".equalsIgnoreCase(defaultText(role.getRoleCode(), ""))) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "SUPER_ADMIN 系统角色不允许修改权限");
+    }
+    List<String> normalizedPermissions = normalizePermissionCodes(permissionCodes);
+    LocalDateTime now = LocalDateTime.now();
+    role.updatePermissions(normalizedPermissions, defaultText(operator, "admn03-permission"), now);
+    admn03RoleStore.put(role.getRoleId(), role);
+    return role;
+  }
+
+  public int countUsersByRoleCodeForAdmin(String roleCode) {
+    String normalized = defaultText(roleCode, "").toUpperCase(Locale.ROOT);
+    return (int)
+        userStore.values().stream()
+            .filter(item -> normalized.equals(defaultText(item.getRole(), "").toUpperCase(Locale.ROOT)))
+            .count();
+  }
+
+  public String permissionNameForAdmin(String permissionCode) {
+    return switch (defaultText(permissionCode, "").toUpperCase(Locale.ROOT)) {
+      case "DASHBOARD_VIEW" -> "经营看板查看";
+      case "LEAD_OPS_MANAGE" -> "线索运营管理";
+      case "RISK_ALERT_MANAGE" -> "风险预警处置";
+      case "ADMN01_CERT_REVIEW" -> "商家认证审核";
+      case "ADMN02_BLACKLIST_MANAGE" -> "买家黑名单管理";
+      case "ADMN03_RBAC_MANAGE" -> "角色权限管理";
+      default -> "未命名权限";
+    };
   }
 
   public Optional<AuthUserEntity> findUserByToken(String token) {
@@ -1282,6 +1392,22 @@ public class InMemoryAuthRepository {
     return record != null && record.isBlacklisted();
   }
 
+  private List<String> normalizePermissionCodes(List<String> permissionCodes) {
+    if (permissionCodes == null) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "permissionCodes 不能为空");
+    }
+    List<String> normalized =
+        permissionCodes.stream()
+            .map(code -> defaultText(code, "").toUpperCase(Locale.ROOT))
+            .filter(code -> !code.isBlank())
+            .distinct()
+            .toList();
+    if (normalized.isEmpty()) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "permissionCodes 至少包含1项");
+    }
+    return normalized;
+  }
+
   private String defaultText(String text, String fallback) {
     return text == null || text.isBlank() ? fallback : text.trim();
   }
@@ -1304,6 +1430,7 @@ public class InMemoryAuthRepository {
     userStore.put(seed.getAccount(), seed);
     seedAdmn02BuyerBlacklist(seed);
     seedAdmn02ExtraBuyers();
+    seedAdmn03Roles();
     seedNegotiation(seed);
     seedOrders(seed);
     seedTradeTerms(seed);
@@ -1378,6 +1505,57 @@ public class InMemoryAuthRepository {
             "近30天争议率偏高，临时拉黑",
             "seed-risk",
             now.minusHours(4)));
+  }
+
+  private void seedAdmn03Roles() {
+    LocalDateTime now = LocalDateTime.now();
+    Admn03RolePermissionEntity superAdmin =
+        new Admn03RolePermissionEntity(
+            "RL00000001",
+            "SUPER_ADMIN",
+            "超级管理员",
+            "SYSTEM",
+            "ACTIVE",
+            "平台全局权限管理角色",
+            List.of(
+                "DASHBOARD_VIEW",
+                "LEAD_OPS_MANAGE",
+                "RISK_ALERT_MANAGE",
+                "ADMN01_CERT_REVIEW",
+                "ADMN02_BLACKLIST_MANAGE",
+                "ADMN03_RBAC_MANAGE"),
+            "seed",
+            now.minusDays(30),
+            now.minusDays(1));
+    admn03RoleStore.put(superAdmin.getRoleId(), superAdmin);
+
+    Admn03RolePermissionEntity riskAdmin =
+        new Admn03RolePermissionEntity(
+            "RL00000002",
+            "RISK_ADMIN",
+            "风控管理员",
+            "SYSTEM",
+            "ACTIVE",
+            "负责风控预警与黑名单治理",
+            List.of("RISK_ALERT_MANAGE", "ADMN02_BLACKLIST_MANAGE", "DASHBOARD_VIEW"),
+            "seed",
+            now.minusDays(20),
+            now.minusDays(2));
+    admn03RoleStore.put(riskAdmin.getRoleId(), riskAdmin);
+
+    Admn03RolePermissionEntity certReviewer =
+        new Admn03RolePermissionEntity(
+            "RL00000003",
+            "CERT_REVIEWER",
+            "认证审核员",
+            "CUSTOM",
+            "ACTIVE",
+            "负责商家认证审核与资料复核",
+            List.of("ADMN01_CERT_REVIEW", "DASHBOARD_VIEW"),
+            "seed",
+            now.minusDays(18),
+            now.minusHours(12));
+    admn03RoleStore.put(certReviewer.getRoleId(), certReviewer);
   }
 
   private void seedNegotiation(AuthUserEntity user) {

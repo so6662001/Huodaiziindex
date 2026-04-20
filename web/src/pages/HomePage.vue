@@ -229,6 +229,10 @@ function goAdmn02BuyerBlacklistPage() {
   router.push('/admin/buyer-blacklist/admn02')
 }
 
+function goAdmn03RbacPage() {
+  router.push('/admin/rbac/admn03')
+}
+
 function goN01LoginRegisterPage() {
   router.push('/account/login-register')
 }
@@ -494,6 +498,7 @@ function onSearch() {
         <button class="btn" @click="goA08RiskAlertPage">A08风险预警中心</button>
         <button class="btn" @click="goAdmn01MerchantCertificationReviewPage">ADM-N01商家认证审核台</button>
         <button class="btn" @click="goAdmn02BuyerBlacklistPage">ADM-N02买家与黑名单管理</button>
+        <button class="btn" @click="goAdmn03RbacPage">ADM-N03角色权限管理（RBAC）</button>
         <button class="btn" @click="goN01LoginRegisterPage">PC-N01登录/注册</button>
         <button class="btn" @click="goN02IdentitySelectPage">PC-N02身份选择</button>
         <button class="btn" @click="goN03EnterpriseCertificationPage">PC-N03企业认证提交</button>
