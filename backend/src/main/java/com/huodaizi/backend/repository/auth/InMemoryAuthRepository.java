@@ -26,6 +26,7 @@ public class InMemoryAuthRepository {
   private final ConcurrentMap<String, N05NegotiationSessionEntity> negotiationStore =
       new ConcurrentHashMap<>();
   private final ConcurrentMap<String, N06OrderEntity> orderStore = new ConcurrentHashMap<>();
+  private final ConcurrentMap<String, N07TradeTermsEntity> tradeTermsStore = new ConcurrentHashMap<>();
 
   public InMemoryAuthRepository() {
     seed();
@@ -341,6 +342,28 @@ public class InMemoryAuthRepository {
     return entity;
   }
 
+  public N07TradeTermsEntity getTradeTerms(String token, String orderId) {
+    SessionEntity session = requireSession(token);
+    AuthUserEntity user = userStore.get(session.getAccount());
+    if (user == null) {
+      throw new BaseException(ErrorCode.UNAUTHORIZED.getCode(), "登录态无效");
+    }
+    N07TradeTermsEntity entity = tradeTermsStore.get(defaultText(orderId, ""));
+    if (entity == null || !user.getUserId().equals(entity.getUserId())) {
+      throw new BaseException(ErrorCode.NOT_FOUND.getCode(), "交易条款不存在");
+    }
+    return entity;
+  }
+
+  public N07TradeTermsEntity confirmTradeTerms(
+      String token, String orderId, String operator, String remark) {
+    N07TradeTermsEntity entity = getTradeTerms(token, orderId);
+    String normalizedOperator = defaultText(operator, "pc-n07-confirm");
+    String normalizedRemark = defaultText(remark, "");
+    entity.confirm(normalizedOperator, normalizedRemark, LocalDateTime.now());
+    return entity;
+  }
+
   public void logout(String token) {
     sessionStore.remove(defaultText(token, ""));
   }
@@ -417,6 +440,7 @@ public class InMemoryAuthRepository {
     userStore.put(seed.getAccount(), seed);
     seedNegotiation(seed);
     seedOrders(seed);
+    seedTradeTerms(seed);
   }
 
   private void seedNegotiation(AuthUserEntity user) {
@@ -663,6 +687,97 @@ public class InMemoryAuthRepository {
             now.minusDays(1),
             secondTimeline);
     orderStore.put(second.getOrderId(), second);
+  }
+
+  private void seedTradeTerms(AuthUserEntity user) {
+    LocalDateTime now = LocalDateTime.now();
+    N07TradeTermsEntity first =
+        new N07TradeTermsEntity(
+            "OD0001",
+            user.getUserId(),
+            "OD-20260418-0001",
+            "INQ-20260419-3301",
+            "演示钢贸有限公司",
+            "唐山弘达钢贸",
+            "螺纹钢HRB400E Φ20 500吨",
+            "Φ20*12m",
+            "500吨",
+            "3520",
+            "1760000",
+            "买方自提，供应方负责协调仓库窗口，签约后48小时内可提。",
+            "月结30天，电子对账单确认后5个工作日内付款。",
+            "增值税专票 13%，供应方在发货后3个工作日内开票。",
+            "银行公对公转账，不支持现金与个人代付。",
+            "执行 GB/T 1499.2-2024，按批次附材质单。",
+            "理论重量误差 ±0.3%，超差部分按实结算。",
+            "任何一方违约按未履约金额的3%承担违约责任。",
+            "优先友好协商，协商不成提交买方所在地仲裁委员会。",
+            "极端天气导致运输中断可顺延交付，不视为违约。",
+            now.toLocalDate().toString(),
+            now.plusDays(30).toLocalDate().toString(),
+            List.of(
+                new N07TradeTermsEntity.ClauseItem(
+                    "DELIVERY", "交付条款", "提货通知后24小时内安排车辆入库。", true),
+                new N07TradeTermsEntity.ClauseItem(
+                    "PAYMENT", "结算条款", "对账确认后5个工作日完成货款支付。", true),
+                new N07TradeTermsEntity.ClauseItem(
+                    "QUALITY", "质量条款", "如质量异议需在收货后48小时内书面提出。", true),
+                new N07TradeTermsEntity.ClauseItem(
+                    "FORCE_MAJEURE", "不可抗力", "不可抗力发生后应在24小时内通知对方。", false)),
+            List.of(
+                new N07TradeTermsEntity.AttachmentItem(
+                    "采购合同草案-V1.pdf", "PDF", "https://cdn.huodaizi.com/contract/OD0001-v1.pdf"),
+                new N07TradeTermsEntity.AttachmentItem(
+                    "材质标准附件.docx", "DOCX", "https://cdn.huodaizi.com/contract/OD0001-material.docx")),
+            false,
+            "",
+            "",
+            "",
+            now.minusHours(6),
+            now.minusDays(1));
+    tradeTermsStore.put(first.getOrderId(), first);
+
+    N07TradeTermsEntity second =
+        new N07TradeTermsEntity(
+            "OD0002",
+            user.getUserId(),
+            "OD-20260416-0008",
+            "INQ-20260418-2210",
+            "演示钢贸有限公司",
+            "无锡铭泰供应链",
+            "热轧卷板Q235B 3.0*1500 300吨",
+            "3.0*1500*C",
+            "300吨",
+            "3680",
+            "1104000",
+            "供应方代办物流，含一次装卸费。",
+            "30%预付款，余款见提单后2个工作日支付。",
+            "增值税专票 13%，票到30天内可抵扣。",
+            "银行承兑汇票+电汇组合结算。",
+            "执行 Q/3202MT 2024 企业标准。",
+            "重量误差 ±0.5%，超出部分按补差规则执行。",
+            "违约方承担直接损失及滞纳金。",
+            "争议提交无锡仲裁委员会。",
+            "保密条款有效期 12 个月。",
+            now.minusDays(4).toLocalDate().toString(),
+            now.plusDays(20).toLocalDate().toString(),
+            List.of(
+                new N07TradeTermsEntity.ClauseItem(
+                    "DELIVERY", "交付条款", "按周滚动提货计划执行。", true),
+                new N07TradeTermsEntity.ClauseItem(
+                    "PAYMENT", "结算条款", "提单回传后2个工作日内支付尾款。", true),
+                new N07TradeTermsEntity.ClauseItem(
+                    "QUALITY", "质量条款", "争议样品由第三方检测机构复检。", true)),
+            List.of(
+                new N07TradeTermsEntity.AttachmentItem(
+                    "采购合同签署版.pdf", "PDF", "https://cdn.huodaizi.com/contract/OD0002-signed.pdf")),
+            true,
+            "采购经理",
+            now.minusDays(3).toString(),
+            "双方已确认并生效",
+            now.minusDays(2),
+            now.minusDays(4));
+    tradeTermsStore.put(second.getOrderId(), second);
   }
 
   public static final class SessionEntity {

@@ -157,6 +157,10 @@ function goOrderDetailPage() {
   router.push('/account/order-detail')
 }
 
+function goTradeTermsConfirmPage() {
+  router.push('/account/trade-terms-confirm')
+}
+
 function goHome() {
   router.push('/')
 }
@@ -176,6 +180,7 @@ onMounted(() => {
         <button class="btn" @click="goOnboardingProgress">查看入驻审核进度</button>
         <button class="btn" @click="goNegotiationSession">进入议价会话页</button>
         <button class="btn" @click="goOrderDetailPage">进入订单详情页</button>
+        <button class="btn" @click="goTradeTermsConfirmPage">进入交易条款确认页</button>
         <button class="btn" @click="goHome">返回首页</button>
       </div>
     </section>

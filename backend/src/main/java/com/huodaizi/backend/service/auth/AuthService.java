@@ -23,6 +23,10 @@ import com.huodaizi.backend.dto.auth.N06OrderDetailResponse;
 import com.huodaizi.backend.dto.auth.N06OrderListItemDTO;
 import com.huodaizi.backend.dto.auth.N06OrderListResponse;
 import com.huodaizi.backend.dto.auth.N06OrderTimelineNodeDTO;
+import com.huodaizi.backend.dto.auth.N07TradeTermAttachmentDTO;
+import com.huodaizi.backend.dto.auth.N07TradeTermClauseDTO;
+import com.huodaizi.backend.dto.auth.N07TradeTermsConfirmRequest;
+import com.huodaizi.backend.dto.auth.N07TradeTermsDetailResponse;
 import com.huodaizi.backend.repository.auth.AuthUserEntity;
 import com.huodaizi.backend.repository.auth.EnterpriseCertificationDraft;
 import com.huodaizi.backend.repository.auth.EnterpriseCertificationEntity;
@@ -34,6 +38,7 @@ import com.huodaizi.backend.repository.auth.N05NegotiationQuery;
 import com.huodaizi.backend.repository.auth.N05NegotiationSessionEntity;
 import com.huodaizi.backend.repository.auth.N06OrderEntity;
 import com.huodaizi.backend.repository.auth.N06OrderQuery;
+import com.huodaizi.backend.repository.auth.N07TradeTermsEntity;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -425,6 +430,66 @@ public class AuthService {
     repository.updateOrderStatus(
         token, orderId, targetStatus, safeText(request.operator()), safeText(request.remark()));
     return orderDetail(token, orderId);
+  }
+
+  public N07TradeTermsDetailResponse tradeTermsDetail(String token, String orderId) {
+    N07TradeTermsEntity entity = repository.getTradeTerms(token, orderId);
+    return toTradeTermsDetail(entity);
+  }
+
+  public N07TradeTermsDetailResponse confirmTradeTerms(
+      String token, String orderId, N07TradeTermsConfirmRequest request) {
+    String action = safeText(request.action()).toUpperCase();
+    if (!"CONFIRM".equals(action)) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "action 仅支持 CONFIRM");
+    }
+    N07TradeTermsEntity updated =
+        repository.confirmTradeTerms(token, orderId, safeText(request.operator()), safeText(request.remark()));
+    return toTradeTermsDetail(updated);
+  }
+
+  private N07TradeTermsDetailResponse toTradeTermsDetail(N07TradeTermsEntity entity) {
+    List<N07TradeTermClauseDTO> clauses =
+        entity.getClauses().stream()
+            .map(
+                item ->
+                    new N07TradeTermClauseDTO(
+                        item.getClauseCode(), item.getClauseName(), item.getClauseContent(), item.isRequired()))
+            .toList();
+    List<N07TradeTermAttachmentDTO> attachments =
+        entity.getAttachments().stream()
+            .map(item -> new N07TradeTermAttachmentDTO(item.getFileName(), item.getFileType(), item.getFileUrl()))
+            .toList();
+    return new N07TradeTermsDetailResponse(
+        entity.getOrderId(),
+        entity.getOrderNo(),
+        entity.getInquiryNo(),
+        entity.getBuyerCompany(),
+        entity.getSupplierName(),
+        entity.getGoodsName(),
+        entity.getSpecText(),
+        entity.getQuantityTon(),
+        entity.getUnitPrice(),
+        entity.getTotalAmount(),
+        entity.getDeliveryTerm(),
+        entity.getPaymentTerm(),
+        entity.getInvoiceTerm(),
+        entity.getSettlementMethod(),
+        entity.getQualityStandard(),
+        entity.getToleranceRange(),
+        entity.getBreachLiability(),
+        entity.getDisputeResolution(),
+        entity.getOtherClause(),
+        entity.getEffectiveDate(),
+        entity.getExpireDate(),
+        entity.isConfirmed(),
+        entity.getConfirmedBy(),
+        entity.getConfirmedAt(),
+        entity.getConfirmRemark(),
+        toText(entity.getCreatedAt()),
+        toText(entity.getUpdatedAt()),
+        clauses,
+        attachments);
   }
 
   private N03EnterpriseCertificationDetailResponse toCertificationDetail(

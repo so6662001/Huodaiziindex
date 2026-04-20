@@ -100,6 +100,10 @@ function goOrderDetail() {
   router.push('/account/order-detail')
 }
 
+function goTradeTermsConfirm() {
+  router.push('/account/trade-terms-confirm')
+}
+
 function goTarget(identityCode) {
   if (identityCode === 'BUYER') {
     router.push('/inquiry/create')
@@ -200,6 +204,14 @@ onMounted(() => {
               @click="goOrderDetail"
             >
               订单详情页
+            </button>
+            <button
+              v-if="identity.identityCode === 'BUYER'"
+              class="btn"
+              :disabled="switching"
+              @click="goTradeTermsConfirm"
+            >
+              交易条款确认页
             </button>
             <button class="btn" :disabled="switching" @click="goTarget(identity.identityCode)">进入工作台</button>
           </div>

@@ -16,6 +16,8 @@ import com.huodaizi.backend.dto.auth.N05NegotiationStatusUpdateRequest;
 import com.huodaizi.backend.dto.auth.N06OrderActionRequest;
 import com.huodaizi.backend.dto.auth.N06OrderDetailResponse;
 import com.huodaizi.backend.dto.auth.N06OrderListResponse;
+import com.huodaizi.backend.dto.auth.N07TradeTermsConfirmRequest;
+import com.huodaizi.backend.dto.auth.N07TradeTermsDetailResponse;
 import com.huodaizi.backend.service.auth.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -128,6 +130,21 @@ public class AuthController {
       @PathVariable("orderId") String orderId,
       @Valid @RequestBody N06OrderActionRequest request) {
     return ApiResponse.success(service.orderAction(token, orderId, request));
+  }
+
+  @GetMapping("/orders/{orderId}/trade-terms")
+  public ApiResponse<N07TradeTermsDetailResponse> tradeTermsDetail(
+      @RequestHeader(name = AUTH_HEADER, required = false) String token,
+      @PathVariable("orderId") String orderId) {
+    return ApiResponse.success(service.tradeTermsDetail(token, orderId));
+  }
+
+  @PostMapping("/orders/{orderId}/trade-terms/confirm")
+  public ApiResponse<N07TradeTermsDetailResponse> confirmTradeTerms(
+      @RequestHeader(name = AUTH_HEADER, required = false) String token,
+      @PathVariable("orderId") String orderId,
+      @Valid @RequestBody N07TradeTermsConfirmRequest request) {
+    return ApiResponse.success(service.confirmTradeTerms(token, orderId, request));
   }
 
   @PostMapping("/logout")

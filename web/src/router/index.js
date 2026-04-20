@@ -35,6 +35,7 @@ import N03EnterpriseCertificationPage from '../pages/N03EnterpriseCertificationP
 import N04OnboardingProgressPage from '../pages/N04OnboardingProgressPage.vue'
 import N05NegotiationSessionPage from '../pages/N05NegotiationSessionPage.vue'
 import N06OrderDetailPage from '../pages/N06OrderDetailPage.vue'
+import N07TradeTermsConfirmPage from '../pages/N07TradeTermsConfirmPage.vue'
 import InquiryMerchantLeadManagePage from '../pages/InquiryMerchantLeadManagePage.vue'
 import InquiryQuoteWorkbenchPage from '../pages/InquiryQuoteWorkbenchPage.vue'
 import SiteAdLeadMinePage from '../pages/SiteAdLeadMinePage.vue'
@@ -239,6 +240,14 @@ const routes = [
     component: N06OrderDetailPage,
     meta: {
       title: 'PC-N06订单详情页_货袋子账号中心'
+    }
+  },
+  {
+    path: '/account/trade-terms-confirm',
+    name: 'n07TradeTermsConfirm',
+    component: N07TradeTermsConfirmPage,
+    meta: {
+      title: 'PC-N07交易条款确认页_货袋子账号中心'
     }
   },
   {
