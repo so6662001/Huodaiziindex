@@ -37,6 +37,7 @@ import N05NegotiationSessionPage from '../pages/N05NegotiationSessionPage.vue'
 import N06OrderDetailPage from '../pages/N06OrderDetailPage.vue'
 import N07TradeTermsConfirmPage from '../pages/N07TradeTermsConfirmPage.vue'
 import N08AfterSaleDisputePage from '../pages/N08AfterSaleDisputePage.vue'
+import N09AfterSaleProgressPage from '../pages/N09AfterSaleProgressPage.vue'
 import InquiryMerchantLeadManagePage from '../pages/InquiryMerchantLeadManagePage.vue'
 import InquiryQuoteWorkbenchPage from '../pages/InquiryQuoteWorkbenchPage.vue'
 import SiteAdLeadMinePage from '../pages/SiteAdLeadMinePage.vue'
@@ -257,6 +258,14 @@ const routes = [
     component: N08AfterSaleDisputePage,
     meta: {
       title: 'PC-N08售后争议发起页_货袋子账号中心'
+    }
+  },
+  {
+    path: '/account/after-sale-progress',
+    name: 'n09AfterSaleProgress',
+    component: N09AfterSaleProgressPage,
+    meta: {
+      title: 'PC-N09售后处理进度页_货袋子账号中心'
     }
   },
   {

@@ -149,7 +149,11 @@ function goTradeTerms() {
 }
 
 function goAfterSaleDispute() {
-  router.push('/account/after-sales-dispute')
+  router.push('/account/after-sale-dispute')
+}
+
+function goAfterSaleProgress() {
+  router.push('/account/after-sale-progress')
 }
 
 function goOnboarding() {
@@ -174,6 +178,7 @@ onMounted(() => {
         <button class="btn" @click="goNegotiation">返回议价会话</button>
         <button class="btn" @click="goTradeTerms">交易条款确认页</button>
         <button class="btn" @click="goAfterSaleDispute">售后/争议发起页</button>
+        <button class="btn" @click="goAfterSaleProgress">售后处理进度页</button>
         <button class="btn" @click="goOnboarding">返回入驻进度</button>
         <button class="btn" @click="goHome">返回首页</button>
       </div>

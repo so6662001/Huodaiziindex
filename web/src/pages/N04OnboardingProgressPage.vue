@@ -59,6 +59,10 @@ function goAfterSaleDispute() {
   router.push('/account/after-sale-dispute')
 }
 
+function goAfterSaleProgress() {
+  router.push('/account/after-sale-progress')
+}
+
 function goHome() {
   router.push('/')
 }
@@ -79,6 +83,7 @@ onMounted(() => {
         <button class="btn" @click="goOrderDetail">进入订单详情</button>
         <button class="btn" @click="goTradeTerms">交易条款确认页</button>
         <button class="btn" @click="goAfterSaleDispute">售后/争议发起页</button>
+        <button class="btn" @click="goAfterSaleProgress">售后处理进度页</button>
         <button class="btn" @click="goIdentitySelect">返回身份选择</button>
         <button class="btn" @click="goHome">返回首页</button>
       </div>

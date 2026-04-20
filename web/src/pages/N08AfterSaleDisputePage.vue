@@ -214,6 +214,10 @@ function goTradeTerms() {
   router.push('/account/trade-terms-confirm')
 }
 
+function goAfterSaleProgress() {
+  router.push('/account/after-sale-progress')
+}
+
 function goOrderDetail() {
   router.push('/account/order-detail')
 }
@@ -234,6 +238,7 @@ onMounted(() => {
       <p>针对质量、交付、发票、结算等异常发起售后争议，并跟踪处理进度与结案状态。</p>
       <div class="hero-actions">
         <button class="btn" @click="goTradeTerms">返回交易条款确认页</button>
+        <button class="btn" @click="goAfterSaleProgress">售后处理进度页</button>
         <button class="btn" @click="goOrderDetail">返回订单详情页</button>
         <button class="btn" @click="goHome">返回首页</button>
       </div>

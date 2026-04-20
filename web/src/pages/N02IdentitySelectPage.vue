@@ -108,6 +108,10 @@ function goAfterSaleDispute() {
   router.push('/account/after-sale-dispute')
 }
 
+function goAfterSaleProgress() {
+  router.push('/account/after-sale-progress')
+}
+
 function goTarget(identityCode) {
   if (identityCode === 'BUYER') {
     router.push('/inquiry/create')
@@ -224,6 +228,14 @@ onMounted(() => {
               @click="goAfterSaleDispute"
             >
               售后/争议发起页
+            </button>
+            <button
+              v-if="identity.identityCode === 'BUYER'"
+              class="btn"
+              :disabled="switching"
+              @click="goAfterSaleProgress"
+            >
+              售后处理进度页
             </button>
             <button class="btn" :disabled="switching" @click="goTarget(identity.identityCode)">进入工作台</button>
           </div>

@@ -22,6 +22,8 @@ import com.huodaizi.backend.dto.auth.N08AfterSaleDisputeCreateRequest;
 import com.huodaizi.backend.dto.auth.N08AfterSaleDisputeDetailResponse;
 import com.huodaizi.backend.dto.auth.N08AfterSaleDisputeListResponse;
 import com.huodaizi.backend.dto.auth.N08AfterSaleDisputeStatusUpdateRequest;
+import com.huodaizi.backend.dto.auth.N09AfterSaleProgressDetailResponse;
+import com.huodaizi.backend.dto.auth.N09AfterSaleProgressListResponse;
 import com.huodaizi.backend.service.auth.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -181,6 +183,23 @@ public class AuthController {
       @PathVariable("disputeId") String disputeId,
       @Valid @RequestBody N08AfterSaleDisputeStatusUpdateRequest request) {
     return ApiResponse.success(service.updateAfterSaleDisputeStatus(token, disputeId, request));
+  }
+
+  @GetMapping("/after-sales/progress")
+  public ApiResponse<N09AfterSaleProgressListResponse> afterSaleProgressList(
+      @RequestHeader(name = AUTH_HEADER, required = false) String token,
+      @RequestParam(name = "status", required = false) String status,
+      @RequestParam(name = "keyword", required = false) String keyword,
+      @RequestParam(name = "pageNo", required = false, defaultValue = "1") int pageNo,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "10") int pageSize) {
+    return ApiResponse.success(service.afterSaleProgressList(token, status, keyword, pageNo, pageSize));
+  }
+
+  @GetMapping("/after-sales/progress/{disputeId}")
+  public ApiResponse<N09AfterSaleProgressDetailResponse> afterSaleProgressDetail(
+      @RequestHeader(name = AUTH_HEADER, required = false) String token,
+      @PathVariable("disputeId") String disputeId) {
+    return ApiResponse.success(service.afterSaleProgressDetail(token, disputeId));
   }
 
   @PostMapping("/logout")

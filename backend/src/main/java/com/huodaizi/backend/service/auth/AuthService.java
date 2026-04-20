@@ -32,6 +32,10 @@ import com.huodaizi.backend.dto.auth.N08AfterSaleDisputeDetailResponse;
 import com.huodaizi.backend.dto.auth.N08AfterSaleDisputeListItemDTO;
 import com.huodaizi.backend.dto.auth.N08AfterSaleDisputeListResponse;
 import com.huodaizi.backend.dto.auth.N08AfterSaleDisputeStatusUpdateRequest;
+import com.huodaizi.backend.dto.auth.N09AfterSaleProgressDetailResponse;
+import com.huodaizi.backend.dto.auth.N09AfterSaleProgressListItemDTO;
+import com.huodaizi.backend.dto.auth.N09AfterSaleProgressListResponse;
+import com.huodaizi.backend.dto.auth.N09AfterSaleProgressNodeDTO;
 import com.huodaizi.backend.repository.auth.AuthUserEntity;
 import com.huodaizi.backend.repository.auth.EnterpriseCertificationDraft;
 import com.huodaizi.backend.repository.auth.EnterpriseCertificationEntity;
@@ -534,6 +538,70 @@ public class AuthService {
     return afterSaleDisputeDetail(token, disputeId);
   }
 
+  public N09AfterSaleProgressListResponse afterSaleProgressList(
+      String token, String status, String keyword, int pageNo, int pageSize) {
+    int safePageNo = Math.max(1, pageNo);
+    int safePageSize = Math.min(Math.max(1, pageSize), 50);
+    N08AfterSaleQuery query = new N08AfterSaleQuery(status, keyword, safePageNo, safePageSize);
+    List<N08AfterSaleDisputeEntity> all = repository.listAfterSaleDisputes(token, query);
+    int from = Math.min((safePageNo - 1) * safePageSize, all.size());
+    int to = Math.min(from + safePageSize, all.size());
+    List<N08AfterSaleDisputeEntity> paged = all.subList(from, to);
+    List<N09AfterSaleProgressListItemDTO> records =
+        paged.stream()
+            .map(
+                item ->
+                    new N09AfterSaleProgressListItemDTO(
+                        item.getDisputeId(),
+                        item.getOrderNo(),
+                        item.getSupplierName(),
+                        item.getIssueTypeText(),
+                        item.getIssueSummary(),
+                        currentStageByStatus(item.getStatus()),
+                        item.getStatus(),
+                        item.getStatusText(),
+                        item.getLatestRemark(),
+                        toText(item.getUpdatedAt())))
+            .toList();
+    return new N09AfterSaleProgressListResponse(safePageNo, safePageSize, all.size(), records);
+  }
+
+  public N09AfterSaleProgressDetailResponse afterSaleProgressDetail(String token, String disputeId) {
+    N08AfterSaleDisputeEntity item = repository.getAfterSaleDisputeDetail(token, disputeId);
+    List<N09AfterSaleProgressNodeDTO> nodes =
+        item.getProgressNodes().stream()
+            .map(
+                node ->
+                    new N09AfterSaleProgressNodeDTO(
+                        node.getNodeCode(),
+                        node.getNodeName(),
+                        node.getStatus(),
+                        node.getStatusText(),
+                        node.getHandler(),
+                        node.getRemark(),
+                        node.getHappenedAt()))
+            .toList();
+    return new N09AfterSaleProgressDetailResponse(
+        item.getDisputeId(),
+        item.getOrderId(),
+        item.getOrderNo(),
+        item.getInquiryNo(),
+        item.getBuyerCompany(),
+        item.getSupplierName(),
+        item.getIssueType(),
+        item.getIssueTypeText(),
+        item.getIssueSummary(),
+        item.getIssueDescription(),
+        item.getStatus(),
+        item.getStatusText(),
+        item.getLatestRemark(),
+        toText(item.getCreatedAt()),
+        toText(item.getUpdatedAt()),
+        progressPercentByAfterSaleStatus(item.getStatus()),
+        currentStageByStatus(item.getStatus()),
+        nodes);
+  }
+
   private N07TradeTermsDetailResponse toTradeTermsDetail(N07TradeTermsEntity entity) {
     List<N07TradeTermClauseDTO> clauses =
         entity.getClauses().stream()
@@ -835,6 +903,26 @@ public class AuthService {
       case "MARK_CLOSED", "CLOSED" -> "CLOSED";
       case "REOPEN", "SUBMITTED" -> "SUBMITTED";
       default -> throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "action 不支持");
+    };
+  }
+
+  private int progressPercentByAfterSaleStatus(String status) {
+    return switch (safeText(status).toUpperCase()) {
+      case "SUBMITTED" -> 25;
+      case "PROCESSING" -> 60;
+      case "RESOLVED" -> 90;
+      case "CLOSED" -> 100;
+      default -> 0;
+    };
+  }
+
+  private String currentStageByStatus(String status) {
+    return switch (safeText(status).toUpperCase()) {
+      case "SUBMITTED" -> "争议提交";
+      case "PROCESSING" -> "平台处理中";
+      case "RESOLVED" -> "方案达成";
+      case "CLOSED" -> "争议关闭";
+      default -> "处理中";
     };
   }
 }

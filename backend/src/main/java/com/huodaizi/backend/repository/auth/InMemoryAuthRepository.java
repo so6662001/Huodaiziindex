@@ -459,7 +459,12 @@ public class InMemoryAuthRepository {
           ErrorCode.BAD_REQUEST.getCode(), "status 仅支持 SUBMITTED/PROCESSING/RESOLVED/CLOSED");
     }
     String normalizedRemark = defaultText(remark, "");
-    entity.updateStatus(normalized, disputeStatusText(normalized), normalizedRemark, LocalDateTime.now());
+    entity.updateStatus(
+        normalized,
+        disputeStatusText(normalized),
+        normalizedRemark,
+        defaultText(operator, "n08-system"),
+        LocalDateTime.now());
     return entity;
   }
 
