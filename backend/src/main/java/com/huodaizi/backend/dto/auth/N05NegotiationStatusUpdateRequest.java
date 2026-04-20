@@ -1,0 +1,11 @@
+package com.huodaizi.backend.dto.auth;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
+public record N05NegotiationStatusUpdateRequest(
+    @NotBlank(message = "action 不能为空")
+    @Size(max = 16, message = "action 最大长度16")
+    String action,
+    @Size(max = 200, message = "remark 最大长度200")
+    String remark) {}
