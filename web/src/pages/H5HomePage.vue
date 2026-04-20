@@ -134,6 +134,10 @@ function goH5LitePay() {
   router.push('/h5/lite-pay')
 }
 
+function goH5CreditBrief() {
+  router.push('/h5/credit-brief')
+}
+
 function colorClass(item) {
   const text = String(item?.changeRate || '')
   if (text.startsWith('+')) return 'up'
@@ -166,6 +170,7 @@ onMounted(() => {
         <button class="btn" @click="goH5ReconcileDetail">H5-N07 对账详情</button>
         <button class="btn" @click="goH5AfterSaleCreate">H5-N08 售后发起</button>
         <button class="btn" @click="goH5LitePay">H5-N09 轻支付</button>
+        <button class="btn" @click="goH5CreditBrief">H5-N10 信用分简报</button>
       </div>
       <div class="filters">
         <label>

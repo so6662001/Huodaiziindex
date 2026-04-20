@@ -220,6 +220,10 @@ function goLitePay() {
   router.push('/h5/lite-pay')
 }
 
+function goCreditBrief() {
+  router.push('/h5/credit-brief')
+}
+
 onMounted(() => {
   loadSessions()
 })
@@ -239,6 +243,7 @@ onMounted(() => {
         <button class="btn" @click="goReconcileDetail">前往H5-N07对账详情</button>
         <button class="btn" @click="goAfterSaleCreate">前往H5-N08售后发起</button>
         <button class="btn" @click="goLitePay">前往H5-N09轻支付</button>
+        <button class="btn" @click="goCreditBrief">前往H5-N10信用分简报</button>
       </div>
     </section>
 

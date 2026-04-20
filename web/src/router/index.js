@@ -30,6 +30,7 @@ import H5N06PickupScanPage from '../pages/H5N06PickupScanPage.vue'
 import H5N07ReconcileDetailPage from '../pages/H5N07ReconcileDetailPage.vue'
 import H5N08AfterSaleCreatePage from '../pages/H5N08AfterSaleCreatePage.vue'
 import H5N09LitePayPage from '../pages/H5N09LitePayPage.vue'
+import H5N10CreditBriefPage from '../pages/H5N10CreditBriefPage.vue'
 import A01DashboardPage from '../pages/A01DashboardPage.vue'
 import A02LeadOpsPage from '../pages/A02LeadOpsPage.vue'
 import A03QuoteEfficiencyPage from '../pages/A03QuoteEfficiencyPage.vue'
@@ -136,6 +137,14 @@ const routes = [
     component: H5N09LitePayPage,
     meta: {
       title: 'H5-N09轻支付页_移动端收银支付与状态同步-货袋子'
+    }
+  },
+  {
+    path: '/h5/credit-brief',
+    name: 'h5N10CreditBrief',
+    component: H5N10CreditBriefPage,
+    meta: {
+      title: 'H5-N10信用分简报页_移动端信用概览与趋势追踪-货袋子'
     }
   },
   {

@@ -30,6 +30,8 @@ import com.huodaizi.backend.dto.auth.H5N08AfterSaleStatusUpdateRequest;
 import com.huodaizi.backend.dto.auth.H5N09LitePayDetailResponse;
 import com.huodaizi.backend.dto.auth.H5N09LitePayListResponse;
 import com.huodaizi.backend.dto.auth.H5N09LitePaySubmitRequest;
+import com.huodaizi.backend.dto.auth.H5N10CreditBriefDetailResponse;
+import com.huodaizi.backend.dto.auth.H5N10CreditBriefListResponse;
 import com.huodaizi.backend.dto.auth.H5N07ReconcileDetailResponse;
 import com.huodaizi.backend.dto.auth.H5N07ReconcileListResponse;
 import com.huodaizi.backend.dto.auth.H5N07ReconcileStatusUpdateRequest;
@@ -353,6 +355,23 @@ public class AuthController {
       @PathVariable("cashierOrderId") String cashierOrderId,
       @Valid @RequestBody H5N09LitePaySubmitRequest request) {
     return ApiResponse.success(service.h5LitePaySubmit(token, cashierOrderId, request));
+  }
+
+  @GetMapping("/h5/credit-brief/scores")
+  public ApiResponse<H5N10CreditBriefListResponse> h5CreditBriefList(
+      @RequestHeader(name = AUTH_HEADER, required = false) String token,
+      @RequestParam(name = "grade", required = false) String grade,
+      @RequestParam(name = "keyword", required = false) String keyword,
+      @RequestParam(name = "pageNo", required = false, defaultValue = "1") int pageNo,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "10") int pageSize) {
+    return ApiResponse.success(service.h5CreditBriefList(token, grade, keyword, pageNo, pageSize));
+  }
+
+  @GetMapping("/h5/credit-brief/scores/{scoreId}")
+  public ApiResponse<H5N10CreditBriefDetailResponse> h5CreditBriefDetail(
+      @RequestHeader(name = AUTH_HEADER, required = false) String token,
+      @PathVariable("scoreId") String scoreId) {
+    return ApiResponse.success(service.h5CreditBriefDetail(token, scoreId));
   }
 
   @GetMapping("/negotiations")

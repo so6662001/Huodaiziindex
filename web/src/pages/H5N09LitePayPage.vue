@@ -185,6 +185,10 @@ function goAfterSaleCreate() {
   router.push('/h5/after-sale-create')
 }
 
+function goCreditBrief() {
+  router.push('/h5/credit-brief')
+}
+
 function goQuickLogin() {
   router.push('/h5/login-quick')
 }
@@ -202,6 +206,7 @@ onMounted(() => {
       <div class="hero-actions">
         <button class="btn" @click="goH5Home">返回H5首页</button>
         <button class="btn" @click="goAfterSaleCreate">前往H5-N08售后发起</button>
+        <button class="btn" @click="goCreditBrief">前往H5-N10信用分简报</button>
         <button class="btn" @click="goQuickLogin">返回H5-N01快捷登录</button>
       </div>
     </section>

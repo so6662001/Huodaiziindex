@@ -197,6 +197,10 @@ function goLitePay() {
   router.push('/h5/lite-pay')
 }
 
+function goCreditBrief() {
+  router.push('/h5/credit-brief')
+}
+
 onMounted(() => {
   loadReconciles()
 })
@@ -213,6 +217,7 @@ onMounted(() => {
         <button class="btn" @click="goPickupScan">前往H5-N06扫码提货</button>
         <button class="btn" @click="goAfterSaleCreate">前往H5-N08售后发起</button>
         <button class="btn" @click="goLitePay">前往H5-N09轻支付</button>
+        <button class="btn" @click="goCreditBrief">前往H5-N10信用分简报</button>
         <button class="btn" @click="goQuickLogin">返回H5-N01快捷登录</button>
       </div>
     </section>

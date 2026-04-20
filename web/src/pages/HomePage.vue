@@ -181,6 +181,10 @@ function goH5N09LitePayPage() {
   router.push('/h5/lite-pay')
 }
 
+function goH5N10CreditBriefPage() {
+  router.push('/h5/credit-brief')
+}
+
 function goA01DashboardPage() {
   router.push('/admin/dashboard/a01')
 }
@@ -466,6 +470,7 @@ function onSearch() {
         <button class="btn" @click="goH5N07ReconcileDetailPage">H5-N07对账详情</button>
         <button class="btn" @click="goH5N08AfterSaleCreatePage">H5-N08售后发起</button>
         <button class="btn" @click="goH5N09LitePayPage">H5-N09轻支付</button>
+        <button class="btn" @click="goH5N10CreditBriefPage">H5-N10信用分简报</button>
         <button class="btn" @click="goA01DashboardPage">A01经营总看板</button>
         <button class="btn" @click="goA02LeadOpsPage">A02线索运营中心</button>
         <button class="btn" @click="goA03QuoteEfficiencyPage">A03报价效率中心</button>

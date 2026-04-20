@@ -43,6 +43,11 @@ import com.huodaizi.backend.dto.auth.H5N09LitePayDetailResponse;
 import com.huodaizi.backend.dto.auth.H5N09LitePayListItemDTO;
 import com.huodaizi.backend.dto.auth.H5N09LitePayListResponse;
 import com.huodaizi.backend.dto.auth.H5N09LitePaySubmitRequest;
+import com.huodaizi.backend.dto.auth.H5N10CreditBriefDetailResponse;
+import com.huodaizi.backend.dto.auth.H5N10CreditBriefFactorDTO;
+import com.huodaizi.backend.dto.auth.H5N10CreditBriefListItemDTO;
+import com.huodaizi.backend.dto.auth.H5N10CreditBriefListResponse;
+import com.huodaizi.backend.dto.auth.H5N10CreditBriefTrendPointDTO;
 import com.huodaizi.backend.dto.auth.N03EnterpriseCertificationDetailResponse;
 import com.huodaizi.backend.dto.auth.N03EnterpriseCertificationSubmitRequest;
 import com.huodaizi.backend.dto.auth.N04OnboardingProgressNodeDTO;
@@ -1007,6 +1012,62 @@ public class AuthService {
             finalRemark,
             finalOperator);
     return toH5LitePayDetail(updated, "支付已提交成功，可前往支付结果页查看流水");
+  }
+
+  public H5N10CreditBriefListResponse h5CreditBriefList(
+      String token, String grade, String keyword, int pageNo, int pageSize) {
+    AuthUserEntity user =
+        repository
+            .findUserByToken(token)
+            .orElseThrow(() -> new BaseException(ErrorCode.UNAUTHORIZED.getCode(), "登录态无效"));
+    int safePageNo = Math.max(1, pageNo);
+    int safePageSize = Math.min(Math.max(1, pageSize), 50);
+    N13CreditScoreQuery query = new N13CreditScoreQuery(safeText(grade), keyword, safePageNo, safePageSize);
+    List<N13CreditScoreEntity> all = repository.listCreditScores(token, query);
+    String normalizedGrade = safeText(grade).toUpperCase();
+    if (!normalizedGrade.isBlank()) {
+      all =
+          all.stream()
+              .filter(item -> h5CreditGrade(item).equalsIgnoreCase(normalizedGrade))
+              .toList();
+    }
+    int from = Math.min((safePageNo - 1) * safePageSize, all.size());
+    int to = Math.min(from + safePageSize, all.size());
+    List<N13CreditScoreEntity> paged = all.subList(from, to);
+    List<H5N10CreditBriefListItemDTO> records =
+        paged.stream()
+            .map(
+                item ->
+                    new H5N10CreditBriefListItemDTO(
+                        item.getScoreId(),
+                        item.getMerchantId(),
+                        item.getMerchantName(),
+                        item.getScoreMonth(),
+                        h5CreditTotalScore(item),
+                        h5CreditGrade(item),
+                        item.getRankPercent(),
+                        item.getRiskLevel(),
+                        h5CreditRiskLevelText(item.getRiskLevel()),
+                        h5CreditQuickActionText(item.getRiskLevel(), h5CreditGrade(item)),
+                        toText(item.getUpdatedAt())))
+            .toList();
+    String activeScoreId = records.isEmpty() ? "" : records.get(0).scoreId();
+    return new H5N10CreditBriefListResponse(
+        safePageNo,
+        safePageSize,
+        all.size(),
+        "H5",
+        repository.maskPhone(user.getAccount()),
+        activeScoreId,
+        records);
+  }
+
+  public H5N10CreditBriefDetailResponse h5CreditBriefDetail(String token, String scoreId) {
+    repository
+        .findUserByToken(token)
+        .orElseThrow(() -> new BaseException(ErrorCode.UNAUTHORIZED.getCode(), "登录态无效"));
+    N13CreditScoreEntity item = repository.getCreditScoreDetail(token, scoreId);
+    return toH5CreditBriefDetail(item, h5CreditTipText(item.getRiskLevel()));
   }
 
   public N06OrderListResponse orderList(
@@ -2246,6 +2307,53 @@ public class AuthService {
         timeline);
   }
 
+  private H5N10CreditBriefDetailResponse toH5CreditBriefDetail(
+      N13CreditScoreEntity item, String tipText) {
+    List<H5N10CreditBriefFactorDTO> factors =
+        item.getFactors().stream()
+            .map(
+                factor ->
+                    new H5N10CreditBriefFactorDTO(
+                        factor.getFactorCode(),
+                        factor.getFactorName(),
+                        factor.getScore(),
+                        factor.getWeight(),
+                        factor.getTrend(),
+                        factor.getSummary()))
+            .toList();
+    List<H5N10CreditBriefTrendPointDTO> trend =
+        item.getTimeline().stream()
+            .map(
+                point ->
+                    new H5N10CreditBriefTrendPointDTO(
+                        point.getNodeCode(),
+                        point.getImpactScore(),
+                        point.getImpactDirection(),
+                        point.getDescription(),
+                        point.getHappenedAt()))
+            .toList();
+    return new H5N10CreditBriefDetailResponse(
+        item.getScoreId(),
+        item.getMerchantId(),
+        item.getMerchantName(),
+        item.getScoreMonth(),
+        h5CreditTotalScore(item),
+        h5CreditGrade(item),
+        item.getRankPercent(),
+        item.getRiskLevel(),
+        h5CreditRiskLevelText(item.getRiskLevel()),
+        String.join("、", item.getTags()),
+        item.getScoreVersion(),
+        item.getRiskSummary(),
+        "H5",
+        h5CreditAvailableActions(item.getRiskLevel()),
+        item.getSuggestions(),
+        factors,
+        trend,
+        tipText,
+        toText(item.getUpdatedAt()));
+  }
+
   private List<String> h5AfterSaleAvailableActions(String status) {
     return switch (safeText(status).toUpperCase()) {
       case "SUBMITTED" -> List.of("MARK_PROCESSING", "MARK_CLOSED");
@@ -2287,6 +2395,75 @@ public class AuthService {
       case "UNPAID" -> List.of("SUBMIT_PAY");
       case "PAID" -> List.of("VIEW_RESULT");
       default -> List.of("VIEW_RESULT");
+    };
+  }
+
+  private String h5CreditTotalScore(N13CreditScoreEntity item) {
+    String totalScore = safeText(item.getTotalScore());
+    String grade = safeText(item.getGrade());
+    if (totalScore.matches("^\\d{1,3}$")) {
+      return totalScore;
+    }
+    if (grade.matches("^\\d{1,3}$")) {
+      return grade;
+    }
+    return "0";
+  }
+
+  private String h5CreditGrade(N13CreditScoreEntity item) {
+    String grade = safeText(item.getGrade()).toUpperCase();
+    String totalScore = safeText(item.getTotalScore()).toUpperCase();
+    if (grade.matches("A\\+|A-|A|B\\+|B|C")) {
+      return grade;
+    }
+    if (totalScore.matches("A\\+|A-|A|B\\+|B|C")) {
+      return totalScore;
+    }
+    return "B";
+  }
+
+  private String h5CreditRiskLevelText(String riskLevel) {
+    return switch (safeText(riskLevel).toUpperCase()) {
+      case "LOW" -> "低风险";
+      case "MEDIUM" -> "中风险";
+      case "HIGH" -> "高风险";
+      default -> "风险待评估";
+    };
+  }
+
+  private String h5CreditQuickActionText(String riskLevel, String grade) {
+    String normalizedRisk = safeText(riskLevel).toUpperCase();
+    String normalizedGrade = safeText(grade).toUpperCase();
+    if (!normalizedGrade.matches("A\\+|A-|A|B\\+|B|C")) {
+      normalizedGrade = "B";
+    }
+    if ("HIGH".equals(normalizedRisk)) {
+      return "立即风控复核";
+    }
+    if ("MEDIUM".equals(normalizedRisk)) {
+      return "跟进整改建议";
+    }
+    if (normalizedGrade.matches("A\\+|A")) {
+      return "查看提升路径";
+    }
+    return "查看信用详情";
+  }
+
+  private List<String> h5CreditAvailableActions(String riskLevel) {
+    return switch (safeText(riskLevel).toUpperCase()) {
+      case "HIGH" -> List.of("RISK_RECHECK", "VIEW_FACTORS");
+      case "MEDIUM" -> List.of("FOLLOW_SUGGESTIONS", "VIEW_FACTORS");
+      case "LOW" -> List.of("VIEW_FACTORS", "TRACK_TREND");
+      default -> List.of("VIEW_FACTORS");
+    };
+  }
+
+  private String h5CreditTipText(String riskLevel) {
+    return switch (safeText(riskLevel).toUpperCase()) {
+      case "HIGH" -> "当前风险偏高，建议优先处理争议率与回款时效。";
+      case "MEDIUM" -> "当前风险中等，可按建议清单持续优化履约表现。";
+      case "LOW" -> "当前信用表现稳定，建议保持高质量履约与回款记录。";
+      default -> "可查看信用因子与趋势，持续优化经营评分。";
     };
   }
 
