@@ -127,6 +127,7 @@ public class Admn04AuditLogAdminService {
       case "ADMN03" -> "/api/admin/rbac/roles/{roleId}/permissions";
       case "ADMN04" -> "/api/admin/audit-logs";
       case "ADMN05" -> "/api/admin/category-spec-dicts";
+      case "ADMN06" -> "/api/admin/lead-quality";
       default -> "/api/admin/unknown";
     };
   }

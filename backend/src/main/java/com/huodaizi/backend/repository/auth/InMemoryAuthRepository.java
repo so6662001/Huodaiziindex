@@ -45,6 +45,8 @@ public class InMemoryAuthRepository {
       new ConcurrentHashMap<>();
   private final ConcurrentMap<String, Admn05CategorySpecDictEntity> admn05CategorySpecStore =
       new ConcurrentHashMap<>();
+  private final ConcurrentMap<String, Admn06LeadQualityEntity> admn06LeadQualityStore =
+      new ConcurrentHashMap<>();
 
   public InMemoryAuthRepository() {
     seed();
@@ -561,8 +563,140 @@ public class InMemoryAuthRepository {
       case "ADMN03_RBAC_MANAGE" -> "角色权限管理";
       case "ADMN04_AUDIT_LOG_VIEW" -> "操作审计日志查看";
       case "ADMN05_DICT_MANAGE" -> "类目规格词库管理";
+      case "ADMN06_LEAD_QA_MANAGE" -> "线索质检中心";
       default -> "未命名权限";
     };
+  }
+
+  public List<Admn06LeadQualityEntity> listLeadQualityForAdmin(
+      String source, String qualityStatus, String riskLevel, String reviewer, String keyword) {
+    String sourceFilter = defaultText(source, "").toUpperCase(Locale.ROOT);
+    String statusFilter = defaultText(qualityStatus, "").toUpperCase(Locale.ROOT);
+    String riskFilter = defaultText(riskLevel, "").toUpperCase(Locale.ROOT);
+    String reviewerFilter = defaultText(reviewer, "").toLowerCase(Locale.ROOT);
+    String keywordFilter = defaultText(keyword, "").toLowerCase(Locale.ROOT);
+    return admn06LeadQualityStore.values().stream()
+        .filter(
+            item ->
+                sourceFilter.isBlank()
+                    || sourceFilter.equals(defaultText(item.getSource(), "").toUpperCase(Locale.ROOT)))
+        .filter(
+            item ->
+                statusFilter.isBlank()
+                    || statusFilter.equals(defaultText(item.getQualityStatus(), "").toUpperCase(Locale.ROOT)))
+        .filter(
+            item ->
+                riskFilter.isBlank()
+                    || riskFilter.equals(defaultText(item.getRiskLevel(), "").toUpperCase(Locale.ROOT)))
+        .filter(
+            item ->
+                reviewerFilter.isBlank()
+                    || defaultText(item.getReviewer(), "").toLowerCase(Locale.ROOT).contains(reviewerFilter))
+        .filter(
+            item ->
+                keywordFilter.isBlank()
+                    || defaultText(item.getQualityId(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                    || defaultText(item.getLeadId(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                    || defaultText(item.getLeadNo(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                    || defaultText(item.getIssueTags(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                    || defaultText(item.getReviewRemark(), "").toLowerCase(Locale.ROOT).contains(keywordFilter))
+        .sorted(Comparator.comparing(Admn06LeadQualityEntity::getUpdatedAt).reversed())
+        .toList();
+  }
+
+  public Admn06LeadQualityEntity getLeadQualityForAdmin(String qualityId) {
+    String normalized = defaultText(qualityId, "");
+    if (normalized.isBlank()) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "qualityId 不能为空");
+    }
+    Admn06LeadQualityEntity entity = admn06LeadQualityStore.get(normalized);
+    if (entity == null) {
+      throw new BaseException(ErrorCode.NOT_FOUND.getCode(), "质检记录不存在");
+    }
+    return entity;
+  }
+
+  public Admn06LeadQualityEntity reviewLeadQualityForAdmin(
+      String qualityId,
+      String qualityStatus,
+      String riskLevel,
+      Integer qualityScore,
+      String ruleCode,
+      String reviewRemark,
+      String reviewer) {
+    Admn06LeadQualityEntity entity = getLeadQualityForAdmin(qualityId);
+    String source = defaultText(entity.getSource(), "").toUpperCase(Locale.ROOT);
+    if (!source.matches("INQUIRY|SITE_AD")) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "source 仅支持 INQUIRY/SITE_AD");
+    }
+    String status = defaultText(qualityStatus, "").toUpperCase(Locale.ROOT);
+    if (!status.matches("PENDING|PASS|REJECT|RECHECK")) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "qualityStatus 仅支持 PENDING/PASS/REJECT/RECHECK");
+    }
+    String risk = defaultText(riskLevel, entity.getRiskLevel()).toUpperCase(Locale.ROOT);
+    if (!risk.matches("LOW|MEDIUM|HIGH")) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "riskLevel 仅支持 LOW/MEDIUM/HIGH");
+    }
+    int score = qualityScore == null ? entity.getQualityScore() : Math.max(0, Math.min(qualityScore, 100));
+    String tags = mergeIssueTags(entity.getIssueTags(), ruleCode, status, risk);
+    String remark = defaultText(reviewRemark, entity.getReviewRemark());
+    String operator = defaultText(reviewer, "admn06-reviewer");
+    entity.review(status, score, risk, tags, remark, operator, LocalDateTime.now());
+    admn06LeadQualityStore.put(entity.getQualityId(), entity);
+    return entity;
+  }
+
+  public String admn06SourceText(String source) {
+    return switch (defaultText(source, "").toUpperCase(Locale.ROOT)) {
+      case "INQUIRY" -> "询价线索";
+      case "SITE_AD" -> "广告线索";
+      default -> "其他来源";
+    };
+  }
+
+  public String admn06QualityStatusText(String qualityStatus) {
+    return switch (defaultText(qualityStatus, "").toUpperCase(Locale.ROOT)) {
+      case "PASS" -> "通过";
+      case "REJECT" -> "驳回";
+      case "RECHECK" -> "待复检";
+      case "PENDING" -> "待审核";
+      default -> "未知";
+    };
+  }
+
+  public String admn06RiskLevelText(String riskLevel) {
+    return switch (defaultText(riskLevel, "").toUpperCase(Locale.ROOT)) {
+      case "LOW" -> "低风险";
+      case "MEDIUM" -> "中风险";
+      case "HIGH" -> "高风险";
+      default -> "未知";
+    };
+  }
+
+  private String mergeIssueTags(String currentTags, String ruleCode, String qualityStatus, String riskLevel) {
+    List<String> tags = new ArrayList<>();
+    String existed = defaultText(currentTags, "");
+    if (!existed.isBlank()) {
+      for (String item : existed.split(",")) {
+        String trimmed = item == null ? "" : item.trim().toUpperCase(Locale.ROOT);
+        if (!trimmed.isBlank() && !tags.contains(trimmed)) {
+          tags.add(trimmed);
+        }
+      }
+    }
+    String rule = defaultText(ruleCode, "").toUpperCase(Locale.ROOT);
+    if (!rule.isBlank() && !tags.contains(rule)) {
+      tags.add(rule);
+    }
+    String statusTag = "QA_" + defaultText(qualityStatus, "PENDING").toUpperCase(Locale.ROOT);
+    if (!tags.contains(statusTag)) {
+      tags.add(statusTag);
+    }
+    String riskTag = "RISK_" + defaultText(riskLevel, "LOW").toUpperCase(Locale.ROOT);
+    if (!tags.contains(riskTag)) {
+      tags.add(riskTag);
+    }
+    return String.join(",", tags);
   }
 
   public List<Admn05CategorySpecDictEntity> listCategorySpecDictsForAdmin(
@@ -1630,6 +1764,7 @@ public class InMemoryAuthRepository {
       case "ADMN03" -> "角色权限管理";
       case "ADMN04" -> "操作审计日志";
       case "ADMN05" -> "类目规格词库管理";
+      case "ADMN06" -> "线索质检中心";
       default -> "其他模块";
     };
   }
@@ -1643,6 +1778,8 @@ public class InMemoryAuthRepository {
       case "AUDIT_QUERY" -> "审计日志查询";
       case "DICT_UPSERT" -> "词库新增/更新";
       case "DICT_QUERY" -> "词库查询";
+      case "LEAD_QA_REVIEW" -> "线索质检复核";
+      case "LEAD_QA_QUERY" -> "线索质检查询";
       default -> "通用操作";
     };
   }
@@ -1696,6 +1833,7 @@ public class InMemoryAuthRepository {
     seedAdmn03Roles();
     seedAdmn04AuditLogs();
     seedAdmn05CategorySpecDicts();
+    seedAdmn06LeadQuality();
     seedNegotiation(seed);
     seedOrders(seed);
     seedTradeTerms(seed);
@@ -1790,7 +1928,8 @@ public class InMemoryAuthRepository {
                 "ADMN02_BLACKLIST_MANAGE",
                 "ADMN03_RBAC_MANAGE",
                 "ADMN04_AUDIT_LOG_VIEW",
-                "ADMN05_DICT_MANAGE"),
+                "ADMN05_DICT_MANAGE",
+                "ADMN06_LEAD_QA_MANAGE"),
             "seed",
             now.minusDays(30),
             now.minusDays(1));
@@ -1809,7 +1948,8 @@ public class InMemoryAuthRepository {
                 "ADMN02_BLACKLIST_MANAGE",
                 "DASHBOARD_VIEW",
                 "ADMN04_AUDIT_LOG_VIEW",
-                "ADMN05_DICT_MANAGE"),
+                "ADMN05_DICT_MANAGE",
+                "ADMN06_LEAD_QA_MANAGE"),
             "seed",
             now.minusDays(20),
             now.minusDays(2));
@@ -1927,6 +2067,57 @@ public class InMemoryAuthRepository {
             now.minusDays(6),
             now.minusHours(30));
     admn05CategorySpecStore.put(plate10mm.getDictId(), plate10mm);
+  }
+
+  private void seedAdmn06LeadQuality() {
+    LocalDateTime now = LocalDateTime.now();
+    Admn06LeadQualityEntity inquiryQa =
+        new Admn06LeadQualityEntity(
+            "QA_INQ_0001",
+            "INQUIRY",
+            "ML20260418001",
+            "ML-20260418-20260418001",
+            "PASS",
+            92,
+            "LOW",
+            "SPEC_STANDARD,CONTACT_VALID,QA_PASS",
+            "字段完整，联系方式有效",
+            "qa-seed",
+            now.minusDays(4),
+            now.minusHours(20));
+    admn06LeadQualityStore.put(inquiryQa.getQualityId(), inquiryQa);
+
+    Admn06LeadQualityEntity siteAdQa =
+        new Admn06LeadQualityEntity(
+            "QA_AD_0001",
+            "SITE_AD",
+            "SAL20260418001",
+            "ADL-20260418-SAL20260418001",
+            "RECHECK",
+            66,
+            "MEDIUM",
+            "BUDGET_AMBIGUOUS,FOLLOW_DELAY,RISK_MEDIUM",
+            "预算区间偏宽，需补充投放目标与复联计划",
+            "qa-seed",
+            now.minusDays(3),
+            now.minusHours(8));
+    admn06LeadQualityStore.put(siteAdQa.getQualityId(), siteAdQa);
+
+    Admn06LeadQualityEntity inquiryRiskQa =
+        new Admn06LeadQualityEntity(
+            "QA_INQ_0002",
+            "INQUIRY",
+            "ML20260418002",
+            "ML-20260418-20260418002",
+            "PENDING",
+            48,
+            "HIGH",
+            "CONTACT_SUSPECT,REPEAT_SUBMIT,RISK_HIGH",
+            "疑似重复提交，待人工二次核验",
+            "qa-seed",
+            now.minusDays(2),
+            now.minusHours(2));
+    admn06LeadQualityStore.put(inquiryRiskQa.getQualityId(), inquiryRiskQa);
   }
 
   private void seedNegotiation(AuthUserEntity user) {

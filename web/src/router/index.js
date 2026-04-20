@@ -45,6 +45,7 @@ import Admn02BuyerBlacklistPage from '../pages/Admn02BuyerBlacklistPage.vue'
 import Admn03RbacRolePermissionPage from '../pages/Admn03RbacRolePermissionPage.vue'
 import Admn04AuditLogPage from '../pages/Admn04AuditLogPage.vue'
 import Admn05CategorySpecDictPage from '../pages/Admn05CategorySpecDictPage.vue'
+import Admn06LeadQualityCenterPage from '../pages/Admn06LeadQualityCenterPage.vue'
 import N01LoginRegisterPage from '../pages/N01LoginRegisterPage.vue'
 import N02IdentitySelectPage from '../pages/N02IdentitySelectPage.vue'
 import N03EnterpriseCertificationPage from '../pages/N03EnterpriseCertificationPage.vue'
@@ -343,6 +344,14 @@ const routes = [
     component: Admn05CategorySpecDictPage,
     meta: {
       title: 'ADM-N05类目规格词库管理_管理端词库治理中心-货袋子'
+    }
+  },
+  {
+    path: '/admin/lead-quality/admn06',
+    name: 'admn06LeadQualityCenter',
+    component: Admn06LeadQualityCenterPage,
+    meta: {
+      title: 'ADM-N06线索质检中心_管理端线索质量巡检与复核-货袋子'
     }
   },
   {
