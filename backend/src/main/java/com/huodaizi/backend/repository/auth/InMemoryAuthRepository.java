@@ -53,6 +53,8 @@ public class InMemoryAuthRepository {
       new ConcurrentHashMap<>();
   private final ConcurrentMap<String, Admn10BillingRuleEntity> admn10BillingRuleStore =
       new ConcurrentHashMap<>();
+  private final ConcurrentMap<String, Admn11PaymentRefundEntity> admn11PaymentRefundStore =
+      new ConcurrentHashMap<>();
 
   public InMemoryAuthRepository() {
     seed();
@@ -573,6 +575,7 @@ public class InMemoryAuthRepository {
       case "ADMN08_FUNNEL_VIEW" -> "成交漏斗分析";
       case "ADMN09_ARBITRATION_MANAGE" -> "仲裁工单中心";
       case "ADMN10_BILLING_RULE_MANAGE" -> "计费规则配置";
+      case "ADMN11_PAYMENT_REFUND_MANAGE" -> "支付与退款管理";
       default -> "未命名权限";
     };
   }
@@ -2151,6 +2154,7 @@ public class InMemoryAuthRepository {
       case "ADMN08" -> "成交漏斗分析";
       case "ADMN09" -> "仲裁工单中心";
       case "ADMN10" -> "计费规则配置";
+      case "ADMN11" -> "支付与退款管理";
       default -> "其他模块";
     };
   }
@@ -2172,6 +2176,8 @@ public class InMemoryAuthRepository {
       case "ARBITRATION_QUERY" -> "仲裁工单查询";
       case "BILLING_RULE_UPSERT" -> "计费规则新增/更新";
       case "BILLING_RULE_QUERY" -> "计费规则查询";
+      case "PAYMENT_REFUND_REVIEW" -> "退款审核处理";
+      case "PAYMENT_REFUND_QUERY" -> "支付退款查询";
       default -> "通用操作";
     };
   }
@@ -2233,6 +2239,7 @@ public class InMemoryAuthRepository {
     seedTradeTerms(seed);
     seedAfterSaleDisputes(seed);
     seedCashierOrders(seed);
+    seedAdmn11PaymentRefunds(seed);
     seedInvoiceTitles(seed);
     seedInvoiceApplications(seed);
     seedCreditScores(seed);
@@ -2326,7 +2333,8 @@ public class InMemoryAuthRepository {
                 "ADMN06_LEAD_QA_MANAGE",
                 "ADMN08_FUNNEL_VIEW",
                 "ADMN09_ARBITRATION_MANAGE",
-                "ADMN10_BILLING_RULE_MANAGE"),
+                "ADMN10_BILLING_RULE_MANAGE",
+                "ADMN11_PAYMENT_REFUND_MANAGE"),
             "seed",
             now.minusDays(30),
             now.minusDays(1));
@@ -2348,7 +2356,8 @@ public class InMemoryAuthRepository {
                 "ADMN05_DICT_MANAGE",
                 "ADMN06_LEAD_QA_MANAGE",
                 "ADMN09_ARBITRATION_MANAGE",
-                "ADMN10_BILLING_RULE_MANAGE"),
+                "ADMN10_BILLING_RULE_MANAGE",
+                "ADMN11_PAYMENT_REFUND_MANAGE"),
             "seed",
             now.minusDays(20),
             now.minusDays(2));
@@ -2650,6 +2659,117 @@ public class InMemoryAuthRepository {
             now.minusDays(7),
             now.minusHours(6));
     admn10BillingRuleStore.put(settlementRatio.getRuleId(), settlementRatio);
+  }
+
+  private void seedAdmn11PaymentRefunds(AuthUserEntity user) {
+    LocalDateTime now = LocalDateTime.now();
+    Admn11PaymentRefundEntity first =
+        new Admn11PaymentRefundEntity(
+            "RF00000001",
+            "RF-20260418-0001",
+            "CS00000002",
+            "OD0002",
+            "OD-20260416-0008",
+            "INQ-20260418-2210",
+            user.getUserId(),
+            "演示钢贸有限公司",
+            "无锡铭泰供应链",
+            "热轧卷板Q235B 3.0*1500 300吨",
+            "BANK_TRANSFER",
+            payChannelText("BANK_TRANSFER"),
+            "1104000",
+            "1104000",
+            "FULL",
+            "QUALITY_DISPUTE",
+            "45000",
+            "",
+            "",
+            "PENDING_REVIEW",
+            "",
+            "buyer-finance",
+            "",
+            "",
+            "重复质检不通过，买方申请全额退回",
+            now.minusDays(2).toString(),
+            "",
+            "",
+            now.minusDays(2),
+            now.minusHours(3));
+    first.appendProgress(
+        "SUBMIT",
+        "提交退款申请",
+        "PENDING_REVIEW",
+        "待审核",
+        "buyer-finance",
+        "买方提交退款申请，等待管理端审核",
+        now.minusDays(2).toString());
+    first.appendProgress(
+        "PAYMENT_PROOF",
+        "支付凭证核验",
+        "PENDING_REVIEW",
+        "待审核",
+        "system",
+        "已拉取支付流水，待人工复核",
+        now.minusDays(1).toString());
+    admn11PaymentRefundStore.put(first.getRefundId(), first);
+
+    Admn11PaymentRefundEntity second =
+        new Admn11PaymentRefundEntity(
+            "RF00000002",
+            "RF-20260416-0008",
+            "CS00000001",
+            "OD0001",
+            "OD-20260418-0001",
+            "INQ-20260419-3301",
+            user.getUserId(),
+            "演示钢贸有限公司",
+            "唐山弘达钢贸",
+            "螺纹钢HRB400E Φ20 500吨",
+            "ALIPAY",
+            payChannelText("ALIPAY"),
+            "1760000",
+            "1760000",
+            "PARTIAL",
+            "DOUBLE_PAYMENT",
+            "12000",
+            "12000",
+            "12000",
+            "REFUNDED",
+            "",
+            "buyer-finance",
+            "finance-ops",
+            "admn11-seed",
+            "确认重复支付，已原路退款",
+            now.minusDays(6).toString(),
+            now.minusDays(4).toString(),
+            now.minusDays(2).toString(),
+            now.minusDays(6),
+            now.minusDays(2));
+    second.appendProgress(
+        "SUBMIT",
+        "提交退款申请",
+        "PENDING_REVIEW",
+        "待审核",
+        "buyer-finance",
+        "发现重复支付并提交退款",
+        now.minusDays(6).toString());
+    second.appendProgress(
+        "APPROVE",
+        "审核通过",
+        "APPROVED",
+        "退款通过",
+        "admn11-seed",
+        "审核通过，进入退款执行",
+        now.minusDays(4).toString());
+    second.appendProgress(
+        "REFUND_DONE",
+        "退款完成",
+        "REFUNDED",
+        "已退款",
+        "finance-ops",
+        "款项已回退至原支付账户",
+        now.minusDays(2).toString());
+    admn11PaymentRefundStore.put(second.getRefundId(), second);
   }
 
   private void seedNegotiation(AuthUserEntity user) {
@@ -3417,6 +3537,157 @@ public class InMemoryAuthRepository {
       case "UNIONPAY" -> "银联";
       default -> "其他";
     };
+  }
+
+  public String admn11RefundStatusText(String refundStatus) {
+    return switch (defaultText(refundStatus, "").toUpperCase(Locale.ROOT)) {
+      case "PENDING_REVIEW" -> "待审核";
+      case "APPROVED" -> "退款通过";
+      case "REJECTED" -> "退款驳回";
+      case "REFUNDED" -> "已退款";
+      default -> "处理中";
+    };
+  }
+
+  public String admn11RefundReasonText(String refundReasonCode) {
+    return switch (defaultText(refundReasonCode, "").toUpperCase(Locale.ROOT)) {
+      case "DOUBLE_PAYMENT" -> "重复支付";
+      case "ORDER_CANCELLED" -> "订单取消";
+      case "QUALITY_DISPUTE" -> "质量争议";
+      case "OTHER" -> "其他原因";
+      default -> "其他原因";
+    };
+  }
+
+  public List<Admn11PaymentRefundEntity> listPaymentRefundsForAdmin(
+      String refundStatus,
+      String refundReasonCode,
+      String payChannel,
+      String keyword) {
+    String statusFilter = defaultText(refundStatus, "").toUpperCase(Locale.ROOT);
+    String reasonFilter = defaultText(refundReasonCode, "").toUpperCase(Locale.ROOT);
+    String channelFilter = defaultText(payChannel, "").toUpperCase(Locale.ROOT);
+    String keywordFilter = defaultText(keyword, "").toLowerCase(Locale.ROOT);
+    return admn11PaymentRefundStore.values().stream()
+        .filter(
+            item ->
+                statusFilter.isBlank()
+                    || statusFilter.equals(defaultText(item.getRefundStatus(), "").toUpperCase(Locale.ROOT)))
+        .filter(
+            item ->
+                reasonFilter.isBlank()
+                    || reasonFilter.equals(defaultText(item.getRefundReasonCode(), "").toUpperCase(Locale.ROOT)))
+        .filter(
+            item ->
+                channelFilter.isBlank()
+                    || channelFilter.equals(defaultText(item.getPayChannel(), "").toUpperCase(Locale.ROOT)))
+        .filter(
+            item -> {
+              if (keywordFilter.isBlank()) {
+                return true;
+              }
+              return defaultText(item.getRefundId(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                  || defaultText(item.getCashierId(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                  || defaultText(item.getOrderNo(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                  || defaultText(item.getInquiryNo(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                  || defaultText(item.getBuyerCompany(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                  || defaultText(item.getSupplierName(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                  || defaultText(item.getRefundReasonCode(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                  || defaultText(item.getLatestRemark(), "").toLowerCase(Locale.ROOT).contains(keywordFilter);
+            })
+        .sorted(Comparator.comparing(Admn11PaymentRefundEntity::getUpdatedAt).reversed())
+        .toList();
+  }
+
+  public Admn11PaymentRefundEntity getPaymentRefundForAdmin(String refundId) {
+    String normalized = defaultText(refundId, "");
+    if (normalized.isBlank()) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "refundId 不能为空");
+    }
+    Admn11PaymentRefundEntity entity = admn11PaymentRefundStore.get(normalized);
+    if (entity == null) {
+      throw new BaseException(ErrorCode.NOT_FOUND.getCode(), "退款工单不存在");
+    }
+    return entity;
+  }
+
+  public Admn11PaymentRefundEntity reviewPaymentRefundForAdmin(
+      String refundId,
+      String action,
+      String reviewRemark,
+      String rejectReason,
+      String operator) {
+    Admn11PaymentRefundEntity entity = getPaymentRefundForAdmin(refundId);
+    String normalizedAction = defaultText(action, "").toUpperCase(Locale.ROOT);
+    if (!normalizedAction.matches("APPROVE|REJECT|CONFIRM_REFUND")) {
+      throw new BaseException(
+          ErrorCode.BAD_REQUEST.getCode(), "action 仅支持 APPROVE/REJECT/CONFIRM_REFUND");
+    }
+    String safeOperator = defaultText(operator, "admn11-review");
+    String safeRemark = defaultText(reviewRemark, "退款工单处理");
+    String safeRejectReason = defaultText(rejectReason, "");
+
+    String nextStatus = entity.getRefundStatus();
+    if ("APPROVE".equals(normalizedAction)) {
+      nextStatus = "APPROVED";
+    } else if ("REJECT".equals(normalizedAction)) {
+      nextStatus = "REJECTED";
+    } else if ("CONFIRM_REFUND".equals(normalizedAction)) {
+      nextStatus = "REFUNDED";
+    }
+
+    LocalDateTime now = LocalDateTime.now();
+    String reviewedAt = now.toString();
+    String refundedAt = "REFUNDED".equals(nextStatus) ? now.toString() : entity.getRefundedAt();
+    String approvedAmount =
+        "REJECTED".equals(nextStatus)
+            ? "0"
+            : defaultText(entity.getApprovedAmountYuan(), entity.getRefundAmountYuan());
+    entity.review(
+        nextStatus,
+        approvedAmount,
+        "REJECTED".equals(nextStatus) ? safeRejectReason : "",
+        safeRemark,
+        safeOperator,
+        "REFUNDED".equals(nextStatus) ? safeOperator : entity.getFinanceOperator(),
+        reviewedAt,
+        refundedAt,
+        now);
+    admn11PaymentRefundStore.put(entity.getRefundId(), entity);
+
+    if ("REFUNDED".equals(nextStatus)) {
+      N10CashierOrderEntity cashier = cashierStore.get(entity.getCashierId());
+      if (cashier != null) {
+        cashier.markPaid(
+            cashier.getPayChannel(),
+            cashier.getPayChannelText(),
+            "0",
+            cashier.getAmountPayable(),
+            "ADM-N11退款确认：" + safeRemark,
+            now,
+            safeOperator);
+      }
+      N06OrderEntity order = orderStore.get(entity.getOrderId());
+      if (order != null) {
+        order.updateStatus("RECONCILING", safeOperator, now, "ADM-N11退款确认：" + safeRemark);
+      }
+    }
+    return entity;
+  }
+
+  public String admn11AuditRiskLevel(String refundStatus, String refundAmountYuan) {
+    String status = defaultText(refundStatus, "").toUpperCase(Locale.ROOT);
+    if ("REJECTED".equals(status)) {
+      return "LOW";
+    }
+    BigDecimal amount = parseNonNegativeMoney(defaultText(refundAmountYuan, "0"), "refundAmountYuan");
+    if (amount.compareTo(new BigDecimal("100000")) >= 0) {
+      return "HIGH";
+    }
+    if (amount.compareTo(new BigDecimal("30000")) >= 0) {
+      return "MEDIUM";
+    }
+    return "LOW";
   }
 
   private String invoiceTypeText(String invoiceType) {

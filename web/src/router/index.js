@@ -49,6 +49,7 @@ import Admn06LeadQualityCenterPage from '../pages/Admn06LeadQualityCenterPage.vu
 import Admn08DealFunnelAnalysisPage from '../pages/Admn08DealFunnelAnalysisPage.vue'
 import Admn09ArbitrationTicketCenterPage from '../pages/Admn09ArbitrationTicketCenterPage.vue'
 import Admn10BillingRuleConfigPage from '../pages/Admn10BillingRuleConfigPage.vue'
+import Admn11PaymentRefundManagePage from '../pages/Admn11PaymentRefundManagePage.vue'
 import N01LoginRegisterPage from '../pages/N01LoginRegisterPage.vue'
 import N02IdentitySelectPage from '../pages/N02IdentitySelectPage.vue'
 import N03EnterpriseCertificationPage from '../pages/N03EnterpriseCertificationPage.vue'
@@ -379,6 +380,14 @@ const routes = [
     component: Admn10BillingRuleConfigPage,
     meta: {
       title: 'ADM-N10计费规则配置_管理端计费规则治理与生效控制-货袋子'
+    }
+  },
+  {
+    path: '/admin/payment-refund-manage/admn11',
+    name: 'admn11PaymentRefundManage',
+    component: Admn11PaymentRefundManagePage,
+    meta: {
+      title: 'ADM-N11支付与退款管理_管理端支付退款审核与资金追踪-货袋子'
     }
   },
   {

@@ -131,6 +131,7 @@ public class Admn04AuditLogAdminService {
       case "ADMN08" -> "/api/admin/deal-funnel";
       case "ADMN09" -> "/api/admin/arbitration-tickets";
       case "ADMN10" -> "/api/admin/billing-rules";
+      case "ADMN11" -> "/api/admin/payment-refunds";
       default -> "/api/admin/unknown";
     };
   }
@@ -138,6 +139,9 @@ public class Admn04AuditLogAdminService {
   private String requestMethodByAction(String actionCode) {
     if (actionCode.contains("QUERY")) {
       return "GET";
+    }
+    if (actionCode.contains("REVIEW")) {
+      return "PUT";
     }
     if (actionCode.contains("UPSERT")) {
       return "POST";
