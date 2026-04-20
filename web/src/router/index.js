@@ -48,6 +48,7 @@ import Admn05CategorySpecDictPage from '../pages/Admn05CategorySpecDictPage.vue'
 import Admn06LeadQualityCenterPage from '../pages/Admn06LeadQualityCenterPage.vue'
 import Admn08DealFunnelAnalysisPage from '../pages/Admn08DealFunnelAnalysisPage.vue'
 import Admn09ArbitrationTicketCenterPage from '../pages/Admn09ArbitrationTicketCenterPage.vue'
+import Admn10BillingRuleConfigPage from '../pages/Admn10BillingRuleConfigPage.vue'
 import N01LoginRegisterPage from '../pages/N01LoginRegisterPage.vue'
 import N02IdentitySelectPage from '../pages/N02IdentitySelectPage.vue'
 import N03EnterpriseCertificationPage from '../pages/N03EnterpriseCertificationPage.vue'
@@ -370,6 +371,14 @@ const routes = [
     component: Admn09ArbitrationTicketCenterPage,
     meta: {
       title: 'ADM-N09仲裁工单中心_管理端争议仲裁流转与裁决处理-货袋子'
+    }
+  },
+  {
+    path: '/admin/billing-rule-config/admn10',
+    name: 'admn10BillingRuleConfig',
+    component: Admn10BillingRuleConfigPage,
+    meta: {
+      title: 'ADM-N10计费规则配置_管理端计费规则治理与生效控制-货袋子'
     }
   },
   {

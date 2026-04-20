@@ -144,6 +144,7 @@ public class Admn03RolePermissionAdminService {
       case "ADMN06_LEAD_QA_MANAGE" -> "线索质检中心";
       case "ADMN08_FUNNEL_VIEW" -> "成交漏斗分析";
       case "ADMN09_ARBITRATION_MANAGE" -> "仲裁工单中心";
+      case "ADMN10_BILLING_RULE_MANAGE" -> "计费规则配置";
       default -> "权限-" + safeText(permissionCode);
     };
   }

@@ -2,9 +2,11 @@ package com.huodaizi.backend.repository.auth;
 
 import com.huodaizi.backend.common.BaseException;
 import com.huodaizi.backend.common.ErrorCode;
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.ArrayList;
@@ -48,6 +50,8 @@ public class InMemoryAuthRepository {
   private final ConcurrentMap<String, Admn06LeadQualityEntity> admn06LeadQualityStore =
       new ConcurrentHashMap<>();
   private final ConcurrentMap<String, Admn09ArbitrationTicketEntity> admn09ArbitrationStore =
+      new ConcurrentHashMap<>();
+  private final ConcurrentMap<String, Admn10BillingRuleEntity> admn10BillingRuleStore =
       new ConcurrentHashMap<>();
 
   public InMemoryAuthRepository() {
@@ -568,6 +572,7 @@ public class InMemoryAuthRepository {
       case "ADMN06_LEAD_QA_MANAGE" -> "线索质检中心";
       case "ADMN08_FUNNEL_VIEW" -> "成交漏斗分析";
       case "ADMN09_ARBITRATION_MANAGE" -> "仲裁工单中心";
+      case "ADMN10_BILLING_RULE_MANAGE" -> "计费规则配置";
       default -> "未命名权限";
     };
   }
@@ -875,30 +880,180 @@ public class InMemoryAuthRepository {
     };
   }
 
-  private String mergeIssueTags(String currentTags, String ruleCode, String qualityStatus, String riskLevel) {
-    List<String> tags = new ArrayList<>();
-    String existed = defaultText(currentTags, "");
-    if (!existed.isBlank()) {
-      for (String item : existed.split(",")) {
-        String trimmed = item == null ? "" : item.trim().toUpperCase(Locale.ROOT);
-        if (!trimmed.isBlank() && !tags.contains(trimmed)) {
-          tags.add(trimmed);
-        }
-      }
+  public List<Admn10BillingRuleEntity> listBillingRulesForAdmin(
+      String ruleStatus, String sceneCode, String billingMode, String keyword) {
+    String statusFilter = defaultText(ruleStatus, "").toUpperCase(Locale.ROOT);
+    String sceneFilter = defaultText(sceneCode, "").toUpperCase(Locale.ROOT);
+    String modeFilter = defaultText(billingMode, "").toUpperCase(Locale.ROOT);
+    String keywordFilter = defaultText(keyword, "").toLowerCase(Locale.ROOT);
+    return admn10BillingRuleStore.values().stream()
+        .filter(
+            item ->
+                statusFilter.isBlank()
+                    || statusFilter.equals(defaultText(item.getRuleStatus(), "").toUpperCase(Locale.ROOT)))
+        .filter(
+            item ->
+                sceneFilter.isBlank()
+                    || sceneFilter.equals(defaultText(item.getSceneCode(), "").toUpperCase(Locale.ROOT)))
+        .filter(
+            item ->
+                modeFilter.isBlank()
+                    || modeFilter.equals(defaultText(item.getBillingMode(), "").toUpperCase(Locale.ROOT)))
+        .filter(
+            item -> {
+              if (keywordFilter.isBlank()) {
+                return true;
+              }
+              return defaultText(item.getRuleId(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                  || defaultText(item.getRuleCode(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                  || defaultText(item.getRuleName(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                  || defaultText(item.getSceneCode(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                  || defaultText(item.getBillingMode(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                  || defaultText(item.getRemark(), "").toLowerCase(Locale.ROOT).contains(keywordFilter);
+            })
+        .sorted(Comparator.comparing(Admn10BillingRuleEntity::getUpdatedAt).reversed())
+        .toList();
+  }
+
+  public Admn10BillingRuleEntity getBillingRuleForAdmin(String ruleId) {
+    String normalized = defaultText(ruleId, "");
+    if (normalized.isBlank()) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "ruleId 不能为空");
     }
-    String rule = defaultText(ruleCode, "").toUpperCase(Locale.ROOT);
-    if (!rule.isBlank() && !tags.contains(rule)) {
-      tags.add(rule);
+    Admn10BillingRuleEntity entity = admn10BillingRuleStore.get(normalized);
+    if (entity == null) {
+      throw new BaseException(ErrorCode.NOT_FOUND.getCode(), "计费规则不存在");
     }
-    String statusTag = "QA_" + defaultText(qualityStatus, "PENDING").toUpperCase(Locale.ROOT);
-    if (!tags.contains(statusTag)) {
-      tags.add(statusTag);
+    return entity;
+  }
+
+  public Admn10BillingRuleEntity upsertBillingRuleForAdmin(
+      String ruleCode,
+      String ruleName,
+      String sceneCode,
+      String billingMode,
+      String feeCurrency,
+      String basePriceYuan,
+      String minFeeYuan,
+      String maxFeeYuan,
+      String ladderConfig,
+      String effectiveFrom,
+      String effectiveTo,
+      String ruleStatus,
+      String remark,
+      String operator) {
+    String safeRuleCode = defaultText(ruleCode, "").toUpperCase(Locale.ROOT);
+    String safeRuleName = defaultText(ruleName, "");
+    String safeSceneCode = defaultText(sceneCode, "").toUpperCase(Locale.ROOT);
+    String safeBillingMode = defaultText(billingMode, "").toUpperCase(Locale.ROOT);
+    if (safeRuleCode.isBlank() || safeRuleName.isBlank()) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "ruleCode 与 ruleName 不能为空");
     }
-    String riskTag = "RISK_" + defaultText(riskLevel, "LOW").toUpperCase(Locale.ROOT);
-    if (!tags.contains(riskTag)) {
-      tags.add(riskTag);
+    if (!safeSceneCode.matches("SUBSCRIPTION|BILLING_ORDER|SETTLEMENT|ARBITRATION")) {
+      throw new BaseException(
+          ErrorCode.BAD_REQUEST.getCode(), "sceneCode 仅支持 SUBSCRIPTION/BILLING_ORDER/SETTLEMENT/ARBITRATION");
     }
-    return String.join(",", tags);
+    if (!safeBillingMode.matches("FIXED|LADDER|RATIO")) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "billingMode 仅支持 FIXED/LADDER/RATIO");
+    }
+    String safeCurrency = defaultText(feeCurrency, "CNY").toUpperCase(Locale.ROOT);
+    if (!"CNY".equals(safeCurrency)) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "feeCurrency 当前仅支持 CNY");
+    }
+    parseNonNegativeMoney(basePriceYuan, "basePriceYuan");
+    parseNonNegativeMoney(minFeeYuan, "minFeeYuan");
+    parseNonNegativeMoney(maxFeeYuan, "maxFeeYuan");
+    String safeEffectiveFrom = defaultText(effectiveFrom, LocalDate.now().toString());
+    String safeEffectiveTo = defaultText(effectiveTo, "");
+    if (!safeEffectiveTo.isBlank() && safeEffectiveFrom.compareTo(safeEffectiveTo) > 0) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "effectiveTo 不能早于 effectiveFrom");
+    }
+    String safeRuleStatus = defaultText(ruleStatus, "ACTIVE").toUpperCase(Locale.ROOT);
+    if (!safeRuleStatus.matches("ACTIVE|DISABLED|DRAFT")) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "ruleStatus 仅支持 ACTIVE/DISABLED/DRAFT");
+    }
+    String safeLadderConfig = defaultText(ladderConfig, "");
+    if ("LADDER".equals(safeBillingMode) && safeLadderConfig.isBlank()) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "billingMode=LADDER 时 ladderConfig 不能为空");
+    }
+    String safeRemark = defaultText(remark, "");
+    String safeOperator = defaultText(operator, "admn10-admin");
+    LocalDateTime now = LocalDateTime.now();
+    Admn10BillingRuleEntity existing =
+        admn10BillingRuleStore.values().stream()
+            .filter(item -> safeRuleCode.equalsIgnoreCase(item.getRuleCode()))
+            .findFirst()
+            .orElse(null);
+    if (existing == null) {
+      Admn10BillingRuleEntity created =
+          new Admn10BillingRuleEntity(
+              "BR_"
+                  + UUID.randomUUID().toString().replace("-", "").substring(0, 10).toUpperCase(Locale.ROOT),
+              safeRuleCode,
+              safeRuleName,
+              safeSceneCode,
+              safeBillingMode,
+              safeCurrency,
+              normalizeMoney(basePriceYuan),
+              normalizeMoney(minFeeYuan),
+              normalizeMoney(maxFeeYuan),
+              safeLadderConfig,
+              safeEffectiveFrom,
+              safeEffectiveTo,
+              safeRuleStatus,
+              safeRemark,
+              safeOperator,
+              now,
+              now);
+      admn10BillingRuleStore.put(created.getRuleId(), created);
+      return created;
+    }
+    existing.update(
+        safeRuleCode,
+        safeRuleName,
+        safeSceneCode,
+        safeBillingMode,
+        safeCurrency,
+        normalizeMoney(basePriceYuan),
+        normalizeMoney(minFeeYuan),
+        normalizeMoney(maxFeeYuan),
+        safeLadderConfig,
+        safeEffectiveFrom,
+        safeEffectiveTo,
+        safeRuleStatus,
+        safeRemark,
+        safeOperator,
+        now);
+    admn10BillingRuleStore.put(existing.getRuleId(), existing);
+    return existing;
+  }
+
+  public String admn10SceneText(String sceneCode) {
+    return switch (defaultText(sceneCode, "").toUpperCase(Locale.ROOT)) {
+      case "SUBSCRIPTION" -> "套餐订阅";
+      case "BILLING_ORDER" -> "账单出账";
+      case "SETTLEMENT" -> "结算回款";
+      case "ARBITRATION" -> "争议仲裁";
+      default -> "其他";
+    };
+  }
+
+  public String admn10BillingModeText(String billingMode) {
+    return switch (defaultText(billingMode, "").toUpperCase(Locale.ROOT)) {
+      case "FIXED" -> "固定金额";
+      case "LADDER" -> "阶梯计费";
+      case "RATIO" -> "比例计费";
+      default -> "未知";
+    };
+  }
+
+  public String admn10RuleStatusText(String ruleStatus) {
+    return switch (defaultText(ruleStatus, "").toUpperCase(Locale.ROOT)) {
+      case "ACTIVE" -> "生效中";
+      case "DISABLED" -> "已停用";
+      case "DRAFT" -> "草稿";
+      default -> "未知";
+    };
   }
 
   public List<Admn05CategorySpecDictEntity> listCategorySpecDictsForAdmin(
@@ -1969,6 +2124,7 @@ public class InMemoryAuthRepository {
       case "ADMN06" -> "线索质检中心";
       case "ADMN08" -> "成交漏斗分析";
       case "ADMN09" -> "仲裁工单中心";
+      case "ADMN10" -> "计费规则配置";
       default -> "其他模块";
     };
   }
@@ -1988,6 +2144,8 @@ public class InMemoryAuthRepository {
       case "ARBITRATION_ASSIGN" -> "仲裁分派处理";
       case "ARBITRATION_REVIEW" -> "仲裁裁决处理";
       case "ARBITRATION_QUERY" -> "仲裁工单查询";
+      case "BILLING_RULE_UPSERT" -> "计费规则新增/更新";
+      case "BILLING_RULE_QUERY" -> "计费规则查询";
       default -> "通用操作";
     };
   }
@@ -2043,6 +2201,7 @@ public class InMemoryAuthRepository {
     seedAdmn05CategorySpecDicts();
     seedAdmn06LeadQuality();
     seedAdmn09ArbitrationTickets();
+    seedAdmn10BillingRules();
     seedNegotiation(seed);
     seedOrders(seed);
     seedTradeTerms(seed);
@@ -2140,7 +2299,8 @@ public class InMemoryAuthRepository {
                 "ADMN05_DICT_MANAGE",
                 "ADMN06_LEAD_QA_MANAGE",
                 "ADMN08_FUNNEL_VIEW",
-                "ADMN09_ARBITRATION_MANAGE"),
+                "ADMN09_ARBITRATION_MANAGE",
+                "ADMN10_BILLING_RULE_MANAGE"),
             "seed",
             now.minusDays(30),
             now.minusDays(1));
@@ -2161,7 +2321,8 @@ public class InMemoryAuthRepository {
                 "ADMN04_AUDIT_LOG_VIEW",
                 "ADMN05_DICT_MANAGE",
                 "ADMN06_LEAD_QA_MANAGE",
-                "ADMN09_ARBITRATION_MANAGE"),
+                "ADMN09_ARBITRATION_MANAGE",
+                "ADMN10_BILLING_RULE_MANAGE"),
             "seed",
             now.minusDays(20),
             now.minusDays(2));
@@ -2397,6 +2558,72 @@ public class InMemoryAuthRepository {
         "已指派仲裁员-周宁",
         now.minusHours(12).toString());
     admn09ArbitrationStore.put(second.getTicketId(), second);
+  }
+
+  private void seedAdmn10BillingRules() {
+    LocalDateTime now = LocalDateTime.now();
+    Admn10BillingRuleEntity subscriptionFixed =
+        new Admn10BillingRuleEntity(
+            "BR_0001",
+            "SUBSCRIPTION_FIXED",
+            "套餐订阅固定月费规则",
+            "SUBSCRIPTION",
+            "FIXED",
+            "CNY",
+            "2999",
+            "1999",
+            "9999",
+            "",
+            now.minusDays(30).toLocalDate().toString(),
+            "",
+            "ACTIVE",
+            "标准套餐固定月费，按自然月出账",
+            "seed",
+            now.minusDays(30),
+            now.minusDays(2));
+    admn10BillingRuleStore.put(subscriptionFixed.getRuleId(), subscriptionFixed);
+
+    Admn10BillingRuleEntity billingLadder =
+        new Admn10BillingRuleEntity(
+            "BR_0002",
+            "BILLING_LADDER_VOLUME",
+            "账单出账阶梯计费规则",
+            "BILLING_ORDER",
+            "LADDER",
+            "CNY",
+            "0",
+            "500",
+            "20000",
+            "0-100:8.5;101-300:7.2;301-999999:6.5",
+            now.minusDays(15).toLocalDate().toString(),
+            "",
+            "ACTIVE",
+            "按月成交吨位阶梯计费，自动写入账单",
+            "seed",
+            now.minusDays(15),
+            now.minusHours(12));
+    admn10BillingRuleStore.put(billingLadder.getRuleId(), billingLadder);
+
+    Admn10BillingRuleEntity settlementRatio =
+        new Admn10BillingRuleEntity(
+            "BR_0003",
+            "SETTLEMENT_RATIO_SERVICE",
+            "结算回款比例计费规则",
+            "SETTLEMENT",
+            "RATIO",
+            "CNY",
+            "0.008",
+            "300",
+            "12000",
+            "",
+            now.minusDays(7).toLocalDate().toString(),
+            now.plusDays(60).toLocalDate().toString(),
+            "DRAFT",
+            "按回款额0.8%计费，当前为灰度草稿",
+            "seed",
+            now.minusDays(7),
+            now.minusHours(6));
+    admn10BillingRuleStore.put(settlementRatio.getRuleId(), settlementRatio);
   }
 
   private void seedNegotiation(AuthUserEntity user) {
@@ -3134,6 +3361,26 @@ public class InMemoryAuthRepository {
       case "REOPEN" -> "根据补充证据重新仲裁";
       default -> "仲裁处理中";
     };
+  }
+
+  private String normalizeMoney(String amountText) {
+    return parseNonNegativeMoney(amountText, "amount").stripTrailingZeros().toPlainString();
+  }
+
+  private BigDecimal parseNonNegativeMoney(String amountText, String fieldName) {
+    String normalized = defaultText(amountText, "");
+    if (normalized.isBlank()) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), fieldName + " 不能为空");
+    }
+    try {
+      BigDecimal value = new BigDecimal(normalized);
+      if (value.compareTo(BigDecimal.ZERO) < 0) {
+        throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), fieldName + " 不能小于0");
+      }
+      return value;
+    } catch (NumberFormatException ex) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), fieldName + " 格式错误");
+    }
   }
 
   private String payChannelText(String channel) {
