@@ -36,6 +36,48 @@ class Admn04AuditLogAdminIntegrationTest {
 
   @Test
   void listAndDetailShouldWorkAndContainAdmnActions() throws Exception {
+    String mobile = "13988" + String.valueOf(System.nanoTime()).substring(5, 11);
+    mockMvc
+        .perform(
+            post("/api/v1/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(
+                    """
+                    {
+                      "accountType":"MOBILE",
+                      "mobile":"%s",
+                      "password":"Pass@1234",
+                      "confirmPassword":"Pass@1234",
+                      "smsCode":"123456",
+                      "companyName":"ADMN04测试买家",
+                      "contactName":"审计联调用户",
+                      "operator":"admn04-test"
+                    }
+                    """
+                        .formatted(mobile)))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.code").value("0"));
+
+    String buyerListResp =
+        mockMvc
+            .perform(
+                get("/api/admin/buyers")
+                    .header("X-Admin-Token", "test-admin-token")
+                    .param("keyword", mobile)
+                    .param("page", "1")
+                    .param("pageSize", "10"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.code").value("0"))
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+    java.util.Map<?, ?> buyerListBody = mapper.readValue(buyerListResp, java.util.Map.class);
+    java.util.Map<?, ?> buyerListData = (java.util.Map<?, ?>) buyerListBody.get("data");
+    java.util.List<?> buyerRecords = (java.util.List<?>) buyerListData.get("records");
+    String buyerUserId = String.valueOf(((java.util.Map<?, ?>) buyerRecords.get(0)).get("userId"));
+
     String certListResp =
         mockMvc
             .perform(
@@ -49,7 +91,6 @@ class Admn04AuditLogAdminIntegrationTest {
             .getResponse()
             .getContentAsString();
 
-    com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
     java.util.Map<?, ?> certListBody = mapper.readValue(certListResp, java.util.Map.class);
     java.util.Map<?, ?> certListData = (java.util.Map<?, ?>) certListBody.get("data");
     java.util.List<?> certRecords = (java.util.List<?>) certListData.get("records");
@@ -74,7 +115,7 @@ class Admn04AuditLogAdminIntegrationTest {
 
     mockMvc
         .perform(
-            put("/api/admin/buyers/{userId}/blacklist", "U000000000021")
+            put("/api/admin/buyers/{userId}/blacklist", buyerUserId)
                 .header("X-Admin-Token", "test-admin-token")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(
