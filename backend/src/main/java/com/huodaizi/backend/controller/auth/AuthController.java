@@ -16,6 +16,9 @@ import com.huodaizi.backend.dto.auth.H5N04NegotiationDetailResponse;
 import com.huodaizi.backend.dto.auth.H5N04NegotiationSendMessageRequest;
 import com.huodaizi.backend.dto.auth.H5N04NegotiationSessionListResponse;
 import com.huodaizi.backend.dto.auth.H5N04NegotiationStatusUpdateRequest;
+import com.huodaizi.backend.dto.auth.H5N05OrderDetailResponse;
+import com.huodaizi.backend.dto.auth.H5N05OrderListResponse;
+import com.huodaizi.backend.dto.auth.H5N05OrderStatusUpdateRequest;
 import com.huodaizi.backend.dto.auth.N04OnboardingProgressResponse;
 import com.huodaizi.backend.dto.auth.N03EnterpriseCertificationDetailResponse;
 import com.huodaizi.backend.dto.auth.N03EnterpriseCertificationSubmitRequest;
@@ -197,6 +200,31 @@ public class AuthController {
       @PathVariable("sessionId") String sessionId,
       @Valid @RequestBody H5N04NegotiationStatusUpdateRequest request) {
     return ApiResponse.success(service.h5UpdateNegotiationStatus(token, sessionId, request));
+  }
+
+  @GetMapping("/h5/orders")
+  public ApiResponse<H5N05OrderListResponse> h5OrderList(
+      @RequestHeader(name = AUTH_HEADER, required = false) String token,
+      @RequestParam(name = "status", required = false) String status,
+      @RequestParam(name = "keyword", required = false) String keyword,
+      @RequestParam(name = "pageNo", required = false, defaultValue = "1") int pageNo,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "10") int pageSize) {
+    return ApiResponse.success(service.h5OrderList(token, status, keyword, pageNo, pageSize));
+  }
+
+  @GetMapping("/h5/orders/{orderId}")
+  public ApiResponse<H5N05OrderDetailResponse> h5OrderDetail(
+      @RequestHeader(name = AUTH_HEADER, required = false) String token,
+      @PathVariable("orderId") String orderId) {
+    return ApiResponse.success(service.h5OrderDetail(token, orderId));
+  }
+
+  @PostMapping("/h5/orders/{orderId}/status")
+  public ApiResponse<H5N05OrderDetailResponse> h5OrderStatusUpdate(
+      @RequestHeader(name = AUTH_HEADER, required = false) String token,
+      @PathVariable("orderId") String orderId,
+      @Valid @RequestBody H5N05OrderStatusUpdateRequest request) {
+    return ApiResponse.success(service.h5UpdateOrderStatus(token, orderId, request));
   }
 
   @GetMapping("/negotiations")

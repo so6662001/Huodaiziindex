@@ -19,6 +19,12 @@ import com.huodaizi.backend.dto.auth.H5N04NegotiationSendMessageRequest;
 import com.huodaizi.backend.dto.auth.H5N04NegotiationSessionItemDTO;
 import com.huodaizi.backend.dto.auth.H5N04NegotiationSessionListResponse;
 import com.huodaizi.backend.dto.auth.H5N04NegotiationStatusUpdateRequest;
+import com.huodaizi.backend.dto.auth.H5N05OrderActionDTO;
+import com.huodaizi.backend.dto.auth.H5N05OrderDetailResponse;
+import com.huodaizi.backend.dto.auth.H5N05OrderListItemDTO;
+import com.huodaizi.backend.dto.auth.H5N05OrderListResponse;
+import com.huodaizi.backend.dto.auth.H5N05OrderStatusUpdateRequest;
+import com.huodaizi.backend.dto.auth.H5N05OrderTimelineNodeDTO;
 import com.huodaizi.backend.dto.auth.N03EnterpriseCertificationDetailResponse;
 import com.huodaizi.backend.dto.auth.N03EnterpriseCertificationSubmitRequest;
 import com.huodaizi.backend.dto.auth.N04OnboardingProgressNodeDTO;
@@ -551,6 +557,107 @@ public class AuthService {
     String fullRemark = remark.isBlank() ? finalOperator : remark + "（" + finalOperator + "）";
     repository.updateNegotiationStatus(token, sessionId, normalized, fullRemark);
     return h5NegotiationDetail(token, sessionId);
+  }
+
+  public H5N05OrderListResponse h5OrderList(
+      String token, String status, String keyword, int pageNo, int pageSize) {
+    int safePageNo = Math.max(1, pageNo);
+    int safePageSize = Math.min(Math.max(1, pageSize), 50);
+    N06OrderQuery query = new N06OrderQuery(status, keyword, safePageNo, safePageSize);
+    List<N06OrderEntity> all = repository.listOrders(token, query);
+    int from = Math.min((safePageNo - 1) * safePageSize, all.size());
+    int to = Math.min(from + safePageSize, all.size());
+    List<N06OrderEntity> paged = all.subList(from, to);
+
+    List<H5N05OrderListItemDTO> records =
+        paged.stream()
+            .map(
+                item -> {
+                  List<N06OrderActionDTO> actions = orderActionsForStatus(item.getOrderStatus());
+                  String quickActionText = actions.isEmpty() ? "查看详情" : actions.get(0).actionName();
+                  return new H5N05OrderListItemDTO(
+                      item.getOrderId(),
+                      item.getOrderNo(),
+                      item.getGoodsName(),
+                      item.getQuantityTon(),
+                      item.getSupplierName(),
+                      item.getOrderStatus(),
+                      item.getOrderStatusText(),
+                      item.getDealTotalAmount(),
+                      toText(item.getUpdatedAt()),
+                      quickActionText);
+                })
+            .toList();
+    String activeOrderId = records.isEmpty() ? "" : records.get(0).orderId();
+    return new H5N05OrderListResponse(
+        safePageNo, safePageSize, all.size(), "H5", activeOrderId, records);
+  }
+
+  public H5N05OrderDetailResponse h5OrderDetail(String token, String orderId) {
+    N06OrderEntity order = repository.getOrderDetail(token, orderId);
+    List<H5N05OrderTimelineNodeDTO> timeline =
+        order.getTimeline().stream()
+            .map(
+                node ->
+                    new H5N05OrderTimelineNodeDTO(
+                        node.getNodeCode(),
+                        node.getNodeName(),
+                        node.getStatus(),
+                        node.getStatusText(),
+                        node.getOwner(),
+                        node.getHappenedAt(),
+                        node.getRemark()))
+            .toList();
+    List<H5N05OrderActionDTO> actions =
+        orderActionsForStatus(order.getOrderStatus()).stream()
+            .map(
+                item ->
+                    new H5N05OrderActionDTO(
+                        item.actionCode(), item.actionName(), item.enabled(), item.reason()))
+            .toList();
+    List<String> availableActions =
+        actions.stream().filter(H5N05OrderActionDTO::enabled).map(H5N05OrderActionDTO::actionCode).toList();
+
+    String receivable = order.getDealTotalAmount();
+    String paidAmount = isPaidLike(order.getPaymentStatus()) ? receivable : "0";
+    String outstanding = isPaidLike(order.getPaymentStatus()) ? "0" : receivable;
+    return new H5N05OrderDetailResponse(
+        order.getOrderId(),
+        order.getOrderNo(),
+        order.getInquiryNo(),
+        order.getGoodsName(),
+        order.getGoodsName(),
+        order.getQuantityTon(),
+        order.getSupplierName(),
+        order.getBuyerCompany(),
+        order.getOrderStatus(),
+        order.getOrderStatusText(),
+        order.getPaymentStatus(),
+        h5PaymentStatusText(order.getPaymentStatus()),
+        order.getContractStatus(),
+        order.getContractStatusText(),
+        order.getExpectedDeliveryAt(),
+        order.getLatestRemark(),
+        receivable,
+        paidAmount,
+        outstanding,
+        "H5",
+        availableActions,
+        toText(order.getCreatedAt()),
+        toText(order.getUpdatedAt()),
+        timeline,
+        actions);
+  }
+
+  public H5N05OrderDetailResponse h5UpdateOrderStatus(
+      String token, String orderId, H5N05OrderStatusUpdateRequest request) {
+    String targetStatus = mapOrderActionToStatus(request.action());
+    String remark = safeText(request.remark());
+    String operator = safeText(request.operator());
+    String finalOperator = operator.isBlank() ? "h5-n05-order-status" : operator;
+    String fullRemark = remark.isBlank() ? finalOperator : remark + "（" + finalOperator + "）";
+    repository.updateOrderStatus(token, orderId, targetStatus, finalOperator, fullRemark);
+    return h5OrderDetail(token, orderId);
   }
 
   public N06OrderListResponse orderList(
@@ -1593,6 +1700,20 @@ public class AuthService {
       case "CLOSED" -> List.of("ONGOING");
       default -> List.of("ONGOING");
     };
+  }
+
+  private String h5PaymentStatusText(String paymentStatus) {
+    return switch (safeText(paymentStatus).toUpperCase()) {
+      case "PAID", "FULLY_PAID" -> "已支付";
+      case "PARTIAL_PAID" -> "部分支付";
+      case "NONE", "UNPAID" -> "待支付";
+      default -> "待支付";
+    };
+  }
+
+  private boolean isPaidLike(String paymentStatus) {
+    String normalized = safeText(paymentStatus).toUpperCase();
+    return "PAID".equals(normalized) || "FULLY_PAID".equals(normalized);
   }
 
   private String sessionStatusText(String status) {

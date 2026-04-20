@@ -25,6 +25,7 @@ import H5N01QuickLoginPage from '../pages/H5N01QuickLoginPage.vue'
 import H5N02IdentitySwitchPage from '../pages/H5N02IdentitySwitchPage.vue'
 import H5N03EnterpriseCertificationPage from '../pages/H5N03EnterpriseCertificationPage.vue'
 import H5N04QuoteSessionPage from '../pages/H5N04QuoteSessionPage.vue'
+import H5N05OrderDetailPage from '../pages/H5N05OrderDetailPage.vue'
 import A01DashboardPage from '../pages/A01DashboardPage.vue'
 import A02LeadOpsPage from '../pages/A02LeadOpsPage.vue'
 import A03QuoteEfficiencyPage from '../pages/A03QuoteEfficiencyPage.vue'
@@ -91,6 +92,14 @@ const routes = [
     component: H5N04QuoteSessionPage,
     meta: {
       title: 'H5-N04报价会话页_移动端报价沟通-货袋子'
+    }
+  },
+  {
+    path: '/h5/order-detail',
+    name: 'h5N05OrderDetail',
+    component: H5N05OrderDetailPage,
+    meta: {
+      title: 'H5-N05订单详情页_移动端订单履约与状态流转-货袋子'
     }
   },
   {

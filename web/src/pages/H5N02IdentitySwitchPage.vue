@@ -102,6 +102,10 @@ function goNegotiation() {
   router.push('/h5/quote-session')
 }
 
+function goOrderDetail() {
+  router.push('/h5/order-detail')
+}
+
 onMounted(() => {
   loadIdentities()
 })
@@ -116,6 +120,7 @@ onMounted(() => {
         <button class="btn" @click="goQuickLogin">返回快捷登录</button>
         <button class="btn" @click="goCertification">企业认证</button>
         <button class="btn" @click="goNegotiation">议价会话</button>
+        <button class="btn" @click="goOrderDetail">订单详情</button>
         <button class="btn" @click="goH5Home">返回H5首页</button>
       </div>
     </section>

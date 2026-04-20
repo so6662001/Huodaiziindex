@@ -200,6 +200,10 @@ function goEnterpriseCertification() {
   router.push('/h5/enterprise-certification')
 }
 
+function goOrderDetail() {
+  router.push('/h5/order-detail')
+}
+
 onMounted(() => {
   loadSessions()
 })
@@ -214,6 +218,7 @@ onMounted(() => {
         <button class="btn" @click="goH5Home">返回H5首页</button>
         <button class="btn" @click="goIdentitySwitch">前往身份切换</button>
         <button class="btn" @click="goEnterpriseCertification">前往企业认证</button>
+        <button class="btn" @click="goOrderDetail">前往H5-N05订单详情</button>
       </div>
     </section>
 

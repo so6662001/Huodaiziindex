@@ -114,6 +114,10 @@ function goQuoteSession() {
   router.push('/h5/quote-session')
 }
 
+function goH5OrderDetail() {
+  router.push('/h5/order-detail')
+}
+
 function colorClass(item) {
   const text = String(item?.changeRate || '')
   if (text.startsWith('+')) return 'up'
@@ -141,6 +145,7 @@ onMounted(() => {
         <button class="btn" @click="goIdentitySwitch">H5-N02 身份切换</button>
         <button class="btn" @click="goEnterpriseCertification">H5-N03 企业认证</button>
         <button class="btn" @click="goQuoteSession">H5-N04 报价会话</button>
+        <button class="btn" @click="goH5OrderDetail">H5-N05 订单详情</button>
       </div>
       <div class="filters">
         <label>
