@@ -21,6 +21,7 @@ public class Admn15RiskAlertTicketEntity {
   private String ticketStatus;
   private String owner;
   private String latestRemark;
+  private String followUpPlan;
   private String contactMobileMasked;
   private String sourceCreatedAt;
   private String sourceUpdatedAt;
@@ -48,6 +49,7 @@ public class Admn15RiskAlertTicketEntity {
       String ticketStatus,
       String owner,
       String latestRemark,
+      String followUpPlan,
       String contactMobileMasked,
       String sourceCreatedAt,
       String sourceUpdatedAt,
@@ -72,6 +74,7 @@ public class Admn15RiskAlertTicketEntity {
     this.ticketStatus = ticketStatus;
     this.owner = owner;
     this.latestRemark = latestRemark;
+    this.followUpPlan = followUpPlan;
     this.contactMobileMasked = contactMobileMasked;
     this.sourceCreatedAt = sourceCreatedAt;
     this.sourceUpdatedAt = sourceUpdatedAt;
@@ -147,6 +150,10 @@ public class Admn15RiskAlertTicketEntity {
     return latestRemark;
   }
 
+  public String getFollowUpPlan() {
+    return followUpPlan;
+  }
+
   public String getContactMobileMasked() {
     return contactMobileMasked;
   }
@@ -187,6 +194,7 @@ public class Admn15RiskAlertTicketEntity {
       String ticketStatus,
       String owner,
       String latestRemark,
+      String followUpPlan,
       String handledAt,
       String handler,
       String operator,
@@ -194,6 +202,7 @@ public class Admn15RiskAlertTicketEntity {
     this.ticketStatus = ticketStatus;
     this.owner = owner;
     this.latestRemark = latestRemark;
+    this.followUpPlan = followUpPlan;
     this.handledAt = handledAt;
     this.handler = handler;
     this.operator = operator;

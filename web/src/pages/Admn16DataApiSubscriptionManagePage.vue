@@ -101,7 +101,7 @@ function formatMetricsText(metrics) {
 
 function applyDetailToForm(data) {
   form.subscriptionCode = data?.subscriptionCode || ''
-  form.subscriptionName = data?.scenarioText || ''
+  form.subscriptionName = data?.scenarioText || data?.apiPackageName || ''
   form.merchantId = data?.merchantId || ''
   form.merchantName = data?.merchantName || ''
   form.apiPackageCode = data?.apiPackageCode || 'CREDIT_DATA'
@@ -121,6 +121,9 @@ function applyDetailToForm(data) {
 
 function inferBillingCycleFromDetail(data) {
   const text = (data?.scenarioText || '').toUpperCase()
+  if (text.includes('YEAR') || text.includes('年')) return 'YEARLY'
+  if (text.includes('QUARTER') || text.includes('季')) return 'QUARTERLY'
+  if (text.includes('MONTH') || text.includes('月')) return 'MONTHLY'
   if (text.includes('年')) return 'YEARLY'
   if (text.includes('季')) return 'QUARTERLY'
   if (text.includes('月')) return 'MONTHLY'

@@ -79,6 +79,7 @@ class Admn15RiskAlertTicketAdminIntegrationTest {
                       "action":"START_PROCESS",
                       "targetStatus":"PROCESSING",
                       "owner":"风控值班组",
+                      "followUpPlan":"15分钟复核并追踪报价结果",
                       "solution":"已联系商家与调度，启动风险工单跟进",
                       "remark":"升级为P1，15分钟复核一次",
                       "operator":"admn15-operator"
@@ -88,7 +89,8 @@ class Admn15RiskAlertTicketAdminIntegrationTest {
         .andExpect(jsonPath("$.code").value("0"))
         .andExpect(jsonPath("$.data.ticketId").value(ticketId))
         .andExpect(jsonPath("$.data.ticketStatus").value("PROCESSING"))
-        .andExpect(jsonPath("$.data.owner").value("风控值班组"));
+        .andExpect(jsonPath("$.data.owner").value("风控值班组"))
+        .andExpect(jsonPath("$.data.followUpPlan").value("15分钟复核并追踪报价结果"));
 
     mockMvc
         .perform(

@@ -3444,6 +3444,7 @@ public class InMemoryAuthRepository {
             "联系商家并在30分钟内完成报价",
             "OPEN",
             "风控值班组",
+            "30分钟内完成报价并回传结果",
             "已触发高风险提醒，待人工接单",
             "138****8000",
             now.minusHours(5).toString(),
@@ -3480,6 +3481,7 @@ public class InMemoryAuthRepository {
             "核实车辆进场并重排提货计划",
             "PROCESSING",
             "履约风控组",
+            "联动仓储与承运商重新排期",
             "已联系仓库确认车辆晚点，等待新排期",
             "139****9988",
             now.minusHours(18).toString(),
@@ -3524,6 +3526,7 @@ public class InMemoryAuthRepository {
             "发起财务催收并升级风险跟踪",
             "RESOLVED",
             "财务风控组",
+            "回款到账后归档并复盘",
             "已完成回款确认并关闭预警",
             "137****2233",
             now.minusDays(2).toString(),
@@ -3624,11 +3627,13 @@ public class InMemoryAuthRepository {
         defaultText(handleRemark, "").isBlank()
             ? defaultText(solution, defaultText(followUpPlan, entity.getLatestRemark()))
             : defaultText(handleRemark, entity.getLatestRemark());
+    String resolvedFollowUpPlan = defaultText(followUpPlan, entity.getFollowUpPlan());
     String handler = defaultText(operator, "admn15-handler");
     entity.handle(
         resolvedStatus,
         resolvedOwner,
         remark,
+        resolvedFollowUpPlan,
         now.toString(),
         handler,
         handler,

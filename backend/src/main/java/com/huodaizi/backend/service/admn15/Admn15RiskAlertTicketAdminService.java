@@ -172,7 +172,7 @@ public class Admn15RiskAlertTicketAdminService {
         repository.admn15TicketStatusText(entity.getTicketStatus()),
         entity.getOwner(),
         entity.getHandler(),
-        defaultText(entity.getLatestRemark(), ""),
+        defaultText(entity.getFollowUpPlan(), ""),
         String.valueOf(calcAgingHours(entity)),
         entity.getSuggestedAction(),
         entity.getLatestRemark(),

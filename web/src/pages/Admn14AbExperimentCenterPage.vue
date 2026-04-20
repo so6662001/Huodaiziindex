@@ -113,6 +113,7 @@ function applyDetailToForm(data) {
   form.owner = data?.owner || '策略运营组'
   form.metricsText = formatMetricsText(data?.metrics)
   form.remark = data?.remark || ''
+  form.operator = data?.owner || form.operator
 }
 
 function resetFormForCreate() {

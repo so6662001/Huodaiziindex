@@ -118,11 +118,11 @@ function goDispatchRulePage() {
 }
 
 function goMessageCenterPage() {
-  router.push('/merchant/messages?merchantId=S001')
+  router.push('/merchant/message-center?merchantId=S001')
 }
 
 function goH5HomePage() {
-  router.push('/h5/home?city=唐山')
+  router.push('/h5?city=唐山')
 }
 
 function goH5InquiryStep1Page() {
