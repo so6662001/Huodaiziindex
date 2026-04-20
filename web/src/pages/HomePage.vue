@@ -165,6 +165,10 @@ function goH5N05OrderDetailPage() {
   router.push('/h5/order-detail')
 }
 
+function goH5N06PickupScanPage() {
+  router.push('/h5/pickup-scan')
+}
+
 function goA01DashboardPage() {
   router.push('/admin/dashboard/a01')
 }
@@ -446,6 +450,7 @@ function onSearch() {
         <button class="btn" @click="goH5N03EnterpriseCertificationPage">H5-N03企业认证</button>
         <button class="btn" @click="goH5N04NegotiationSessionPage">H5-N04报价会话</button>
         <button class="btn" @click="goH5N05OrderDetailPage">H5-N05订单详情</button>
+        <button class="btn" @click="goH5N06PickupScanPage">H5-N06扫码提货</button>
         <button class="btn" @click="goA01DashboardPage">A01经营总看板</button>
         <button class="btn" @click="goA02LeadOpsPage">A02线索运营中心</button>
         <button class="btn" @click="goA03QuoteEfficiencyPage">A03报价效率中心</button>

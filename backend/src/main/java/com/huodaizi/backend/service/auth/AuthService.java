@@ -25,6 +25,11 @@ import com.huodaizi.backend.dto.auth.H5N05OrderListItemDTO;
 import com.huodaizi.backend.dto.auth.H5N05OrderListResponse;
 import com.huodaizi.backend.dto.auth.H5N05OrderStatusUpdateRequest;
 import com.huodaizi.backend.dto.auth.H5N05OrderTimelineNodeDTO;
+import com.huodaizi.backend.dto.auth.H5N06PickupOrderDetailResponse;
+import com.huodaizi.backend.dto.auth.H5N06PickupOrderListItemDTO;
+import com.huodaizi.backend.dto.auth.H5N06PickupOrderListResponse;
+import com.huodaizi.backend.dto.auth.H5N06PickupOrderScanRequest;
+import com.huodaizi.backend.dto.auth.H5N06PickupOrderStatusUpdateRequest;
 import com.huodaizi.backend.dto.auth.N03EnterpriseCertificationDetailResponse;
 import com.huodaizi.backend.dto.auth.N03EnterpriseCertificationSubmitRequest;
 import com.huodaizi.backend.dto.auth.N04OnboardingProgressNodeDTO;
@@ -103,6 +108,9 @@ import com.huodaizi.backend.repository.auth.N13CreditScoreEntity;
 import com.huodaizi.backend.repository.auth.N13CreditScoreQuery;
 import com.huodaizi.backend.repository.auth.N14DispatchAppealEntity;
 import com.huodaizi.backend.repository.auth.N14DispatchAppealQuery;
+import com.huodaizi.backend.dto.inquiry.InquiryPickupOrderStatusUpdateRequest;
+import com.huodaizi.backend.repository.inquiry.InMemoryInquiryRepository;
+import com.huodaizi.backend.repository.inquiry.InquiryPickupOrderEntity;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -110,9 +118,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class AuthService {
   private final InMemoryAuthRepository repository;
+  private final InMemoryInquiryRepository inquiryRepository;
 
-  public AuthService(InMemoryAuthRepository repository) {
+  public AuthService(InMemoryAuthRepository repository, InMemoryInquiryRepository inquiryRepository) {
     this.repository = repository;
+    this.inquiryRepository = inquiryRepository;
   }
 
   public AuthRegisterResponse register(AuthRegisterRequest request) {
@@ -658,6 +668,112 @@ public class AuthService {
     String fullRemark = remark.isBlank() ? finalOperator : remark + "（" + finalOperator + "）";
     repository.updateOrderStatus(token, orderId, targetStatus, finalOperator, fullRemark);
     return h5OrderDetail(token, orderId);
+  }
+
+  public H5N06PickupOrderListResponse h5PickupOrderList(
+      String token, String status, String keyword, int pageNo, int pageSize) {
+    AuthUserEntity user =
+        repository
+            .findUserByToken(token)
+            .orElseThrow(() -> new BaseException(ErrorCode.UNAUTHORIZED.getCode(), "登录态无效"));
+    int safePageNo = Math.max(1, pageNo);
+    int safePageSize = Math.min(Math.max(1, pageSize), 50);
+    String contactMobile = user.getAccount();
+
+    com.huodaizi.backend.dto.inquiry.InquiryPickupOrderListRequest request =
+        new com.huodaizi.backend.dto.inquiry.InquiryPickupOrderListRequest(
+            contactMobile, safeText(status), safeText(keyword), safePageNo, safePageSize);
+    List<InquiryPickupOrderEntity> all = inquiryRepository.listPickupOrders(request);
+    int from = Math.min((safePageNo - 1) * safePageSize, all.size());
+    int to = Math.min(from + safePageSize, all.size());
+    List<InquiryPickupOrderEntity> paged = all.subList(from, to);
+
+    List<H5N06PickupOrderListItemDTO> records =
+        paged.stream()
+            .map(
+                item ->
+                    new H5N06PickupOrderListItemDTO(
+                        item.getPickupId(),
+                        item.getPickupNo(),
+                        item.getInquiryNo(),
+                        item.getQuoteId(),
+                        item.getSupplierName(),
+                        item.getSpecText() + " / " + item.getQuantityTon() + "吨",
+                        item.getPickupAddress(),
+                        item.getPickupDate(),
+                        item.getTruckNo(),
+                        item.getStatus().name(),
+                        h5PickupStatusText(item.getStatus().name()),
+                        h5PickupQuickActionText(item.getStatus().name()),
+                        toText(item.getUpdatedAt())))
+            .toList();
+    String activePickupId = records.isEmpty() ? "" : records.get(0).pickupId();
+    return new H5N06PickupOrderListResponse(
+        safePageNo,
+        safePageSize,
+        all.size(),
+        "H5",
+        repository.maskPhone(contactMobile),
+        activePickupId,
+        records);
+  }
+
+  public H5N06PickupOrderDetailResponse h5PickupOrderDetail(String token, String pickupId) {
+    AuthUserEntity user =
+        repository
+            .findUserByToken(token)
+            .orElseThrow(() -> new BaseException(ErrorCode.UNAUTHORIZED.getCode(), "登录态无效"));
+    String contactMobile = user.getAccount();
+    InquiryPickupOrderEntity item = inquiryRepository.getPickupOrderById(safeText(pickupId), contactMobile);
+    return toH5PickupOrderDetail(item, contactMobile, "扫码已通过，核验司机与车牌后可推进状态");
+  }
+
+  public H5N06PickupOrderDetailResponse h5ScanPickupOrder(String token, H5N06PickupOrderScanRequest request) {
+    AuthUserEntity user =
+        repository
+            .findUserByToken(token)
+            .orElseThrow(() -> new BaseException(ErrorCode.UNAUTHORIZED.getCode(), "登录态无效"));
+    String scanCode = safeText(request.scanCode());
+    if (scanCode.isBlank()) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "scanCode 不能为空");
+    }
+    String pickupId = scanCode;
+    if (scanCode.contains("-PU")) {
+      pickupId = scanCode.substring(scanCode.lastIndexOf("-PU") + 1);
+    } else if (scanCode.startsWith("PU-")) {
+      String suffix = scanCode.substring(3);
+      if (suffix.matches("\\d+")) {
+        pickupId = "PU" + suffix;
+      }
+    }
+    InquiryPickupOrderEntity item = inquiryRepository.getPickupOrderById(pickupId, user.getAccount());
+    return toH5PickupOrderDetail(
+        item,
+        user.getAccount(),
+        "扫码核验成功，可执行「确认提货/运输中/已签收/已完成」状态流转");
+  }
+
+  public H5N06PickupOrderDetailResponse h5PickupOrderStatusUpdate(
+      String token, String pickupId, H5N06PickupOrderStatusUpdateRequest request) {
+    AuthUserEntity user =
+        repository
+            .findUserByToken(token)
+            .orElseThrow(() -> new BaseException(ErrorCode.UNAUTHORIZED.getCode(), "登录态无效"));
+    String normalizedStatus = safeText(request.status()).toUpperCase();
+    if (!normalizedStatus.matches("CONFIRMED|IN_TRANSIT|SIGNED|COMPLETED|CANCELLED")) {
+      throw new BaseException(
+          ErrorCode.BAD_REQUEST.getCode(), "status 仅支持 CONFIRMED/IN_TRANSIT/SIGNED/COMPLETED/CANCELLED");
+    }
+    String operator = safeText(request.operator());
+    String remark = safeText(request.remark());
+    String finalOperator = operator.isBlank() ? "h5-n06-scan" : operator;
+    String fullRemark = remark.isBlank() ? finalOperator : remark + "（" + finalOperator + "）";
+    InquiryPickupOrderEntity updated =
+        inquiryRepository.updatePickupOrderStatus(
+            safeText(pickupId),
+            new InquiryPickupOrderStatusUpdateRequest(
+                user.getAccount(), normalizedStatus, "h5-n06-scan", fullRemark));
+    return toH5PickupOrderDetail(updated, user.getAccount(), "提货状态已更新");
   }
 
   public N06OrderListResponse orderList(
@@ -1689,6 +1805,68 @@ public class AuthService {
       case "DEAL" -> "转成交";
       case "CLOSED" -> "恢复会话";
       default -> "查看详情";
+    };
+  }
+
+  private H5N06PickupOrderDetailResponse toH5PickupOrderDetail(
+      InquiryPickupOrderEntity item, String contactMobile, String scanResultText) {
+    List<String> availableActions = h5PickupAvailableActions(item.getStatus().name());
+    return new H5N06PickupOrderDetailResponse(
+        item.getPickupId(),
+        item.getPickupNo(),
+        item.getInquiryId(),
+        item.getInquiryNo(),
+        item.getQuoteId(),
+        item.getSupplierName(),
+        item.getBuyerCompany(),
+        item.getSpecText() + " / " + item.getQuantityTon() + "吨",
+        item.getPickupAddress(),
+        item.getPickupDate(),
+        item.getTruckNo(),
+        item.getDriverName(),
+        item.getDriverPhoneMasked(),
+        item.getStatus().name(),
+        h5PickupStatusText(item.getStatus().name()),
+        repository.maskPhone(contactMobile),
+        "H5",
+        scanResultText,
+        availableActions,
+        item.getRemark(),
+        toText(item.getCreatedAt()),
+        toText(item.getUpdatedAt()));
+  }
+
+  private String h5PickupStatusText(String status) {
+    return switch (safeText(status).toUpperCase()) {
+      case "CREATED" -> "待确认";
+      case "CONFIRMED" -> "已确认";
+      case "IN_TRANSIT" -> "运输中";
+      case "SIGNED" -> "已签收";
+      case "COMPLETED" -> "已完成";
+      case "CANCELLED" -> "已取消";
+      default -> "处理中";
+    };
+  }
+
+  private String h5PickupQuickActionText(String status) {
+    return switch (safeText(status).toUpperCase()) {
+      case "CREATED" -> "确认提货";
+      case "CONFIRMED" -> "标记运输中";
+      case "IN_TRANSIT" -> "标记已签收";
+      case "SIGNED" -> "标记已完成";
+      case "COMPLETED", "CANCELLED" -> "查看详情";
+      default -> "查看详情";
+    };
+  }
+
+  private List<String> h5PickupAvailableActions(String status) {
+    return switch (safeText(status).toUpperCase()) {
+      case "CREATED" -> List.of("CONFIRMED", "CANCELLED");
+      case "CONFIRMED" -> List.of("IN_TRANSIT", "CANCELLED");
+      case "IN_TRANSIT" -> List.of("SIGNED", "CANCELLED");
+      case "SIGNED" -> List.of("COMPLETED");
+      case "COMPLETED", "CANCELLED" -> List.of();
+      default -> List.of();
     };
   }
 

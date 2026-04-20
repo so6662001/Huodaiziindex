@@ -204,6 +204,10 @@ function goOrderDetail() {
   router.push('/h5/order-detail')
 }
 
+function goPickupScan() {
+  router.push('/h5/pickup-scan')
+}
+
 onMounted(() => {
   loadSessions()
 })
@@ -219,6 +223,7 @@ onMounted(() => {
         <button class="btn" @click="goIdentitySwitch">前往身份切换</button>
         <button class="btn" @click="goEnterpriseCertification">前往企业认证</button>
         <button class="btn" @click="goOrderDetail">前往H5-N05订单详情</button>
+        <button class="btn" @click="goPickupScan">前往H5-N06扫码提货</button>
       </div>
     </section>
 

@@ -19,6 +19,10 @@ import com.huodaizi.backend.dto.auth.H5N04NegotiationStatusUpdateRequest;
 import com.huodaizi.backend.dto.auth.H5N05OrderDetailResponse;
 import com.huodaizi.backend.dto.auth.H5N05OrderListResponse;
 import com.huodaizi.backend.dto.auth.H5N05OrderStatusUpdateRequest;
+import com.huodaizi.backend.dto.auth.H5N06PickupOrderDetailResponse;
+import com.huodaizi.backend.dto.auth.H5N06PickupOrderListResponse;
+import com.huodaizi.backend.dto.auth.H5N06PickupOrderScanRequest;
+import com.huodaizi.backend.dto.auth.H5N06PickupOrderStatusUpdateRequest;
 import com.huodaizi.backend.dto.auth.N04OnboardingProgressResponse;
 import com.huodaizi.backend.dto.auth.N03EnterpriseCertificationDetailResponse;
 import com.huodaizi.backend.dto.auth.N03EnterpriseCertificationSubmitRequest;
@@ -225,6 +229,38 @@ public class AuthController {
       @PathVariable("orderId") String orderId,
       @Valid @RequestBody H5N05OrderStatusUpdateRequest request) {
     return ApiResponse.success(service.h5UpdateOrderStatus(token, orderId, request));
+  }
+
+  @GetMapping("/h5/pickups")
+  public ApiResponse<H5N06PickupOrderListResponse> h5PickupOrderList(
+      @RequestHeader(name = AUTH_HEADER, required = false) String token,
+      @RequestParam(name = "status", required = false) String status,
+      @RequestParam(name = "keyword", required = false) String keyword,
+      @RequestParam(name = "pageNo", required = false, defaultValue = "1") int pageNo,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "10") int pageSize) {
+    return ApiResponse.success(service.h5PickupOrderList(token, status, keyword, pageNo, pageSize));
+  }
+
+  @GetMapping("/h5/pickups/{pickupId}")
+  public ApiResponse<H5N06PickupOrderDetailResponse> h5PickupOrderDetail(
+      @RequestHeader(name = AUTH_HEADER, required = false) String token,
+      @PathVariable("pickupId") String pickupId) {
+    return ApiResponse.success(service.h5PickupOrderDetail(token, pickupId));
+  }
+
+  @PostMapping("/h5/pickups/scan")
+  public ApiResponse<H5N06PickupOrderDetailResponse> h5PickupOrderScan(
+      @RequestHeader(name = AUTH_HEADER, required = false) String token,
+      @Valid @RequestBody H5N06PickupOrderScanRequest request) {
+    return ApiResponse.success(service.h5ScanPickupOrder(token, request));
+  }
+
+  @PostMapping("/h5/pickups/{pickupId}/status")
+  public ApiResponse<H5N06PickupOrderDetailResponse> h5PickupOrderStatus(
+      @RequestHeader(name = AUTH_HEADER, required = false) String token,
+      @PathVariable("pickupId") String pickupId,
+      @Valid @RequestBody H5N06PickupOrderStatusUpdateRequest request) {
+    return ApiResponse.success(service.h5PickupOrderStatusUpdate(token, pickupId, request));
   }
 
   @GetMapping("/negotiations")

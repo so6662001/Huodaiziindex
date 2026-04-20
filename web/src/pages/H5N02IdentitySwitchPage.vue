@@ -106,6 +106,10 @@ function goOrderDetail() {
   router.push('/h5/order-detail')
 }
 
+function goPickupScan() {
+  router.push('/h5/pickup-scan')
+}
+
 onMounted(() => {
   loadIdentities()
 })
@@ -121,6 +125,7 @@ onMounted(() => {
         <button class="btn" @click="goCertification">企业认证</button>
         <button class="btn" @click="goNegotiation">议价会话</button>
         <button class="btn" @click="goOrderDetail">订单详情</button>
+        <button class="btn" @click="goPickupScan">扫码提货</button>
         <button class="btn" @click="goH5Home">返回H5首页</button>
       </div>
     </section>

@@ -172,6 +172,10 @@ function goEnterpriseCertification() {
   router.push('/h5/enterprise-certification')
 }
 
+function goPickupScan() {
+  router.push('/h5/pickup-scan')
+}
+
 onMounted(() => {
   loadOrders()
 })
@@ -186,6 +190,7 @@ onMounted(() => {
         <button class="btn" @click="goH5Home">返回H5首页</button>
         <button class="btn" @click="goQuoteSession">前往H5-N04报价会话</button>
         <button class="btn" @click="goEnterpriseCertification">前往H5-N03企业认证</button>
+        <button class="btn" @click="goPickupScan">前往H5-N06扫码提货</button>
       </div>
     </section>
 
