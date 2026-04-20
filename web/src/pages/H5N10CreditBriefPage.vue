@@ -138,6 +138,10 @@ function goQuickLogin() {
   router.push('/h5/login-quick')
 }
 
+function goMessageSettings() {
+  router.push('/h5/message-settings')
+}
+
 onMounted(() => {
   loadScores()
 })
@@ -151,6 +155,7 @@ onMounted(() => {
       <div class="hero-actions">
         <button class="btn" @click="goH5Home">返回H5首页</button>
         <button class="btn" @click="goLitePay">前往H5-N09轻支付</button>
+        <button class="btn" @click="goMessageSettings">前往H5-N11消息设置</button>
         <button class="btn" @click="goQuickLogin">返回H5-N01快捷登录</button>
       </div>
     </section>

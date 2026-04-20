@@ -126,6 +126,10 @@ function goCreditBrief() {
   router.push('/h5/credit-brief')
 }
 
+function goMessageSettings() {
+  router.push('/h5/message-settings')
+}
+
 onMounted(() => {
   loadIdentities()
 })
@@ -146,6 +150,7 @@ onMounted(() => {
         <button class="btn" @click="goAfterSaleCreate">售后发起</button>
         <button class="btn" @click="goLitePay">轻支付</button>
         <button class="btn" @click="goCreditBrief">信用分简报</button>
+        <button class="btn" @click="goMessageSettings">消息设置</button>
         <button class="btn" @click="goH5Home">返回H5首页</button>
       </div>
     </section>

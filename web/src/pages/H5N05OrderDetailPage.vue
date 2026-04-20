@@ -192,6 +192,10 @@ function goCreditBrief() {
   router.push('/h5/credit-brief')
 }
 
+function goMessageSettings() {
+  router.push('/h5/message-settings')
+}
+
 onMounted(() => {
   loadOrders()
 })
@@ -211,6 +215,7 @@ onMounted(() => {
         <button class="btn" @click="goAfterSaleCreate">前往H5-N08售后发起</button>
         <button class="btn" @click="goLitePay">前往H5-N09轻支付</button>
         <button class="btn" @click="goCreditBrief">前往H5-N10信用分简报</button>
+        <button class="btn" @click="goMessageSettings">前往H5-N11消息设置</button>
       </div>
     </section>
 

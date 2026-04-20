@@ -156,6 +156,10 @@ function goH5CreditBrief() {
   router.push('/h5/credit-brief')
 }
 
+function goH5MessageSettings() {
+  router.push('/h5/message-settings')
+}
+
 onMounted(() => {
   const cached = localStorage.getItem('H5_N01_AUTH_TOKEN') || localStorage.getItem('N01_AUTH_TOKEN') || ''
   if (cached) {
@@ -180,6 +184,7 @@ onMounted(() => {
         <button class="btn" @click="goH5AfterSaleCreate">前往H5-N08售后发起</button>
         <button class="btn" @click="goH5LitePay">前往H5-N09轻支付</button>
         <button class="btn" @click="goH5CreditBrief">前往H5-N10信用分简报</button>
+        <button class="btn" @click="goH5MessageSettings">前往H5-N11消息设置</button>
       </div>
     </section>
 

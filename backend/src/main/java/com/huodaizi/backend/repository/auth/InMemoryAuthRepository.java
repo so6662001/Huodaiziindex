@@ -35,6 +35,8 @@ public class InMemoryAuthRepository {
   private final ConcurrentMap<String, N13CreditScoreEntity> creditScoreStore = new ConcurrentHashMap<>();
   private final ConcurrentMap<String, N14DispatchAppealEntity> dispatchAppealStore = new ConcurrentHashMap<>();
   private final ConcurrentMap<String, H5LoginCodeEntity> h5LoginCodeStore = new ConcurrentHashMap<>();
+  private final ConcurrentMap<String, H5N11MessageSettingsEntity> h5MessageSettingsStore =
+      new ConcurrentHashMap<>();
 
   public InMemoryAuthRepository() {
     seed();
@@ -844,6 +846,80 @@ public class InMemoryAuthRepository {
       throw new BaseException(ErrorCode.NOT_FOUND.getCode(), "信用评分记录不存在");
     }
     return entity;
+  }
+
+  public H5N11MessageSettingsEntity getH5MessageSettings(String token) {
+    SessionEntity session = requireSession(token);
+    AuthUserEntity user = userStore.get(session.getAccount());
+    if (user == null) {
+      throw new BaseException(ErrorCode.UNAUTHORIZED.getCode(), "登录态无效");
+    }
+    return h5MessageSettingsStore.computeIfAbsent(
+        user.getUserId(),
+        userId ->
+            new H5N11MessageSettingsEntity(
+                "MS-" + userId,
+                userId,
+                user.getPhoneMasked(),
+                true,
+                true,
+                false,
+                true,
+                true,
+                true,
+                false,
+                "22:00",
+                "08:00",
+                "H5-N11 默认消息设置",
+                "H5",
+                "system",
+                LocalDateTime.now(),
+                LocalDateTime.now()));
+  }
+
+  public H5N11MessageSettingsEntity updateH5MessageSettings(
+      String token,
+      Boolean systemNoticeEnabled,
+      Boolean orderNoticeEnabled,
+      Boolean financeNoticeEnabled,
+      Boolean marketingNoticeEnabled,
+      Boolean pushEnabled,
+      Boolean smsEnabled,
+      Boolean emailEnabled,
+      Boolean doNotDisturbEnabled,
+      String doNotDisturbStart,
+      String doNotDisturbEnd,
+      String latestRemark,
+      String channel,
+      String operator) {
+    SessionEntity session = requireSession(token);
+    AuthUserEntity user = userStore.get(session.getAccount());
+    if (user == null) {
+      throw new BaseException(ErrorCode.UNAUTHORIZED.getCode(), "登录态无效");
+    }
+    H5N11MessageSettingsEntity current = getH5MessageSettings(token);
+    LocalDateTime now = LocalDateTime.now();
+    H5N11MessageSettingsEntity updated =
+        new H5N11MessageSettingsEntity(
+            current.getSettingId(),
+            user.getUserId(),
+            current.getContactMobileMasked(),
+            pushEnabled == null ? current.isGlobalPushEnabled() : pushEnabled,
+            emailEnabled == null ? current.isAppPushEnabled() : emailEnabled,
+            smsEnabled == null ? current.isSmsPushEnabled() : smsEnabled,
+            marketingNoticeEnabled == null ? current.isMarketingEnabled() : marketingNoticeEnabled,
+            orderNoticeEnabled == null ? current.isTransactionEnabled() : orderNoticeEnabled,
+            financeNoticeEnabled == null ? current.isRiskEnabled() : financeNoticeEnabled,
+            doNotDisturbEnabled == null ? current.isDoNotDisturbEnabled() : doNotDisturbEnabled,
+            defaultText(doNotDisturbStart, current.getDoNotDisturbStart()),
+            defaultText(doNotDisturbEnd, current.getDoNotDisturbEnd()),
+            defaultText(latestRemark, current.getLatestRemark()),
+            defaultText(channel, current.getChannel()),
+            defaultText(operator, "h5-n11-message-settings"),
+            current.getCreatedAt(),
+            now);
+    h5MessageSettingsStore.put(user.getUserId(), updated);
+    return updated;
   }
 
   public List<N14DispatchAppealEntity> listDispatchAppeals(String token, N14DispatchAppealQuery query) {

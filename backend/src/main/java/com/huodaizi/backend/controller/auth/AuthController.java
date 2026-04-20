@@ -32,6 +32,8 @@ import com.huodaizi.backend.dto.auth.H5N09LitePayListResponse;
 import com.huodaizi.backend.dto.auth.H5N09LitePaySubmitRequest;
 import com.huodaizi.backend.dto.auth.H5N10CreditBriefDetailResponse;
 import com.huodaizi.backend.dto.auth.H5N10CreditBriefListResponse;
+import com.huodaizi.backend.dto.auth.H5N11MessageSettingsResponse;
+import com.huodaizi.backend.dto.auth.H5N11MessageSettingsUpdateRequest;
 import com.huodaizi.backend.dto.auth.H5N07ReconcileDetailResponse;
 import com.huodaizi.backend.dto.auth.H5N07ReconcileListResponse;
 import com.huodaizi.backend.dto.auth.H5N07ReconcileStatusUpdateRequest;
@@ -372,6 +374,19 @@ public class AuthController {
       @RequestHeader(name = AUTH_HEADER, required = false) String token,
       @PathVariable("scoreId") String scoreId) {
     return ApiResponse.success(service.h5CreditBriefDetail(token, scoreId));
+  }
+
+  @GetMapping("/h5/message-settings")
+  public ApiResponse<H5N11MessageSettingsResponse> h5MessageSettings(
+      @RequestHeader(name = AUTH_HEADER, required = false) String token) {
+    return ApiResponse.success(service.h5MessageSettings(token));
+  }
+
+  @PostMapping("/h5/message-settings")
+  public ApiResponse<H5N11MessageSettingsResponse> h5UpdateMessageSettings(
+      @RequestHeader(name = AUTH_HEADER, required = false) String token,
+      @Valid @RequestBody H5N11MessageSettingsUpdateRequest request) {
+    return ApiResponse.success(service.h5UpdateMessageSettings(token, request));
   }
 
   @GetMapping("/negotiations")

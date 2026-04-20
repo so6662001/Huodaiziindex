@@ -48,6 +48,8 @@ import com.huodaizi.backend.dto.auth.H5N10CreditBriefFactorDTO;
 import com.huodaizi.backend.dto.auth.H5N10CreditBriefListItemDTO;
 import com.huodaizi.backend.dto.auth.H5N10CreditBriefListResponse;
 import com.huodaizi.backend.dto.auth.H5N10CreditBriefTrendPointDTO;
+import com.huodaizi.backend.dto.auth.H5N11MessageSettingsResponse;
+import com.huodaizi.backend.dto.auth.H5N11MessageSettingsUpdateRequest;
 import com.huodaizi.backend.dto.auth.N03EnterpriseCertificationDetailResponse;
 import com.huodaizi.backend.dto.auth.N03EnterpriseCertificationSubmitRequest;
 import com.huodaizi.backend.dto.auth.N04OnboardingProgressNodeDTO;
@@ -126,6 +128,7 @@ import com.huodaizi.backend.repository.auth.N13CreditScoreEntity;
 import com.huodaizi.backend.repository.auth.N13CreditScoreQuery;
 import com.huodaizi.backend.repository.auth.N14DispatchAppealEntity;
 import com.huodaizi.backend.repository.auth.N14DispatchAppealQuery;
+import com.huodaizi.backend.repository.auth.H5N11MessageSettingsEntity;
 import com.huodaizi.backend.dto.inquiry.InquiryPickupOrderStatusUpdateRequest;
 import com.huodaizi.backend.repository.inquiry.InMemoryInquiryRepository;
 import com.huodaizi.backend.repository.inquiry.InquiryPickupOrderEntity;
@@ -1068,6 +1071,36 @@ public class AuthService {
         .orElseThrow(() -> new BaseException(ErrorCode.UNAUTHORIZED.getCode(), "登录态无效"));
     N13CreditScoreEntity item = repository.getCreditScoreDetail(token, scoreId);
     return toH5CreditBriefDetail(item, h5CreditTipText(item.getRiskLevel()));
+  }
+
+  public H5N11MessageSettingsResponse h5MessageSettings(String token) {
+    H5N11MessageSettingsEntity entity = repository.getH5MessageSettings(token);
+    return toH5MessageSettingsResponse(entity, "可按业务优先级配置推送、静默与营销触达策略");
+  }
+
+  public H5N11MessageSettingsResponse h5UpdateMessageSettings(
+      String token, H5N11MessageSettingsUpdateRequest request) {
+    boolean hasTimeInput = safeText(request.quietStart()).length() > 0 || safeText(request.quietEnd()).length() > 0;
+    if (hasTimeInput && (safeText(request.quietStart()).isBlank() || safeText(request.quietEnd()).isBlank())) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "quietStart 与 quietEnd 需同时设置");
+    }
+    H5N11MessageSettingsEntity updated =
+        repository.updateH5MessageSettings(
+            token,
+            request.systemNoticeEnabled(),
+            request.orderNoticeEnabled(),
+            request.financeNoticeEnabled(),
+            request.marketingNoticeEnabled(),
+            request.pushEnabled(),
+            request.smsEnabled(),
+            request.emailEnabled(),
+            request.doNotDisturbEnabled(),
+            safeText(request.quietStart()),
+            safeText(request.quietEnd()),
+            h5MessageDigestFrequency(request.extraMutedScenes()),
+            "H5",
+            safeText(request.operator()));
+    return toH5MessageSettingsResponse(updated, "消息设置已更新，将按新策略执行触达");
   }
 
   public N06OrderListResponse orderList(
@@ -2352,6 +2385,46 @@ public class AuthService {
         trend,
         tipText,
         toText(item.getUpdatedAt()));
+  }
+
+  private H5N11MessageSettingsResponse toH5MessageSettingsResponse(
+      H5N11MessageSettingsEntity entity, String tipText) {
+    return new H5N11MessageSettingsResponse(
+        entity.getSettingId(),
+        entity.getUserId(),
+        entity.getContactMobileMasked(),
+        entity.isGlobalPushEnabled(),
+        entity.isAppPushEnabled(),
+        entity.isSmsPushEnabled(),
+        entity.isMarketingEnabled(),
+        entity.isTransactionEnabled(),
+        entity.isRiskEnabled(),
+        entity.isDoNotDisturbEnabled(),
+        entity.getDoNotDisturbStart(),
+        entity.getDoNotDisturbEnd(),
+        entity.getLatestRemark(),
+        entity.getChannel(),
+        entity.getUpdatedBy(),
+        h5MessageSettingsAvailableActions(entity),
+        tipText,
+        toText(entity.getUpdatedAt()));
+  }
+
+  private List<String> h5MessageSettingsAvailableActions(H5N11MessageSettingsEntity entity) {
+    if (!entity.isGlobalPushEnabled()) {
+      return List.of("ENABLE_GLOBAL_PUSH", "SAVE_SETTINGS");
+    }
+    if (entity.isDoNotDisturbEnabled()) {
+      return List.of("UPDATE_QUIET_HOURS", "SAVE_SETTINGS");
+    }
+    return List.of("SAVE_SETTINGS", "TOGGLE_MARKETING");
+  }
+
+  private String h5MessageDigestFrequency(List<String> extraMutedScenes) {
+    if (extraMutedScenes == null || extraMutedScenes.isEmpty()) {
+      return "REALTIME";
+    }
+    return extraMutedScenes.contains("MARKETING") ? "DAILY_DIGEST" : "REALTIME";
   }
 
   private List<String> h5AfterSaleAvailableActions(String status) {
