@@ -139,6 +139,8 @@ public class Admn03RolePermissionAdminService {
       case "ADMN01_CERT_REVIEW" -> "商家认证审核";
       case "ADMN02_BLACKLIST_MANAGE" -> "买家黑名单管理";
       case "ADMN03_RBAC_MANAGE" -> "角色权限管理";
+      case "ADMN04_AUDIT_LOG_VIEW" -> "操作审计日志查看";
+      case "ADMN05_DICT_MANAGE" -> "类目规格词库管理";
       default -> "权限-" + safeText(permissionCode);
     };
   }

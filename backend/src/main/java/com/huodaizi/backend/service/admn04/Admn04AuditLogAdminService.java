@@ -126,12 +126,19 @@ public class Admn04AuditLogAdminService {
       case "ADMN02" -> "/api/admin/buyers/{userId}/blacklist";
       case "ADMN03" -> "/api/admin/rbac/roles/{roleId}/permissions";
       case "ADMN04" -> "/api/admin/audit-logs";
+      case "ADMN05" -> "/api/admin/category-spec-dicts";
       default -> "/api/admin/unknown";
     };
   }
 
   private String requestMethodByAction(String actionCode) {
-    return actionCode.contains("QUERY") ? "GET" : "PUT";
+    if (actionCode.contains("QUERY")) {
+      return "GET";
+    }
+    if (actionCode.contains("UPSERT")) {
+      return "POST";
+    }
+    return "PUT";
   }
 
   private String toText(LocalDateTime value) {

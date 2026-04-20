@@ -43,6 +43,8 @@ public class InMemoryAuthRepository {
       new ConcurrentHashMap<>();
   private final ConcurrentMap<String, Admn04AuditLogEntity> admn04AuditLogStore =
       new ConcurrentHashMap<>();
+  private final ConcurrentMap<String, Admn05CategorySpecDictEntity> admn05CategorySpecStore =
+      new ConcurrentHashMap<>();
 
   public InMemoryAuthRepository() {
     seed();
@@ -558,7 +560,132 @@ public class InMemoryAuthRepository {
       case "ADMN02_BLACKLIST_MANAGE" -> "买家黑名单管理";
       case "ADMN03_RBAC_MANAGE" -> "角色权限管理";
       case "ADMN04_AUDIT_LOG_VIEW" -> "操作审计日志查看";
+      case "ADMN05_DICT_MANAGE" -> "类目规格词库管理";
       default -> "未命名权限";
+    };
+  }
+
+  public List<Admn05CategorySpecDictEntity> listCategorySpecDictsForAdmin(
+      String keyword, String status, String sceneCode) {
+    String keywordFilter = defaultText(keyword, "").toLowerCase(Locale.ROOT);
+    String statusFilter = defaultText(status, "").toUpperCase(Locale.ROOT);
+    String sceneFilter = defaultText(sceneCode, "").toUpperCase(Locale.ROOT);
+    return admn05CategorySpecStore.values().stream()
+        .filter(
+            item ->
+                statusFilter.isBlank()
+                    || statusFilter.equals(defaultText(item.getStatus(), "").toUpperCase(Locale.ROOT)))
+        .filter(
+            item ->
+                sceneFilter.isBlank()
+                    || sceneFilter.equals(defaultText(item.getSceneCode(), "").toUpperCase(Locale.ROOT)))
+        .filter(
+            item ->
+                keywordFilter.isBlank()
+                    || defaultText(item.getDictId(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                    || defaultText(item.getCategoryCode(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                    || defaultText(item.getCategoryName(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                    || defaultText(item.getSpecName(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                    || defaultText(item.getSpecValue(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                    || defaultText(item.getRemark(), "").toLowerCase(Locale.ROOT).contains(keywordFilter))
+        .sorted(
+            Comparator.comparingInt(Admn05CategorySpecDictEntity::getSortNo)
+                .thenComparing(Admn05CategorySpecDictEntity::getUpdatedAt, Comparator.reverseOrder()))
+        .toList();
+  }
+
+  public Admn05CategorySpecDictEntity getCategorySpecDictForAdmin(String dictId) {
+    String normalized = defaultText(dictId, "");
+    if (normalized.isBlank()) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "dictId 不能为空");
+    }
+    Admn05CategorySpecDictEntity entity = admn05CategorySpecStore.get(normalized);
+    if (entity == null) {
+      throw new BaseException(ErrorCode.NOT_FOUND.getCode(), "类目规格词库项不存在");
+    }
+    return entity;
+  }
+
+  public Admn05CategorySpecDictEntity upsertCategorySpecDictForAdmin(
+      String categoryCode,
+      String categoryName,
+      String specName,
+      String specValue,
+      String sceneCode,
+      String status,
+      Integer sortNo,
+      String remark,
+      String operator) {
+    String safeCategoryCode = defaultText(categoryCode, "").toUpperCase(Locale.ROOT);
+    String safeCategoryName = defaultText(categoryName, "");
+    String safeSpecName = defaultText(specName, "");
+    String safeSpecValue = defaultText(specValue, "");
+    if (safeCategoryCode.isBlank()
+        || safeCategoryName.isBlank()
+        || safeSpecName.isBlank()
+        || safeSpecValue.isBlank()) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "category/spec 字段不能为空");
+    }
+    String safeSceneCode = defaultText(sceneCode, "BUYER_INQUIRY").toUpperCase(Locale.ROOT);
+    if (!safeSceneCode.matches("BUYER_INQUIRY|MERCHANT_QUOTE|RISK_CONTROL")) {
+      throw new BaseException(
+          ErrorCode.BAD_REQUEST.getCode(), "sceneCode 仅支持 BUYER_INQUIRY/MERCHANT_QUOTE/RISK_CONTROL");
+    }
+    String safeStatus = defaultText(status, "ACTIVE").toUpperCase(Locale.ROOT);
+    if (!safeStatus.matches("ACTIVE|DISABLED")) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "status 仅支持 ACTIVE/DISABLED");
+    }
+    int safeSortNo = sortNo == null ? 100 : Math.max(sortNo, 0);
+    String safeRemark = defaultText(remark, "");
+    String safeOperator = defaultText(operator, "admn05-admin");
+    LocalDateTime now = LocalDateTime.now();
+    Admn05CategorySpecDictEntity existing =
+        admn05CategorySpecStore.values().stream()
+            .filter(item -> safeCategoryCode.equalsIgnoreCase(item.getCategoryCode()))
+            .filter(item -> safeSpecName.equalsIgnoreCase(item.getSpecName()))
+            .filter(item -> safeSpecValue.equalsIgnoreCase(item.getSpecValue()))
+            .filter(item -> safeSceneCode.equalsIgnoreCase(item.getSceneCode()))
+            .findFirst()
+            .orElse(null);
+    if (existing == null) {
+      Admn05CategorySpecDictEntity created =
+          new Admn05CategorySpecDictEntity(
+              "DICT_" + UUID.randomUUID().toString().replace("-", "").substring(0, 12).toUpperCase(Locale.ROOT),
+              safeCategoryCode,
+              safeCategoryName,
+              safeSpecName,
+              safeSpecValue,
+              safeSceneCode,
+              safeStatus,
+              safeSortNo,
+              safeRemark,
+              safeOperator,
+              now,
+              now);
+      admn05CategorySpecStore.put(created.getDictId(), created);
+      return created;
+    }
+    existing.update(
+        safeCategoryCode,
+        safeCategoryName,
+        safeSpecName,
+        safeSpecValue,
+        safeSceneCode,
+        safeStatus,
+        safeSortNo,
+        safeRemark,
+        safeOperator,
+        now);
+    admn05CategorySpecStore.put(existing.getDictId(), existing);
+    return existing;
+  }
+
+  public String admn05SceneText(String sceneCode) {
+    return switch (defaultText(sceneCode, "").toUpperCase(Locale.ROOT)) {
+      case "BUYER_INQUIRY" -> "买家询价";
+      case "MERCHANT_QUOTE" -> "商家报价";
+      case "RISK_CONTROL" -> "风控审核";
+      default -> "其他场景";
     };
   }
 
@@ -1502,6 +1629,7 @@ public class InMemoryAuthRepository {
       case "ADMN02" -> "买家与黑名单管理";
       case "ADMN03" -> "角色权限管理";
       case "ADMN04" -> "操作审计日志";
+      case "ADMN05" -> "类目规格词库管理";
       default -> "其他模块";
     };
   }
@@ -1513,6 +1641,8 @@ public class InMemoryAuthRepository {
       case "ROLE_UPSERT" -> "角色新增/编辑";
       case "ROLE_PERMISSION_UPDATE" -> "角色权限更新";
       case "AUDIT_QUERY" -> "审计日志查询";
+      case "DICT_UPSERT" -> "词库新增/更新";
+      case "DICT_QUERY" -> "词库查询";
       default -> "通用操作";
     };
   }
@@ -1565,6 +1695,7 @@ public class InMemoryAuthRepository {
     seedAdmn02ExtraBuyers();
     seedAdmn03Roles();
     seedAdmn04AuditLogs();
+    seedAdmn05CategorySpecDicts();
     seedNegotiation(seed);
     seedOrders(seed);
     seedTradeTerms(seed);
@@ -1658,7 +1789,8 @@ public class InMemoryAuthRepository {
                 "ADMN01_CERT_REVIEW",
                 "ADMN02_BLACKLIST_MANAGE",
                 "ADMN03_RBAC_MANAGE",
-                "ADMN04_AUDIT_LOG_VIEW"),
+                "ADMN04_AUDIT_LOG_VIEW",
+                "ADMN05_DICT_MANAGE"),
             "seed",
             now.minusDays(30),
             now.minusDays(1));
@@ -1676,7 +1808,8 @@ public class InMemoryAuthRepository {
                 "RISK_ALERT_MANAGE",
                 "ADMN02_BLACKLIST_MANAGE",
                 "DASHBOARD_VIEW",
-                "ADMN04_AUDIT_LOG_VIEW"),
+                "ADMN04_AUDIT_LOG_VIEW",
+                "ADMN05_DICT_MANAGE"),
             "seed",
             now.minusDays(20),
             now.minusDays(2));
@@ -1743,6 +1876,57 @@ public class InMemoryAuthRepository {
         "{\"permissions\":[\"RISK_ALERT_MANAGE\",\"ADMN04_AUDIT_LOG_VIEW\"]}",
         "127.0.0.1",
         "seed");
+  }
+
+  private void seedAdmn05CategorySpecDicts() {
+    LocalDateTime now = LocalDateTime.now();
+    Admn05CategorySpecDictEntity rebar20 =
+        new Admn05CategorySpecDictEntity(
+            "DICT_REBAR_001",
+            "REBAR",
+            "螺纹钢",
+            "规格",
+            "HRB400E Φ20*12m",
+            "BUYER_INQUIRY",
+            "ACTIVE",
+            10,
+            "常用工地规格",
+            "seed",
+            now.minusDays(8),
+            now.minusDays(1));
+    admn05CategorySpecStore.put(rebar20.getDictId(), rebar20);
+
+    Admn05CategorySpecDictEntity hrc3mm =
+        new Admn05CategorySpecDictEntity(
+            "DICT_HRC_001",
+            "HRC",
+            "热轧卷板",
+            "厚度",
+            "3.0*1500*C",
+            "MERCHANT_QUOTE",
+            "ACTIVE",
+            20,
+            "高频报价规格",
+            "seed",
+            now.minusDays(7),
+            now.minusHours(18));
+    admn05CategorySpecStore.put(hrc3mm.getDictId(), hrc3mm);
+
+    Admn05CategorySpecDictEntity plate10mm =
+        new Admn05CategorySpecDictEntity(
+            "DICT_PLATE_001",
+            "PLATE",
+            "中厚板",
+            "材质",
+            "Q355B 10*2000*8000",
+            "RISK_CONTROL",
+            "DISABLED",
+            30,
+            "历史规格，暂不建议前台曝光",
+            "seed",
+            now.minusDays(6),
+            now.minusHours(30));
+    admn05CategorySpecStore.put(plate10mm.getDictId(), plate10mm);
   }
 
   private void seedNegotiation(AuthUserEntity user) {

@@ -44,6 +44,7 @@ import Admn01MerchantCertificationReviewPage from '../pages/Admn01MerchantCertif
 import Admn02BuyerBlacklistPage from '../pages/Admn02BuyerBlacklistPage.vue'
 import Admn03RbacRolePermissionPage from '../pages/Admn03RbacRolePermissionPage.vue'
 import Admn04AuditLogPage from '../pages/Admn04AuditLogPage.vue'
+import Admn05CategorySpecDictPage from '../pages/Admn05CategorySpecDictPage.vue'
 import N01LoginRegisterPage from '../pages/N01LoginRegisterPage.vue'
 import N02IdentitySelectPage from '../pages/N02IdentitySelectPage.vue'
 import N03EnterpriseCertificationPage from '../pages/N03EnterpriseCertificationPage.vue'
@@ -334,6 +335,14 @@ const routes = [
     component: Admn04AuditLogPage,
     meta: {
       title: 'ADM-N04操作审计日志_管理端关键操作全量留痕-货袋子'
+    }
+  },
+  {
+    path: '/admin/category-spec-dict/admn05',
+    name: 'admn05CategorySpecDict',
+    component: Admn05CategorySpecDictPage,
+    meta: {
+      title: 'ADM-N05类目规格词库管理_管理端词库治理中心-货袋子'
     }
   },
   {
