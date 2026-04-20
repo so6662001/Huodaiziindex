@@ -51,6 +51,7 @@ import Admn09ArbitrationTicketCenterPage from '../pages/Admn09ArbitrationTicketC
 import Admn10BillingRuleConfigPage from '../pages/Admn10BillingRuleConfigPage.vue'
 import Admn11PaymentRefundManagePage from '../pages/Admn11PaymentRefundManagePage.vue'
 import Admn12AdSlotScheduleCenterPage from '../pages/Admn12AdSlotScheduleCenterPage.vue'
+import Admn13CreditModelVersionManagePage from '../pages/Admn13CreditModelVersionManagePage.vue'
 import N01LoginRegisterPage from '../pages/N01LoginRegisterPage.vue'
 import N02IdentitySelectPage from '../pages/N02IdentitySelectPage.vue'
 import N03EnterpriseCertificationPage from '../pages/N03EnterpriseCertificationPage.vue'
@@ -397,6 +398,14 @@ const routes = [
     component: Admn12AdSlotScheduleCenterPage,
     meta: {
       title: 'ADM-N12广告位排期中心_管理端广告位排期管理与窗口编排-货袋子'
+    }
+  },
+  {
+    path: '/admin/credit-model-version-manage/admn13',
+    name: 'admn13CreditModelVersionManage',
+    component: Admn13CreditModelVersionManagePage,
+    meta: {
+      title: 'ADM-N13信用模型版本管理_管理端信用模型版本治理与生效控制-货袋子'
     }
   },
   {

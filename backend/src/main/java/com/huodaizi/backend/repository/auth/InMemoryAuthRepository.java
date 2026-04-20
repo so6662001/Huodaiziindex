@@ -57,6 +57,8 @@ public class InMemoryAuthRepository {
       new ConcurrentHashMap<>();
   private final ConcurrentMap<String, Admn12AdSlotScheduleEntity> admn12AdSlotScheduleStore =
       new ConcurrentHashMap<>();
+  private final ConcurrentMap<String, Admn13CreditModelVersionEntity> admn13CreditModelVersionStore =
+      new ConcurrentHashMap<>();
 
   public InMemoryAuthRepository() {
     seed();
@@ -579,6 +581,7 @@ public class InMemoryAuthRepository {
       case "ADMN10_BILLING_RULE_MANAGE" -> "计费规则配置";
       case "ADMN11_PAYMENT_REFUND_MANAGE" -> "支付与退款管理";
       case "ADMN12_AD_SLOT_SCHEDULE_MANAGE" -> "广告位排期中心";
+      case "ADMN13_CREDIT_MODEL_VERSION_MANAGE" -> "信用模型版本管理";
       default -> "未命名权限";
     };
   }
@@ -2159,6 +2162,7 @@ public class InMemoryAuthRepository {
       case "ADMN10" -> "计费规则配置";
       case "ADMN11" -> "支付与退款管理";
       case "ADMN12" -> "广告位排期中心";
+      case "ADMN13" -> "信用模型版本管理";
       default -> "其他模块";
     };
   }
@@ -2184,6 +2188,8 @@ public class InMemoryAuthRepository {
       case "PAYMENT_REFUND_QUERY" -> "支付退款查询";
       case "AD_SLOT_SCHEDULE_UPSERT" -> "广告位排期新增/更新";
       case "AD_SLOT_SCHEDULE_QUERY" -> "广告位排期查询";
+      case "CREDIT_MODEL_VERSION_UPSERT" -> "信用模型版本新增/更新";
+      case "CREDIT_MODEL_VERSION_QUERY" -> "信用模型版本查询";
       default -> "通用操作";
     };
   }
@@ -2241,6 +2247,7 @@ public class InMemoryAuthRepository {
     seedAdmn09ArbitrationTickets();
     seedAdmn10BillingRules();
     seedAdmn12AdSlotSchedules();
+    seedAdmn13CreditModelVersions();
     seedNegotiation(seed);
     seedOrders(seed);
     seedTradeTerms(seed);
@@ -2342,7 +2349,8 @@ public class InMemoryAuthRepository {
                 "ADMN09_ARBITRATION_MANAGE",
                 "ADMN10_BILLING_RULE_MANAGE",
                 "ADMN11_PAYMENT_REFUND_MANAGE",
-                "ADMN12_AD_SLOT_SCHEDULE_MANAGE"),
+                "ADMN12_AD_SLOT_SCHEDULE_MANAGE",
+                "ADMN13_CREDIT_MODEL_VERSION_MANAGE"),
             "seed",
             now.minusDays(30),
             now.minusDays(1));
@@ -2366,7 +2374,8 @@ public class InMemoryAuthRepository {
                 "ADMN09_ARBITRATION_MANAGE",
                 "ADMN10_BILLING_RULE_MANAGE",
                 "ADMN11_PAYMENT_REFUND_MANAGE",
-                "ADMN12_AD_SLOT_SCHEDULE_MANAGE"),
+                "ADMN12_AD_SLOT_SCHEDULE_MANAGE",
+                "ADMN13_CREDIT_MODEL_VERSION_MANAGE"),
             "seed",
             now.minusDays(20),
             now.minusDays(2));
@@ -3035,6 +3044,263 @@ public class InMemoryAuthRepository {
       case "WEST_CHINA" -> "西南";
       default -> "其他区域";
     };
+  }
+
+  private void seedAdmn13CreditModelVersions() {
+    LocalDateTime now = LocalDateTime.now();
+    Admn13CreditModelVersionEntity first =
+        new Admn13CreditModelVersionEntity(
+            "CMV000001",
+            "CREDIT_MODEL_CORE",
+            "钢贸核心信用模型",
+            "v2026.04",
+            "ACTIVE",
+            "MERCHANT",
+            "0-100",
+            "{\"low\":60,\"medium\":75,\"high\":88}",
+            "2026-04-01",
+            "",
+            "12540",
+            "89.4%",
+            "0.421",
+            "0.913",
+            "风控策略组",
+            "覆盖履约、争议、支付与数据完整性四大维度",
+            "admn13-seed",
+            now.minusDays(20),
+            now.minusDays(1),
+            List.of(
+                new Admn13CreditModelVersionEntity.FactorWeight("FULFILL", "履约稳定性", "35", "POSITIVE"),
+                new Admn13CreditModelVersionEntity.FactorWeight("DISPUTE", "争议率", "25", "NEGATIVE"),
+                new Admn13CreditModelVersionEntity.FactorWeight("PAYMENT", "回款及时率", "25", "POSITIVE"),
+                new Admn13CreditModelVersionEntity.FactorWeight("DATA", "数据完整性", "15", "POSITIVE")));
+    admn13CreditModelVersionStore.put(first.getVersionId(), first);
+
+    Admn13CreditModelVersionEntity second =
+        new Admn13CreditModelVersionEntity(
+            "CMV000002",
+            "CREDIT_MODEL_CORE",
+            "钢贸核心信用模型",
+            "v2026.05-beta",
+            "DRAFT",
+            "MERCHANT",
+            "0-100",
+            "{\"low\":62,\"medium\":78,\"high\":90}",
+            "2026-05-01",
+            "2026-06-30",
+            "8420",
+            "87.8%",
+            "0.398",
+            "0.901",
+            "模型实验组",
+            "提高履约指标权重并引入波动惩罚项",
+            "admn13-seed",
+            now.minusDays(12),
+            now.minusHours(10),
+            List.of(
+                new Admn13CreditModelVersionEntity.FactorWeight("FULFILL", "履约稳定性", "40", "POSITIVE"),
+                new Admn13CreditModelVersionEntity.FactorWeight("DISPUTE", "争议率", "22", "NEGATIVE"),
+                new Admn13CreditModelVersionEntity.FactorWeight("PAYMENT", "回款及时率", "23", "POSITIVE"),
+                new Admn13CreditModelVersionEntity.FactorWeight("DATA", "数据完整性", "15", "POSITIVE")));
+    admn13CreditModelVersionStore.put(second.getVersionId(), second);
+
+    Admn13CreditModelVersionEntity third =
+        new Admn13CreditModelVersionEntity(
+            "CMV000003",
+            "CREDIT_MODEL_LIGHT",
+            "轻量信用预估模型",
+            "v2026.03",
+            "ARCHIVED",
+            "LEAD",
+            "0-100",
+            "{\"low\":55,\"medium\":70,\"high\":85}",
+            "2026-03-01",
+            "2026-03-31",
+            "5600",
+            "84.2%",
+            "0.355",
+            "0.872",
+            "数据科学组",
+            "历史版本，仅用于线索分发回溯分析",
+            "admn13-seed",
+            now.minusDays(45),
+            now.minusDays(28),
+            List.of(
+                new Admn13CreditModelVersionEntity.FactorWeight("RESPONSE", "响应时效", "30", "POSITIVE"),
+                new Admn13CreditModelVersionEntity.FactorWeight("QUOTE", "报价有效率", "30", "POSITIVE"),
+                new Admn13CreditModelVersionEntity.FactorWeight("DISPUTE", "争议率", "20", "NEGATIVE"),
+                new Admn13CreditModelVersionEntity.FactorWeight("DATA", "数据完整性", "20", "POSITIVE")));
+    admn13CreditModelVersionStore.put(third.getVersionId(), third);
+  }
+
+  public List<Admn13CreditModelVersionEntity> listCreditModelVersionsForAdmin(
+      String versionStatus, String scenarioCode, String riskLevel, String keyword) {
+    String statusFilter = defaultText(versionStatus, "").toUpperCase(Locale.ROOT);
+    String scenarioFilter = defaultText(scenarioCode, "").toUpperCase(Locale.ROOT);
+    String riskFilter = defaultText(riskLevel, "").toUpperCase(Locale.ROOT);
+    String keywordFilter = defaultText(keyword, "").toLowerCase(Locale.ROOT);
+    return admn13CreditModelVersionStore.values().stream()
+        .filter(
+            item ->
+                statusFilter.isBlank()
+                    || statusFilter.equals(defaultText(item.getVersionStatus(), "").toUpperCase(Locale.ROOT)))
+        .filter(
+            item ->
+                scenarioFilter.isBlank()
+                    || scenarioFilter.equals(defaultText(item.getScenarioCode(), "").toUpperCase(Locale.ROOT)))
+        .filter(
+            item ->
+                riskFilter.isBlank()
+                    || riskFilter.equals(admn13RiskLevelText(item.getRiskThresholdJson()).toUpperCase(Locale.ROOT)))
+        .filter(
+            item -> {
+              if (keywordFilter.isBlank()) {
+                return true;
+              }
+              return defaultText(item.getVersionId(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                  || defaultText(item.getModelCode(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                  || defaultText(item.getModelName(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                  || defaultText(item.getModelVersion(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                  || defaultText(item.getOwner(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                  || defaultText(item.getRemark(), "").toLowerCase(Locale.ROOT).contains(keywordFilter);
+            })
+        .sorted(Comparator.comparing(Admn13CreditModelVersionEntity::getUpdatedAt).reversed())
+        .toList();
+  }
+
+  public Admn13CreditModelVersionEntity getCreditModelVersionForAdmin(String versionId) {
+    String normalized = defaultText(versionId, "");
+    if (normalized.isBlank()) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "versionId 不能为空");
+    }
+    Admn13CreditModelVersionEntity entity = admn13CreditModelVersionStore.get(normalized);
+    if (entity == null) {
+      throw new BaseException(ErrorCode.NOT_FOUND.getCode(), "信用模型版本不存在");
+    }
+    return entity;
+  }
+
+  public Admn13CreditModelVersionEntity upsertCreditModelVersionForAdmin(
+      String modelCode,
+      String modelName,
+      String versionNo,
+      String versionStatus,
+      String applicableScope,
+      String effectiveFrom,
+      String effectiveTo,
+      String baseScore,
+      String passThreshold,
+      String riskThreshold,
+      List<Admn13CreditModelVersionEntity.FactorWeight> factors,
+      String remark,
+      String operator) {
+    String safeModelCode = defaultText(modelCode, "").toUpperCase(Locale.ROOT);
+    String safeModelName = defaultText(modelName, "");
+    String safeVersionNo = defaultText(versionNo, "");
+    if (safeModelCode.isBlank() || safeModelName.isBlank() || safeVersionNo.isBlank()) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "modelCode/modelName/versionNo 不能为空");
+    }
+    LocalDateTime now = LocalDateTime.now();
+    Admn13CreditModelVersionEntity existing =
+        admn13CreditModelVersionStore.values().stream()
+            .filter(
+                item ->
+                    safeModelCode.equalsIgnoreCase(defaultText(item.getModelCode(), ""))
+                        && safeVersionNo.equalsIgnoreCase(defaultText(item.getModelVersion(), "")))
+            .findFirst()
+            .orElse(null);
+    String thresholdJson =
+        "{\"base\":"
+            + defaultText(baseScore, "0")
+            + ",\"pass\":"
+            + defaultText(passThreshold, "0")
+            + ",\"risk\":"
+            + defaultText(riskThreshold, "0")
+            + "}";
+    List<Admn13CreditModelVersionEntity.FactorWeight> safeFactors =
+        factors == null ? List.of() : factors;
+
+    if (existing == null) {
+      String versionId =
+          "CMV"
+              + UUID.randomUUID().toString().replace("-", "").substring(0, 8).toUpperCase(Locale.ROOT);
+      Admn13CreditModelVersionEntity created =
+          new Admn13CreditModelVersionEntity(
+              versionId,
+              safeModelCode,
+              safeModelName,
+              safeVersionNo,
+              defaultText(versionStatus, "DRAFT").toUpperCase(Locale.ROOT),
+              defaultText(applicableScope, "MERCHANT").toUpperCase(Locale.ROOT),
+              "0-100",
+              thresholdJson,
+              defaultText(effectiveFrom, LocalDate.now().toString()),
+              defaultText(effectiveTo, ""),
+              "0",
+              "0%",
+              "0.000",
+              "0.000",
+              defaultText(operator, "admn13-upsert"),
+              defaultText(remark, ""),
+              defaultText(operator, "admn13-upsert"),
+              now,
+              now,
+              safeFactors);
+      admn13CreditModelVersionStore.put(created.getVersionId(), created);
+      return created;
+    }
+
+    existing.update(
+        safeModelName,
+        defaultText(versionStatus, existing.getVersionStatus()).toUpperCase(Locale.ROOT),
+        defaultText(applicableScope, existing.getScenarioCode()).toUpperCase(Locale.ROOT),
+        existing.getScoreScale(),
+        thresholdJson,
+        defaultText(effectiveFrom, existing.getEffectiveFrom()),
+        defaultText(effectiveTo, existing.getEffectiveTo()),
+        existing.getSampleSize(),
+        existing.getHitRate(),
+        existing.getKsValue(),
+        existing.getAucValue(),
+        defaultText(operator, existing.getOwner()),
+        defaultText(remark, existing.getRemark()),
+        defaultText(operator, existing.getOperator()),
+        safeFactors,
+        now);
+    admn13CreditModelVersionStore.put(existing.getVersionId(), existing);
+    return existing;
+  }
+
+  public String admn13ModelStatusText(String versionStatus) {
+    return switch (defaultText(versionStatus, "").toUpperCase(Locale.ROOT)) {
+      case "ACTIVE" -> "生效中";
+      case "DRAFT" -> "草稿";
+      case "ARCHIVED" -> "已归档";
+      default -> "未知";
+    };
+  }
+
+  public String admn13RiskLevelText(String riskThresholdJson) {
+    String text = defaultText(riskThresholdJson, "");
+    if (text.contains("\"risk\":90") || text.contains("\"risk\":89")) {
+      return "HIGH";
+    }
+    if (text.contains("\"risk\":80") || text.contains("\"risk\":85") || text.contains("\"risk\":88")) {
+      return "MEDIUM";
+    }
+    return "LOW";
+  }
+
+  public String admn13AuditRiskLevel(String versionStatus, String scenarioCode) {
+    String status = defaultText(versionStatus, "").toUpperCase(Locale.ROOT);
+    String scope = defaultText(scenarioCode, "").toUpperCase(Locale.ROOT);
+    if ("ACTIVE".equals(status) && "MERCHANT".equals(scope)) {
+      return "HIGH";
+    }
+    if ("ACTIVE".equals(status) || "DRAFT".equals(status)) {
+      return "MEDIUM";
+    }
+    return "LOW";
   }
 
   private void seedNegotiation(AuthUserEntity user) {

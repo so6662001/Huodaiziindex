@@ -265,6 +265,10 @@ function goAdmn12AdSlotScheduleCenterPage() {
   router.push('/admin/ad-slot-schedule-center/admn12')
 }
 
+function goAdmn13CreditModelVersionManagePage() {
+  router.push('/admin/credit-model-version-manage/admn13')
+}
+
 function goN01LoginRegisterPage() {
   router.push('/account/login-register')
 }
@@ -539,6 +543,7 @@ function onSearch() {
         <button class="btn" @click="goAdmn10BillingRuleConfigPage">ADM-N10计费规则配置</button>
         <button class="btn" @click="goAdmn11PaymentRefundManagePage">ADM-N11支付与退款管理</button>
         <button class="btn" @click="goAdmn12AdSlotScheduleCenterPage">ADM-N12广告位排期中心</button>
+        <button class="btn" @click="goAdmn13CreditModelVersionManagePage">ADM-N13信用模型版本管理</button>
         <button class="btn" @click="goN01LoginRegisterPage">PC-N01登录/注册</button>
         <button class="btn" @click="goN02IdentitySelectPage">PC-N02身份选择</button>
         <button class="btn" @click="goN03EnterpriseCertificationPage">PC-N03企业认证提交</button>
