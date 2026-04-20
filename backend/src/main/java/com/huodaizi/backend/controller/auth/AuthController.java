@@ -6,6 +6,10 @@ import com.huodaizi.backend.dto.auth.AuthLoginResponse;
 import com.huodaizi.backend.dto.auth.AuthRegisterRequest;
 import com.huodaizi.backend.dto.auth.AuthRegisterResponse;
 import com.huodaizi.backend.dto.auth.AuthSessionResponse;
+import com.huodaizi.backend.dto.auth.H5N01QuickLoginRequest;
+import com.huodaizi.backend.dto.auth.H5N01QuickLoginResponse;
+import com.huodaizi.backend.dto.auth.H5N01SendLoginCodeRequest;
+import com.huodaizi.backend.dto.auth.H5N01SendLoginCodeResponse;
 import com.huodaizi.backend.dto.auth.N04OnboardingProgressResponse;
 import com.huodaizi.backend.dto.auth.N03EnterpriseCertificationDetailResponse;
 import com.huodaizi.backend.dto.auth.N03EnterpriseCertificationSubmitRequest;
@@ -71,6 +75,18 @@ public class AuthController {
   @PostMapping("/login")
   public ApiResponse<AuthLoginResponse> login(@Valid @RequestBody AuthLoginRequest request) {
     return ApiResponse.success(service.login(request));
+  }
+
+  @PostMapping("/h5/send-login-code")
+  public ApiResponse<H5N01SendLoginCodeResponse> h5SendLoginCode(
+      @Valid @RequestBody H5N01SendLoginCodeRequest request) {
+    return ApiResponse.success(service.sendH5LoginCode(request));
+  }
+
+  @PostMapping("/h5/quick-login")
+  public ApiResponse<H5N01QuickLoginResponse> h5QuickLogin(
+      @Valid @RequestBody H5N01QuickLoginRequest request) {
+    return ApiResponse.success(service.h5QuickLogin(request));
   }
 
   @GetMapping("/session")

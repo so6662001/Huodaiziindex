@@ -145,6 +145,10 @@ function goH5MemberPage() {
   router.push('/h5/member?merchantId=S001')
 }
 
+function goH5N01QuickLoginPage() {
+  router.push('/h5/login/quick')
+}
+
 function goA01DashboardPage() {
   router.push('/admin/dashboard/a01')
 }
@@ -421,6 +425,7 @@ function onSearch() {
         <button class="btn" @click="goH5PickupOrderPage">H5提货单</button>
         <button class="btn" @click="goH5ReconcileOrderPage">H5对账单</button>
         <button class="btn" @click="goH5MemberPage">H5我的会员</button>
+        <button class="btn" @click="goH5N01QuickLoginPage">H5-N01快捷登录</button>
         <button class="btn" @click="goA01DashboardPage">A01经营总看板</button>
         <button class="btn" @click="goA02LeadOpsPage">A02线索运营中心</button>
         <button class="btn" @click="goA03QuoteEfficiencyPage">A03报价效率中心</button>

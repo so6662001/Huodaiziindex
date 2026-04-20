@@ -7,6 +7,10 @@ import com.huodaizi.backend.dto.auth.AuthLoginResponse;
 import com.huodaizi.backend.dto.auth.AuthRegisterRequest;
 import com.huodaizi.backend.dto.auth.AuthRegisterResponse;
 import com.huodaizi.backend.dto.auth.AuthSessionResponse;
+import com.huodaizi.backend.dto.auth.H5N01QuickLoginRequest;
+import com.huodaizi.backend.dto.auth.H5N01QuickLoginResponse;
+import com.huodaizi.backend.dto.auth.H5N01SendLoginCodeRequest;
+import com.huodaizi.backend.dto.auth.H5N01SendLoginCodeResponse;
 import com.huodaizi.backend.dto.auth.N03EnterpriseCertificationDetailResponse;
 import com.huodaizi.backend.dto.auth.N03EnterpriseCertificationSubmitRequest;
 import com.huodaizi.backend.dto.auth.N04OnboardingProgressNodeDTO;
@@ -134,6 +138,37 @@ public class AuthService {
         session.getToken(),
         session.getExpireAt().toString(),
         session.getCreatedAt().toString());
+  }
+
+  public H5N01SendLoginCodeResponse sendH5LoginCode(H5N01SendLoginCodeRequest request) {
+    String mobile = request.mobile() == null ? "" : request.mobile().trim();
+    if (!mobile.matches("^1\\d{10}$")) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "mobile 必须为11位手机号");
+    }
+    String operator = safeText(request.operator());
+    InMemoryAuthRepository.H5LoginCodeEntity code = repository.sendH5LoginCode(mobile, operator);
+    return new H5N01SendLoginCodeResponse(
+        mobile,
+        repository.maskPhone(mobile),
+        code.getCodeToken(),
+        code.getExpireAt().toString(),
+        "验证码已发送");
+  }
+
+  public H5N01QuickLoginResponse h5QuickLogin(H5N01QuickLoginRequest request) {
+    AuthUserEntity user = repository.quickLoginByCode(safeText(request.mobile()), safeText(request.smsCode()));
+    String channel = safeText(request.channel()).isBlank() ? "H5" : safeText(request.channel()).toUpperCase();
+    SessionEntity session = repository.createSession(user, channel);
+    return new H5N01QuickLoginResponse(
+        user.getUserId(),
+        user.getAccount(),
+        user.getPhoneMasked(),
+        user.getContactName(),
+        user.getRole(),
+        session.getToken(),
+        session.getExpireAt().toString(),
+        session.getCreatedAt().toString(),
+        channel);
   }
 
   public AuthSessionResponse session(String token) {

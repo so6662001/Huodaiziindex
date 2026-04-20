@@ -21,6 +21,7 @@ import H5QuickQuotePage from '../pages/H5QuickQuotePage.vue'
 import H5PickupOrderPage from '../pages/H5PickupOrderPage.vue'
 import H5ReconcileOrderPage from '../pages/H5ReconcileOrderPage.vue'
 import H5MemberPage from '../pages/H5MemberPage.vue'
+import H5N01QuickLoginPage from '../pages/H5N01QuickLoginPage.vue'
 import A01DashboardPage from '../pages/A01DashboardPage.vue'
 import A02LeadOpsPage from '../pages/A02LeadOpsPage.vue'
 import A03QuoteEfficiencyPage from '../pages/A03QuoteEfficiencyPage.vue'
@@ -55,6 +56,14 @@ const routes = [
     component: HomePage,
     meta: {
       title: '货袋子钢铁交易平台_找货更快卖货更稳'
+    }
+  },
+  {
+    path: '/h5/login-quick',
+    name: 'h5N01QuickLogin',
+    component: H5N01QuickLoginPage,
+    meta: {
+      title: 'H5-N01快捷登录页_移动端短信验证码登录-货袋子'
     }
   },
   {

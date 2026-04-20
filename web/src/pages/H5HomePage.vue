@@ -63,6 +63,10 @@ async function loadHome() {
 
 function goto(url) {
   if (!url) return
+  if (url.includes('/h5/auth/quick-login')) {
+    router.push('/h5/auth/quick-login')
+    return
+  }
   if (url === '/inquiry/create') {
     router.push('/h5/inquiry/step1')
     return
@@ -90,6 +94,10 @@ function goto(url) {
   router.push(url)
 }
 
+function goQuickLogin() {
+  router.push('/h5/auth/quick-login')
+}
+
 function colorClass(item) {
   const text = String(item?.changeRate || '')
   if (text.startsWith('+')) return 'up'
@@ -112,6 +120,9 @@ onMounted(() => {
         <span class="muted">{{ home.city }}｜{{ home.weather }}</span>
       </div>
       <p class="muted">更新时间：{{ home.updateTime || '-' }}</p>
+      <div class="hero-actions">
+        <button class="btn primary" @click="goQuickLogin">H5-N01 快捷登录</button>
+      </div>
       <div class="filters">
         <label>
           城市
@@ -228,6 +239,11 @@ h3 {
 .error {
   color: #b42318;
   margin-top: 10px;
+}
+.hero-actions {
+  margin-top: 10px;
+  display: flex;
+  gap: 8px;
 }
 .filters {
   display: grid;

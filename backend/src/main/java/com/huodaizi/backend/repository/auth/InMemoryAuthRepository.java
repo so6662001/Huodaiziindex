@@ -34,6 +34,7 @@ public class InMemoryAuthRepository {
       new ConcurrentHashMap<>();
   private final ConcurrentMap<String, N13CreditScoreEntity> creditScoreStore = new ConcurrentHashMap<>();
   private final ConcurrentMap<String, N14DispatchAppealEntity> dispatchAppealStore = new ConcurrentHashMap<>();
+  private final ConcurrentMap<String, H5LoginCodeEntity> h5LoginCodeStore = new ConcurrentHashMap<>();
 
   public InMemoryAuthRepository() {
     seed();
@@ -73,6 +74,50 @@ public class InMemoryAuthRepository {
     if (!user.getPasswordHash().equals(hashPassword(password))) {
       throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "账号或密码错误");
     }
+    return user;
+  }
+
+  public H5LoginCodeEntity sendH5LoginCode(String mobile, String operator) {
+    String normalizedMobile = normalizeMobile(mobile);
+    AuthUserEntity user = userStore.get(normalizedMobile);
+    if (user == null || !"ACTIVE".equalsIgnoreCase(user.getStatus())) {
+      throw new BaseException(ErrorCode.NOT_FOUND.getCode(), "手机号未注册，请先注册账号");
+    }
+    LocalDateTime now = LocalDateTime.now();
+    String code = "123456";
+    H5LoginCodeEntity entity =
+        new H5LoginCodeEntity(
+            normalizedMobile,
+            code,
+            "H5CODE_" + UUID.randomUUID().toString().replace("-", "").substring(0, 12).toUpperCase(Locale.ROOT),
+            60,
+            now.plusMinutes(5),
+            defaultText(operator, "h5-n01-send-code"),
+            now);
+    h5LoginCodeStore.put(normalizedMobile, entity);
+    return entity;
+  }
+
+  public AuthUserEntity quickLoginByCode(String mobile, String smsCode) {
+    String normalizedMobile = normalizeMobile(mobile);
+    String normalizedCode = defaultText(smsCode, "");
+    if (!normalizedCode.matches("^\\d{6}$")) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "smsCode 必须为6位数字");
+    }
+    H5LoginCodeEntity codeEntity = h5LoginCodeStore.get(normalizedMobile);
+    if (codeEntity == null) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "请先获取验证码");
+    }
+    if (codeEntity.getExpireAt().isBefore(LocalDateTime.now())) {
+      h5LoginCodeStore.remove(normalizedMobile);
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "验证码已过期，请重新获取");
+    }
+    if (!codeEntity.getSmsCode().equals(normalizedCode)
+        && !codeEntity.getCodeToken().equalsIgnoreCase(normalizedCode)) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "验证码错误");
+    }
+    AuthUserEntity user = requireUser(normalizedMobile);
+    h5LoginCodeStore.remove(normalizedMobile);
     return user;
   }
 
@@ -1869,4 +1914,59 @@ public class InMemoryAuthRepository {
       String companyName,
       String contactName,
       String operator) {}
+
+  public static final class H5LoginCodeEntity {
+    private final String mobile;
+    private final String codeToken;
+    private final String smsCode;
+    private final int expireInSeconds;
+    private final LocalDateTime expireAt;
+    private final String operator;
+    private final LocalDateTime sentAt;
+
+    public H5LoginCodeEntity(
+        String mobile,
+        String codeToken,
+        String smsCode,
+        int expireInSeconds,
+        LocalDateTime expireAt,
+        String operator,
+        LocalDateTime sentAt) {
+      this.mobile = mobile;
+      this.codeToken = codeToken;
+      this.smsCode = smsCode;
+      this.expireInSeconds = expireInSeconds;
+      this.expireAt = expireAt;
+      this.operator = operator;
+      this.sentAt = sentAt;
+    }
+
+    public String getMobile() {
+      return mobile;
+    }
+
+    public String getCodeToken() {
+      return codeToken;
+    }
+
+    public String getSmsCode() {
+      return smsCode;
+    }
+
+    public int getExpireInSeconds() {
+      return expireInSeconds;
+    }
+
+    public LocalDateTime getExpireAt() {
+      return expireAt;
+    }
+
+    public String getOperator() {
+      return operator;
+    }
+
+    public LocalDateTime getSentAt() {
+      return sentAt;
+    }
+  }
 }
