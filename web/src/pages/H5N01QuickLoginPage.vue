@@ -128,6 +128,10 @@ function goH5EnterpriseCertification() {
   router.push('/h5/enterprise-certification')
 }
 
+function goH5NegotiationSession() {
+  router.push('/h5/negotiation-session')
+}
+
 onMounted(() => {
   const cached = localStorage.getItem('H5_N01_AUTH_TOKEN') || localStorage.getItem('N01_AUTH_TOKEN') || ''
   if (cached) {
@@ -145,6 +149,7 @@ onMounted(() => {
         <button class="btn" @click="goH5Home">前往H5首页</button>
         <button class="btn" @click="goH5IdentitySwitch">前往H5-N02身份切换</button>
         <button class="btn" @click="goH5EnterpriseCertification">前往H5-N03企业认证</button>
+        <button class="btn" @click="goH5NegotiationSession">前往H5-N04议价会话</button>
       </div>
     </section>
 

@@ -13,6 +13,12 @@ import com.huodaizi.backend.dto.auth.H5N01SendLoginCodeRequest;
 import com.huodaizi.backend.dto.auth.H5N01SendLoginCodeResponse;
 import com.huodaizi.backend.dto.auth.H5N03EnterpriseCertificationDetailResponse;
 import com.huodaizi.backend.dto.auth.H5N03EnterpriseCertificationSubmitRequest;
+import com.huodaizi.backend.dto.auth.H5N04NegotiationDetailResponse;
+import com.huodaizi.backend.dto.auth.H5N04NegotiationMessageDTO;
+import com.huodaizi.backend.dto.auth.H5N04NegotiationSendMessageRequest;
+import com.huodaizi.backend.dto.auth.H5N04NegotiationSessionItemDTO;
+import com.huodaizi.backend.dto.auth.H5N04NegotiationSessionListResponse;
+import com.huodaizi.backend.dto.auth.H5N04NegotiationStatusUpdateRequest;
 import com.huodaizi.backend.dto.auth.N03EnterpriseCertificationDetailResponse;
 import com.huodaizi.backend.dto.auth.N03EnterpriseCertificationSubmitRequest;
 import com.huodaizi.backend.dto.auth.N04OnboardingProgressNodeDTO;
@@ -482,6 +488,69 @@ public class AuthService {
     String normalized = normalizeActionToStatus(request.action());
     repository.updateNegotiationStatus(token, sessionId, normalized, safeText(request.remark()));
     return negotiationDetail(token, sessionId);
+  }
+
+  public H5N04NegotiationSessionListResponse h5NegotiationSessions(
+      String token, String status, String keyword, int pageNo, int pageSize) {
+    int safePageNo = Math.max(1, pageNo);
+    int safePageSize = Math.min(Math.max(1, pageSize), 50);
+    N05NegotiationQuery query = new N05NegotiationQuery(status, keyword, safePageNo, safePageSize);
+    List<N05NegotiationSessionEntity> all = repository.listNegotiations(token, query);
+    int from = Math.min((safePageNo - 1) * safePageSize, all.size());
+    int to = Math.min(from + safePageSize, all.size());
+    List<N05NegotiationSessionEntity> sessions = all.subList(from, to);
+
+    List<H5N04NegotiationSessionItemDTO> records =
+        sessions.stream()
+            .map(
+                session ->
+                    new H5N04NegotiationSessionItemDTO(
+                        session.getSessionId(),
+                        session.getInquiryNo(),
+                        session.getProductName(),
+                        session.getSpecification(),
+                        session.getCounterpartyName(),
+                        session.getRoleInSession(),
+                        session.getStatus(),
+                        sessionStatusText(session.getStatus()),
+                        session.getLatestOfferPrice(),
+                        session.getLatestMessage(),
+                        toText(session.getLatestMessageAt()),
+                        session.getUnreadCount(),
+                        h5StatusActionText(session.getStatus())))
+            .toList();
+    String activeSessionId = records.isEmpty() ? "" : records.get(0).sessionId();
+    return new H5N04NegotiationSessionListResponse(
+        safePageNo, safePageSize, all.size(), "H5", activeSessionId, records);
+  }
+
+  public H5N04NegotiationDetailResponse h5NegotiationDetail(String token, String sessionId) {
+    N05NegotiationSessionEntity session = repository.getNegotiationDetail(token, sessionId);
+    List<H5N04NegotiationMessageDTO> messages =
+        session.getMessages().stream().map(this::toH5NegotiationMessage).toList();
+    return toH5NegotiationDetail(session, messages);
+  }
+
+  public H5N04NegotiationDetailResponse h5SendNegotiationMessage(
+      String token, String sessionId, H5N04NegotiationSendMessageRequest request) {
+    repository.appendNegotiationMessage(
+        token,
+        sessionId,
+        safeText(request.senderRole()),
+        safeText(request.content()),
+        safeText(request.operator()));
+    return h5NegotiationDetail(token, sessionId);
+  }
+
+  public H5N04NegotiationDetailResponse h5UpdateNegotiationStatus(
+      String token, String sessionId, H5N04NegotiationStatusUpdateRequest request) {
+    String normalized = normalizeActionToStatus(request.action());
+    String remark = safeText(request.remark());
+    String operator = safeText(request.operator());
+    String finalOperator = operator.isBlank() ? "h5-n04-status" : operator;
+    String fullRemark = remark.isBlank() ? finalOperator : remark + "（" + finalOperator + "）";
+    repository.updateNegotiationStatus(token, sessionId, normalized, fullRemark);
+    return h5NegotiationDetail(token, sessionId);
   }
 
   public N06OrderListResponse orderList(
@@ -1469,6 +1538,61 @@ public class AuthService {
         entity.getOfferPrice(),
         entity.getActionLabel(),
         toText(entity.getCreatedAt()));
+  }
+
+  private H5N04NegotiationDetailResponse toH5NegotiationDetail(
+      N05NegotiationSessionEntity session, List<H5N04NegotiationMessageDTO> messages) {
+    return new H5N04NegotiationDetailResponse(
+        session.getSessionId(),
+        session.getInquiryNo(),
+        session.getProductName(),
+        session.getSpecification(),
+        session.getBuyerName(),
+        session.getSupplierName(),
+        session.getStatus(),
+        sessionStatusText(session.getStatus()),
+        session.getLatestOfferPrice(),
+        session.getTargetPrice(),
+        session.getRoundNo(),
+        String.valueOf(session.getUnreadCount()),
+        toText(session.getLatestMessageAt()),
+        toText(session.getUpdatedAt()),
+        session.getRoleInSession(),
+        "H5",
+        h5AvailableActions(session.getStatus()),
+        messages);
+  }
+
+  private H5N04NegotiationMessageDTO toH5NegotiationMessage(N05NegotiationMessageEntity entity) {
+    return new H5N04NegotiationMessageDTO(
+        entity.getMessageId(),
+        entity.getSenderRole(),
+        senderRoleText(entity.getSenderRole()),
+        entity.getMessageType(),
+        entity.getContent(),
+        entity.getOfferPrice(),
+        entity.getActionLabel(),
+        toText(entity.getCreatedAt()));
+  }
+
+  private String h5StatusActionText(String status) {
+    return switch (safeText(status).toUpperCase()) {
+      case "ONGOING" -> "转待确认";
+      case "WAIT_CONFIRM" -> "标记达成";
+      case "DEAL" -> "转成交";
+      case "CLOSED" -> "恢复会话";
+      default -> "查看详情";
+    };
+  }
+
+  private List<String> h5AvailableActions(String status) {
+    return switch (safeText(status).toUpperCase()) {
+      case "ONGOING" -> List.of("WAIT_CONFIRM", "CLOSED");
+      case "WAIT_CONFIRM" -> List.of("DEAL", "ONGOING");
+      case "DEAL" -> List.of("ONGOING", "CLOSED");
+      case "CLOSED" -> List.of("ONGOING");
+      default -> List.of("ONGOING");
+    };
   }
 
   private String sessionStatusText(String status) {

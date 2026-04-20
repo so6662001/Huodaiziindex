@@ -98,6 +98,10 @@ function goCertification() {
   router.push('/h5/enterprise-certification')
 }
 
+function goNegotiation() {
+  router.push('/h5/negotiation-session')
+}
+
 onMounted(() => {
   loadIdentities()
 })
@@ -111,6 +115,7 @@ onMounted(() => {
       <div class="hero-actions">
         <button class="btn" @click="goQuickLogin">返回快捷登录</button>
         <button class="btn" @click="goCertification">企业认证</button>
+        <button class="btn" @click="goNegotiation">议价会话</button>
         <button class="btn" @click="goH5Home">返回H5首页</button>
       </div>
     </section>

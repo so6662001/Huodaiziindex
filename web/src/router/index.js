@@ -24,6 +24,7 @@ import H5MemberPage from '../pages/H5MemberPage.vue'
 import H5N01QuickLoginPage from '../pages/H5N01QuickLoginPage.vue'
 import H5N02IdentitySwitchPage from '../pages/H5N02IdentitySwitchPage.vue'
 import H5N03EnterpriseCertificationPage from '../pages/H5N03EnterpriseCertificationPage.vue'
+import H5N04NegotiationSessionPage from '../pages/H5N04NegotiationSessionPage.vue'
 import A01DashboardPage from '../pages/A01DashboardPage.vue'
 import A02LeadOpsPage from '../pages/A02LeadOpsPage.vue'
 import A03QuoteEfficiencyPage from '../pages/A03QuoteEfficiencyPage.vue'
@@ -82,6 +83,14 @@ const routes = [
     component: H5N03EnterpriseCertificationPage,
     meta: {
       title: 'H5-N03企业认证页_移动端企业认证提交-货袋子'
+    }
+  },
+  {
+    path: '/h5/negotiation-session',
+    name: 'h5N04NegotiationSession',
+    component: H5N04NegotiationSessionPage,
+    meta: {
+      title: 'H5-N04议价会话页_移动端议价沟通-货袋子'
     }
   },
   {

@@ -12,6 +12,10 @@ import com.huodaizi.backend.dto.auth.H5N01SendLoginCodeRequest;
 import com.huodaizi.backend.dto.auth.H5N01SendLoginCodeResponse;
 import com.huodaizi.backend.dto.auth.H5N03EnterpriseCertificationDetailResponse;
 import com.huodaizi.backend.dto.auth.H5N03EnterpriseCertificationSubmitRequest;
+import com.huodaizi.backend.dto.auth.H5N04NegotiationDetailResponse;
+import com.huodaizi.backend.dto.auth.H5N04NegotiationSendMessageRequest;
+import com.huodaizi.backend.dto.auth.H5N04NegotiationSessionListResponse;
+import com.huodaizi.backend.dto.auth.H5N04NegotiationStatusUpdateRequest;
 import com.huodaizi.backend.dto.auth.N04OnboardingProgressResponse;
 import com.huodaizi.backend.dto.auth.N03EnterpriseCertificationDetailResponse;
 import com.huodaizi.backend.dto.auth.N03EnterpriseCertificationSubmitRequest;
@@ -127,6 +131,39 @@ public class AuthController {
   public ApiResponse<N04OnboardingProgressResponse> onboardingProgress(
       @RequestHeader(name = AUTH_HEADER, required = false) String token) {
     return ApiResponse.success(service.onboardingProgress(token));
+  }
+
+  @GetMapping("/h5/negotiations")
+  public ApiResponse<H5N04NegotiationSessionListResponse> h5NegotiationSessions(
+      @RequestHeader(name = AUTH_HEADER, required = false) String token,
+      @RequestParam(name = "status", required = false) String status,
+      @RequestParam(name = "keyword", required = false) String keyword,
+      @RequestParam(name = "pageNo", required = false, defaultValue = "1") int pageNo,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "10") int pageSize) {
+    return ApiResponse.success(service.h5NegotiationSessions(token, status, keyword, pageNo, pageSize));
+  }
+
+  @GetMapping("/h5/negotiations/{sessionId}")
+  public ApiResponse<H5N04NegotiationDetailResponse> h5NegotiationDetail(
+      @RequestHeader(name = AUTH_HEADER, required = false) String token,
+      @PathVariable("sessionId") String sessionId) {
+    return ApiResponse.success(service.h5NegotiationDetail(token, sessionId));
+  }
+
+  @PostMapping("/h5/negotiations/{sessionId}/messages")
+  public ApiResponse<H5N04NegotiationDetailResponse> h5NegotiationMessage(
+      @RequestHeader(name = AUTH_HEADER, required = false) String token,
+      @PathVariable("sessionId") String sessionId,
+      @Valid @RequestBody H5N04NegotiationSendMessageRequest request) {
+    return ApiResponse.success(service.h5SendNegotiationMessage(token, sessionId, request));
+  }
+
+  @PostMapping("/h5/negotiations/{sessionId}/status")
+  public ApiResponse<H5N04NegotiationDetailResponse> h5NegotiationStatus(
+      @RequestHeader(name = AUTH_HEADER, required = false) String token,
+      @PathVariable("sessionId") String sessionId,
+      @Valid @RequestBody H5N04NegotiationStatusUpdateRequest request) {
+    return ApiResponse.success(service.h5UpdateNegotiationStatus(token, sessionId, request));
   }
 
   @GetMapping("/negotiations")
