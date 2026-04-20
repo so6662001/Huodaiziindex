@@ -148,7 +148,6 @@ public class Admn10BillingRuleAdminService {
         entity.getMinFeeYuan(),
         entity.getMaxFeeYuan(),
         entity.getLadderConfig(),
-        toRuleSteps(entity.getBillingMode(), entity.getLadderConfig(), entity.getBasePriceYuan()),
         entity.getRuleStatus(),
         repository.admn10RuleStatusText(entity.getRuleStatus()),
         entity.getEffectiveFrom(),
@@ -157,6 +156,7 @@ public class Admn10BillingRuleAdminService {
         safeText(entity.getOperator()),
         toText(entity.getCreatedAt()),
         toText(entity.getUpdatedAt()),
+        toRuleSteps(entity.getBillingMode(), entity.getLadderConfig(), entity.getBasePriceYuan()),
         availableActions(entity.getRuleStatus()));
   }
 

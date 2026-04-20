@@ -1056,6 +1056,32 @@ public class InMemoryAuthRepository {
     };
   }
 
+  private String mergeIssueTags(String currentTags, String ruleCode, String qualityStatus, String riskLevel) {
+    List<String> tags = new ArrayList<>();
+    String existed = defaultText(currentTags, "");
+    if (!existed.isBlank()) {
+      for (String item : existed.split(",")) {
+        String trimmed = item == null ? "" : item.trim().toUpperCase(Locale.ROOT);
+        if (!trimmed.isBlank() && !tags.contains(trimmed)) {
+          tags.add(trimmed);
+        }
+      }
+    }
+    String rule = defaultText(ruleCode, "").toUpperCase(Locale.ROOT);
+    if (!rule.isBlank() && !tags.contains(rule)) {
+      tags.add(rule);
+    }
+    String statusTag = "QA_" + defaultText(qualityStatus, "PENDING").toUpperCase(Locale.ROOT);
+    if (!tags.contains(statusTag)) {
+      tags.add(statusTag);
+    }
+    String riskTag = "RISK_" + defaultText(riskLevel, "LOW").toUpperCase(Locale.ROOT);
+    if (!tags.contains(riskTag)) {
+      tags.add(riskTag);
+    }
+    return String.join(",", tags);
+  }
+
   public List<Admn05CategorySpecDictEntity> listCategorySpecDictsForAdmin(
       String keyword, String status, String sceneCode) {
     String keywordFilter = defaultText(keyword, "").toLowerCase(Locale.ROOT);

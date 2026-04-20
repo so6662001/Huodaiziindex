@@ -1,7 +1,6 @@
 package com.huodaizi.backend.controller.admn10;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -83,7 +82,7 @@ class Admn10BillingRuleAdminIntegrationTest {
                           "basePriceYuan":"0",
                           "minFeeYuan":"299",
                           "maxFeeYuan":"19999",
-                          "ladderConfig":"{\"ratio\":\"0.015\",\"round\":\"HALF_UP\",\"scale\":2}",
+                          "ladderConfig":"ratio=0.015,round=HALF_UP,scale=2",
                           "effectiveFrom":"2026-05-01",
                           "effectiveTo":"2027-04-30",
                           "ruleStatus":"ACTIVE",
@@ -120,7 +119,7 @@ class Admn10BillingRuleAdminIntegrationTest {
                       "basePriceYuan":"0",
                       "minFeeYuan":"299",
                       "maxFeeYuan":"19999",
-                      "ladderConfig":"{\"ratio\":\"0.015\",\"round\":\"HALF_UP\",\"scale\":2}",
+                      "ladderConfig":"ratio=0.015,round=HALF_UP,scale=2",
                       "effectiveFrom":"2026-05-01",
                       "effectiveTo":"2027-04-30",
                       "ruleStatus":"DISABLED",
