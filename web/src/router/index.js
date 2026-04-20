@@ -53,6 +53,7 @@ import Admn11PaymentRefundManagePage from '../pages/Admn11PaymentRefundManagePag
 import Admn12AdSlotScheduleCenterPage from '../pages/Admn12AdSlotScheduleCenterPage.vue'
 import Admn13CreditModelVersionManagePage from '../pages/Admn13CreditModelVersionManagePage.vue'
 import Admn14AbExperimentCenterPage from '../pages/Admn14AbExperimentCenterPage.vue'
+import Admn15RiskAlertTicketCenterPage from '../pages/Admn15RiskAlertTicketCenterPage.vue'
 import N01LoginRegisterPage from '../pages/N01LoginRegisterPage.vue'
 import N02IdentitySelectPage from '../pages/N02IdentitySelectPage.vue'
 import N03EnterpriseCertificationPage from '../pages/N03EnterpriseCertificationPage.vue'
@@ -415,6 +416,14 @@ const routes = [
     component: Admn14AbExperimentCenterPage,
     meta: {
       title: 'ADM-N14A/B实验中心_管理端实验持续优化与灰度治理-货袋子'
+    }
+  },
+  {
+    path: '/admin/risk-alert-ticket-center/admn15',
+    name: 'admn15RiskAlertTicketCenter',
+    component: Admn15RiskAlertTicketCenterPage,
+    meta: {
+      title: 'ADM-N15风险预警工单中心_管理端预警工单流转与闭环处置-货袋子'
     }
   },
   {

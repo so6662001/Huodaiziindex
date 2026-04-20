@@ -61,6 +61,8 @@ public class InMemoryAuthRepository {
       new ConcurrentHashMap<>();
   private final ConcurrentMap<String, Admn14AbExperimentEntity> admn14AbExperimentStore =
       new ConcurrentHashMap<>();
+  private final ConcurrentMap<String, Admn15RiskAlertTicketEntity> admn15RiskAlertTicketStore =
+      new ConcurrentHashMap<>();
 
   public InMemoryAuthRepository() {
     seed();
@@ -585,6 +587,7 @@ public class InMemoryAuthRepository {
       case "ADMN12_AD_SLOT_SCHEDULE_MANAGE" -> "广告位排期中心";
       case "ADMN13_CREDIT_MODEL_VERSION_MANAGE" -> "信用模型版本管理";
       case "ADMN14_AB_EXPERIMENT_MANAGE" -> "A/B实验中心";
+      case "ADMN15_RISK_ALERT_TICKET_MANAGE" -> "风险预警工单中心";
       default -> "未命名权限";
     };
   }
@@ -2167,6 +2170,7 @@ public class InMemoryAuthRepository {
       case "ADMN12" -> "广告位排期中心";
       case "ADMN13" -> "信用模型版本管理";
       case "ADMN14" -> "A/B实验中心";
+      case "ADMN15" -> "风险预警工单中心";
       default -> "其他模块";
     };
   }
@@ -2196,6 +2200,8 @@ public class InMemoryAuthRepository {
       case "CREDIT_MODEL_VERSION_QUERY" -> "信用模型版本查询";
       case "AB_EXPERIMENT_UPSERT" -> "A/B实验新增/更新";
       case "AB_EXPERIMENT_QUERY" -> "A/B实验查询";
+      case "RISK_ALERT_TICKET_HANDLE" -> "风险预警工单处置";
+      case "RISK_ALERT_TICKET_QUERY" -> "风险预警工单查询";
       default -> "通用操作";
     };
   }
@@ -2255,6 +2261,7 @@ public class InMemoryAuthRepository {
     seedAdmn12AdSlotSchedules();
     seedAdmn13CreditModelVersions();
     seedAdmn14AbExperiments();
+    seedAdmn15RiskAlertTickets();
     seedNegotiation(seed);
     seedOrders(seed);
     seedTradeTerms(seed);
@@ -2358,7 +2365,8 @@ public class InMemoryAuthRepository {
                 "ADMN11_PAYMENT_REFUND_MANAGE",
                 "ADMN12_AD_SLOT_SCHEDULE_MANAGE",
                 "ADMN13_CREDIT_MODEL_VERSION_MANAGE",
-                "ADMN14_AB_EXPERIMENT_MANAGE"),
+                "ADMN14_AB_EXPERIMENT_MANAGE",
+                "ADMN15_RISK_ALERT_TICKET_MANAGE"),
             "seed",
             now.minusDays(30),
             now.minusDays(1));
@@ -2384,7 +2392,8 @@ public class InMemoryAuthRepository {
                 "ADMN11_PAYMENT_REFUND_MANAGE",
                 "ADMN12_AD_SLOT_SCHEDULE_MANAGE",
                 "ADMN13_CREDIT_MODEL_VERSION_MANAGE",
-                "ADMN14_AB_EXPERIMENT_MANAGE"),
+                "ADMN14_AB_EXPERIMENT_MANAGE",
+                "ADMN15_RISK_ALERT_TICKET_MANAGE"),
             "seed",
             now.minusDays(20),
             now.minusDays(2));
@@ -3405,6 +3414,306 @@ public class InMemoryAuthRepository {
                 new Admn14AbExperimentEntity.MetricSnapshot(
                     "AFTERSALE_SATISFACTION", "售后满意度", "81.0%", "86.5%", "6.79%", "96.7%")));
     admn14AbExperimentStore.put(third.getExperimentId(), third);
+  }
+
+  private void seedAdmn15RiskAlertTickets() {
+    LocalDateTime now = LocalDateTime.now();
+    Admn15RiskAlertTicketEntity first =
+        new Admn15RiskAlertTicketEntity(
+            "RAT000001",
+            "RISK-202604-0001",
+            "LEAD",
+            "LEAD-202604-1001",
+            "M000001",
+            "唐山弘达钢贸",
+            "唐山",
+            "HIGH",
+            "LEAD_TIMEOUT",
+            "线索超时未报价",
+            "新线索超过2小时仍未报价，存在流失风险",
+            "88",
+            "联系商家并在30分钟内完成报价",
+            "OPEN",
+            "风控值班组",
+            "已触发高风险提醒，待人工接单",
+            "138****8000",
+            now.minusHours(5).toString(),
+            now.minusHours(2).toString(),
+            "",
+            "",
+            "admn15-seed",
+            now.minusHours(5),
+            now.minusHours(2));
+    first.appendProgress(
+        "ALERT",
+        "触发预警",
+        "OPEN",
+        "待处理",
+        "system",
+        "线索长时间未报价，自动触发高风险告警",
+        now.minusHours(2).toString());
+    admn15RiskAlertTicketStore.put(first.getTicketId(), first);
+
+    Admn15RiskAlertTicketEntity second =
+        new Admn15RiskAlertTicketEntity(
+            "RAT000002",
+            "RISK-202604-0002",
+            "PICKUP",
+            "PICKUP-202604-2003",
+            "M000002",
+            "无锡铭泰供应链",
+            "无锡",
+            "MEDIUM",
+            "PICKUP_OVERDUE",
+            "提货计划逾期",
+            "提货计划时间已过仍未完成，影响履约评分",
+            "72",
+            "核实车辆进场并重排提货计划",
+            "PROCESSING",
+            "履约风控组",
+            "已联系仓库确认车辆晚点，等待新排期",
+            "139****9988",
+            now.minusHours(18).toString(),
+            now.minusHours(1).toString(),
+            now.minusHours(1).toString(),
+            "王值班",
+            "admn15-seed",
+            now.minusHours(18),
+            now.minusHours(1));
+    second.appendProgress(
+        "ALERT",
+        "触发预警",
+        "OPEN",
+        "待处理",
+        "system",
+        "提货时间逾期未签收",
+        now.minusHours(10).toString());
+    second.appendProgress(
+        "FOLLOW",
+        "人工跟进",
+        "PROCESSING",
+        "处理中",
+        "王值班",
+        "联系仓库与司机，确认晚点原因",
+        now.minusHours(1).toString());
+    admn15RiskAlertTicketStore.put(second.getTicketId(), second);
+
+    Admn15RiskAlertTicketEntity third =
+        new Admn15RiskAlertTicketEntity(
+            "RAT000003",
+            "RISK-202604-0003",
+            "RECONCILE",
+            "REC-202604-3008",
+            "M000003",
+            "佛山联胜金属",
+            "佛山",
+            "HIGH",
+            "RECONCILE_OVERDUE",
+            "对账逾期未回款",
+            "对账单超过到期日仍有未收款项",
+            "91",
+            "发起财务催收并升级风险跟踪",
+            "RESOLVED",
+            "财务风控组",
+            "已完成回款确认并关闭预警",
+            "137****2233",
+            now.minusDays(2).toString(),
+            now.minusHours(6).toString(),
+            now.minusHours(6).toString(),
+            "李复核",
+            "admn15-seed",
+            now.minusDays(2),
+            now.minusHours(6));
+    third.appendProgress(
+        "ALERT",
+        "触发预警",
+        "OPEN",
+        "待处理",
+        "system",
+        "账款逾期，触发高风险预警",
+        now.minusDays(1).toString());
+    third.appendProgress(
+        "RESOLVE",
+        "处理完成",
+        "RESOLVED",
+        "已处理",
+        "李复核",
+        "回款到账，风险关闭",
+        now.minusHours(6).toString());
+    admn15RiskAlertTicketStore.put(third.getTicketId(), third);
+  }
+
+  public List<Admn15RiskAlertTicketEntity> listRiskAlertTicketsForAdmin(
+      String ticketStatus, String riskLevel, String sourceType, String owner, String keyword) {
+    String statusFilter = defaultText(ticketStatus, "").toUpperCase(Locale.ROOT);
+    String levelFilter = defaultText(riskLevel, "").toUpperCase(Locale.ROOT);
+    String sourceFilter = defaultText(sourceType, "").toUpperCase(Locale.ROOT);
+    String ownerFilter = defaultText(owner, "").toLowerCase(Locale.ROOT);
+    String keywordFilter = defaultText(keyword, "").toLowerCase(Locale.ROOT);
+    return admn15RiskAlertTicketStore.values().stream()
+        .filter(
+            item ->
+                statusFilter.isBlank()
+                    || statusFilter.equals(defaultText(item.getTicketStatus(), "").toUpperCase(Locale.ROOT)))
+        .filter(
+            item ->
+                levelFilter.isBlank()
+                    || levelFilter.equals(defaultText(item.getSeverity(), "").toUpperCase(Locale.ROOT)))
+        .filter(
+            item ->
+                sourceFilter.isBlank()
+                    || sourceFilter.equals(defaultText(item.getSourceType(), "").toUpperCase(Locale.ROOT)))
+        .filter(
+            item ->
+                ownerFilter.isBlank()
+                    || defaultText(item.getOwner(), "").toLowerCase(Locale.ROOT).contains(ownerFilter))
+        .filter(
+            item -> {
+              if (keywordFilter.isBlank()) {
+                return true;
+              }
+              return defaultText(item.getTicketId(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                  || defaultText(item.getTicketNo(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                  || defaultText(item.getBizNo(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                  || defaultText(item.getRiskCode(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                  || defaultText(item.getRiskTitle(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                  || defaultText(item.getRiskDetail(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                  || defaultText(item.getMerchantName(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                  || defaultText(item.getLatestRemark(), "").toLowerCase(Locale.ROOT).contains(keywordFilter);
+            })
+        .sorted(Comparator.comparing(Admn15RiskAlertTicketEntity::getUpdatedAt).reversed())
+        .toList();
+  }
+
+  public Admn15RiskAlertTicketEntity getRiskAlertTicketForAdmin(String ticketId) {
+    String normalized = defaultText(ticketId, "");
+    if (normalized.isBlank()) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "ticketId 不能为空");
+    }
+    Admn15RiskAlertTicketEntity entity = admn15RiskAlertTicketStore.get(normalized);
+    if (entity == null) {
+      throw new BaseException(ErrorCode.NOT_FOUND.getCode(), "风险预警工单不存在");
+    }
+    return entity;
+  }
+
+  public Admn15RiskAlertTicketEntity handleRiskAlertTicketForAdmin(
+      String ticketId,
+      String action,
+      String targetStatus,
+      String owner,
+      String followUpPlan,
+      String solution,
+      String handleRemark,
+      String operator) {
+    Admn15RiskAlertTicketEntity entity = getRiskAlertTicketForAdmin(ticketId);
+    String normalizedAction = defaultText(action, "").toUpperCase(Locale.ROOT);
+    String resolvedStatus = resolveAdmn15TargetStatus(normalizedAction, targetStatus, entity.getTicketStatus());
+    LocalDateTime now = LocalDateTime.now();
+    String resolvedOwner = defaultText(owner, entity.getOwner());
+    String remark =
+        defaultText(handleRemark, "").isBlank()
+            ? defaultText(solution, defaultText(followUpPlan, entity.getLatestRemark()))
+            : defaultText(handleRemark, entity.getLatestRemark());
+    String handler = defaultText(operator, "admn15-handler");
+    entity.handle(
+        resolvedStatus,
+        resolvedOwner,
+        remark,
+        now.toString(),
+        handler,
+        handler,
+        now);
+    entity.appendProgress(
+        normalizedAction,
+        admn15ActionNodeName(normalizedAction),
+        resolvedStatus,
+        admn15TicketStatusText(resolvedStatus),
+        handler,
+        remark,
+        now.toString());
+    admn15RiskAlertTicketStore.put(entity.getTicketId(), entity);
+    return entity;
+  }
+
+  private String resolveAdmn15TargetStatus(String action, String targetStatus, String currentStatus) {
+    String explicit = defaultText(targetStatus, "").toUpperCase(Locale.ROOT);
+    if (!explicit.isBlank()) {
+      return explicit;
+    }
+    return switch (action) {
+      case "CLAIM", "START_PROCESS", "FOLLOW_UP" -> "PROCESSING";
+      case "ESCALATE" -> "ESCALATED";
+      case "RESOLVE", "CLOSE" -> "RESOLVED";
+      case "REOPEN" -> "OPEN";
+      default -> defaultText(currentStatus, "OPEN").toUpperCase(Locale.ROOT);
+    };
+  }
+
+  private String admn15ActionNodeName(String action) {
+    return switch (defaultText(action, "").toUpperCase(Locale.ROOT)) {
+      case "CLAIM" -> "接单认领";
+      case "START_PROCESS" -> "启动处理";
+      case "FOLLOW_UP" -> "持续跟进";
+      case "ESCALATE" -> "升级处置";
+      case "RESOLVE" -> "处理完成";
+      case "REOPEN" -> "重新打开";
+      default -> "工单处理";
+    };
+  }
+
+  public String admn15RiskSourceText(String sourceType) {
+    return switch (defaultText(sourceType, "").toUpperCase(Locale.ROOT)) {
+      case "LEAD" -> "线索";
+      case "PICKUP" -> "提货";
+      case "RECONCILE" -> "对账";
+      case "BILLING" -> "账单";
+      default -> "其他";
+    };
+  }
+
+  public String admn15RiskLevelText(String riskLevel) {
+    return switch (defaultText(riskLevel, "").toUpperCase(Locale.ROOT)) {
+      case "HIGH" -> "高风险";
+      case "MEDIUM" -> "中风险";
+      case "LOW" -> "低风险";
+      default -> "未知";
+    };
+  }
+
+  public String admn15TicketStatusText(String ticketStatus) {
+    return switch (defaultText(ticketStatus, "").toUpperCase(Locale.ROOT)) {
+      case "OPEN" -> "待处理";
+      case "PROCESSING" -> "处理中";
+      case "ESCALATED" -> "升级处理中";
+      case "RESOLVED" -> "已处理";
+      case "CLOSED" -> "已关闭";
+      default -> "未知";
+    };
+  }
+
+  public String admn15AuditRiskLevel(String riskLevel, String ticketStatus) {
+    String level = defaultText(riskLevel, "").toUpperCase(Locale.ROOT);
+    String status = defaultText(ticketStatus, "").toUpperCase(Locale.ROOT);
+    if ("HIGH".equals(level) && ("OPEN".equals(status) || "ESCALATED".equals(status))) {
+      return "HIGH";
+    }
+    if ("HIGH".equals(level) || "MEDIUM".equals(level)) {
+      return "MEDIUM";
+    }
+    return "LOW";
+  }
+
+  private long parseLongSafe(String text, long fallback) {
+    String normalized = defaultText(text, "").replace("小时", "").replace("h", "").trim();
+    if (normalized.isBlank()) {
+      return fallback;
+    }
+    try {
+      return Long.parseLong(normalized);
+    } catch (NumberFormatException ex) {
+      return fallback;
+    }
   }
 
   public List<Admn14AbExperimentEntity> listAbExperimentsForAdmin(

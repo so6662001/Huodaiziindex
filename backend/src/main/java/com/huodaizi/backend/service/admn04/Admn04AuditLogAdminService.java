@@ -135,6 +135,7 @@ public class Admn04AuditLogAdminService {
       case "ADMN12" -> "/api/admin/ad-slot-schedules";
       case "ADMN13" -> "/api/admin/credit-model-versions";
       case "ADMN14" -> "/api/admin/ab-experiments";
+      case "ADMN15" -> "/api/admin/risk-alert-tickets";
       default -> "/api/admin/unknown";
     };
   }
@@ -144,6 +145,9 @@ public class Admn04AuditLogAdminService {
       return "PUT";
     }
     if ("AB_EXPERIMENT_UPSERT".equals(actionCode)) {
+      return "PUT";
+    }
+    if ("RISK_ALERT_TICKET_HANDLE".equals(actionCode)) {
       return "PUT";
     }
     if (actionCode.contains("QUERY")) {

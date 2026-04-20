@@ -273,6 +273,10 @@ function goAdmn14AbExperimentCenterPage() {
   router.push('/admin/ab-experiment-center/admn14')
 }
 
+function goAdmn15RiskAlertTicketCenterPage() {
+  router.push('/admin/risk-alert-ticket-center/admn15')
+}
+
 function goN01LoginRegisterPage() {
   router.push('/account/login-register')
 }
@@ -549,6 +553,7 @@ function onSearch() {
         <button class="btn" @click="goAdmn12AdSlotScheduleCenterPage">ADM-N12广告位排期中心</button>
         <button class="btn" @click="goAdmn13CreditModelVersionManagePage">ADM-N13信用模型版本管理</button>
         <button class="btn" @click="goAdmn14AbExperimentCenterPage">ADM-N14 A/B实验中心</button>
+        <button class="btn" @click="goAdmn15RiskAlertTicketCenterPage">ADM-N15风险预警工单中心</button>
         <button class="btn" @click="goN01LoginRegisterPage">PC-N01登录/注册</button>
         <button class="btn" @click="goN02IdentitySelectPage">PC-N02身份选择</button>
         <button class="btn" @click="goN03EnterpriseCertificationPage">PC-N03企业认证提交</button>
