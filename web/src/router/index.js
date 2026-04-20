@@ -41,6 +41,7 @@ import A06DispatchStrategyConfigPage from '../pages/A06DispatchStrategyConfigPag
 import A07PlanPricingManagePage from '../pages/A07PlanPricingManagePage.vue'
 import A08RiskAlertCenterPage from '../pages/A08RiskAlertCenterPage.vue'
 import Admn01MerchantCertificationReviewPage from '../pages/Admn01MerchantCertificationReviewPage.vue'
+import Admn02BuyerBlacklistPage from '../pages/Admn02BuyerBlacklistPage.vue'
 import N01LoginRegisterPage from '../pages/N01LoginRegisterPage.vue'
 import N02IdentitySelectPage from '../pages/N02IdentitySelectPage.vue'
 import N03EnterpriseCertificationPage from '../pages/N03EnterpriseCertificationPage.vue'
@@ -307,6 +308,14 @@ const routes = [
     component: Admn01MerchantCertificationReviewPage,
     meta: {
       title: 'ADM-N01商家认证审核台_管理端企业认证审核协同-货袋子'
+    }
+  },
+  {
+    path: '/admin/buyer-blacklist/admn02',
+    name: 'admn02BuyerBlacklist',
+    component: Admn02BuyerBlacklistPage,
+    meta: {
+      title: 'ADM-N02买家与黑名单管理_管理端买家风控名单管理-货袋子'
     }
   },
   {

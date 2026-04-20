@@ -37,6 +37,8 @@ public class InMemoryAuthRepository {
   private final ConcurrentMap<String, H5LoginCodeEntity> h5LoginCodeStore = new ConcurrentHashMap<>();
   private final ConcurrentMap<String, H5N11MessageSettingsEntity> h5MessageSettingsStore =
       new ConcurrentHashMap<>();
+  private final ConcurrentMap<String, Admn02BuyerBlacklistRecordEntity> buyerBlacklistStore =
+      new ConcurrentHashMap<>();
 
   public InMemoryAuthRepository() {
     seed();
@@ -347,6 +349,104 @@ public class InMemoryAuthRepository {
   public EnterpriseCertificationEntity reviewCertificationForAdmin(
       String certificationId, String action, String reviewRemark, String reviewer) {
     return reviewCertification(certificationId, action, reviewRemark, reviewer);
+  }
+
+  public List<AuthUserEntity> listAllBuyersForAdmin(
+      String accountStatus, String blacklistStatus, String keyword) {
+    String statusFilter = defaultText(accountStatus, "").toUpperCase(Locale.ROOT);
+    String blacklistFilter = defaultText(blacklistStatus, "").toUpperCase(Locale.ROOT);
+    String keywordFilter = defaultText(keyword, "").toLowerCase(Locale.ROOT);
+    return userStore.values().stream()
+        .filter(item -> "BUYER".equalsIgnoreCase(defaultText(item.getRole(), "")))
+        .filter(
+            item ->
+                statusFilter.isBlank()
+                    || statusFilter.equals(defaultText(item.getStatus(), "").toUpperCase(Locale.ROOT)))
+        .filter(
+            item -> {
+              boolean blacklisted = isBuyerBlacklisted(item.getUserId());
+              if (blacklistFilter.isBlank()) {
+                return true;
+              }
+              if ("BLACKLISTED".equals(blacklistFilter)) {
+                return blacklisted;
+              }
+              if ("NORMAL".equals(blacklistFilter)) {
+                return !blacklisted;
+              }
+              return true;
+            })
+        .filter(
+            item ->
+                keywordFilter.isBlank()
+                    || defaultText(item.getUserId(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                    || defaultText(item.getAccount(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                    || defaultText(item.getPhone(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                    || defaultText(item.getCompanyName(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                    || defaultText(item.getContactName(), "").toLowerCase(Locale.ROOT).contains(keywordFilter))
+        .sorted(Comparator.comparing(AuthUserEntity::getUpdatedAt).reversed())
+        .toList();
+  }
+
+  public AuthUserEntity getBuyerByIdForAdmin(String userId) {
+    String normalizedUserId = defaultText(userId, "");
+    if (normalizedUserId.isBlank()) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "userId 不能为空");
+    }
+    AuthUserEntity target =
+        userStore.values().stream()
+            .filter(item -> normalizedUserId.equals(item.getUserId()))
+            .findFirst()
+            .orElse(null);
+    if (target == null) {
+      throw new BaseException(ErrorCode.NOT_FOUND.getCode(), "买家不存在");
+    }
+    if (!"BUYER".equalsIgnoreCase(defaultText(target.getRole(), ""))) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "当前账号不是买家");
+    }
+    return target;
+  }
+
+  public Optional<Admn02BuyerBlacklistRecordEntity> getBuyerBlacklistRecord(String userId) {
+    return Optional.ofNullable(buyerBlacklistStore.get(defaultText(userId, "")));
+  }
+
+  public Admn02BuyerBlacklistRecordEntity updateBuyerBlacklistForAdmin(
+      String userId, String action, String reasonCode, String remark, String operator) {
+    AuthUserEntity buyer = getBuyerByIdForAdmin(userId);
+    String normalizedAction = defaultText(action, "").toUpperCase(Locale.ROOT);
+    boolean nextBlacklisted =
+        switch (normalizedAction) {
+          case "BLACKLIST" -> true;
+          case "UNBLACKLIST" -> false;
+          default -> throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "action 仅支持 BLACKLIST/UNBLACKLIST");
+        };
+    String safeReason = defaultText(reasonCode, nextBlacklisted ? "RISK_CONTROL" : "RECOVERED");
+    String safeRemark = defaultText(remark, nextBlacklisted ? "管理端拉黑买家" : "管理端解除拉黑");
+    String safeOperator = defaultText(operator, "admn02-system");
+    LocalDateTime now = LocalDateTime.now();
+    Admn02BuyerBlacklistRecordEntity record = buyerBlacklistStore.get(buyer.getUserId());
+    if (record == null) {
+      record =
+          new Admn02BuyerBlacklistRecordEntity(
+              buyer.getUserId(), nextBlacklisted, safeReason, safeRemark, safeOperator, now);
+    } else {
+      record.update(nextBlacklisted, safeReason, safeRemark, safeOperator, now);
+    }
+    buyer.touch(now);
+    userStore.put(buyer.getAccount(), buyer);
+    buyerBlacklistStore.put(buyer.getUserId(), record);
+    return record;
+  }
+
+  public String latestOrderAtForBuyer(String userId) {
+    LocalDateTime latest =
+        orderStore.values().stream()
+            .filter(item -> defaultText(userId, "").equals(item.getUserId()))
+            .map(N06OrderEntity::getUpdatedAt)
+            .max(LocalDateTime::compareTo)
+            .orElse(null);
+    return latest == null ? "" : latest.toString();
   }
 
   public Optional<AuthUserEntity> findUserByToken(String token) {
@@ -1177,6 +1277,11 @@ public class InMemoryAuthRepository {
     return digits.substring(0, 3) + "****" + digits.substring(digits.length() - 4);
   }
 
+  private boolean isBuyerBlacklisted(String userId) {
+    Admn02BuyerBlacklistRecordEntity record = buyerBlacklistStore.get(defaultText(userId, ""));
+    return record != null && record.isBlacklisted();
+  }
+
   private String defaultText(String text, String fallback) {
     return text == null || text.isBlank() ? fallback : text.trim();
   }
@@ -1197,6 +1302,8 @@ public class InMemoryAuthRepository {
             LocalDateTime.now().minusDays(3),
             LocalDateTime.now().minusDays(1));
     userStore.put(seed.getAccount(), seed);
+    seedAdmn02BuyerBlacklist(seed);
+    seedAdmn02ExtraBuyers();
     seedNegotiation(seed);
     seedOrders(seed);
     seedTradeTerms(seed);
@@ -1206,6 +1313,71 @@ public class InMemoryAuthRepository {
     seedInvoiceApplications(seed);
     seedCreditScores(seed);
     seedDispatchAppeals(seed);
+  }
+
+  private void seedAdmn02BuyerBlacklist(AuthUserEntity buyer) {
+    buyerBlacklistStore.put(
+        buyer.getUserId(),
+        new Admn02BuyerBlacklistRecordEntity(
+            buyer.getUserId(),
+            false,
+            "NORMAL",
+            "初始买家状态正常",
+            "seed",
+            LocalDateTime.now().minusDays(2)));
+  }
+
+  private void seedAdmn02ExtraBuyers() {
+    LocalDateTime now = LocalDateTime.now();
+    AuthUserEntity normalBuyer =
+        new AuthUserEntity(
+            "U000000000021",
+            "MOBILE",
+            "13966668888",
+            "13966668888",
+            maskPhone("13966668888"),
+            hashPassword("Demo@123456"),
+            "河北北方钢联采购中心",
+            "采购经理李宁",
+            "BUYER",
+            "ACTIVE",
+            now.minusDays(10),
+            now.minusHours(22));
+    userStore.put(normalBuyer.getAccount(), normalBuyer);
+    buyerBlacklistStore.put(
+        normalBuyer.getUserId(),
+        new Admn02BuyerBlacklistRecordEntity(
+            normalBuyer.getUserId(),
+            false,
+            "NORMAL",
+            "历史行为正常",
+            "seed",
+            now.minusHours(20)));
+
+    AuthUserEntity blacklistedBuyer =
+        new AuthUserEntity(
+            "U000000000022",
+            "MOBILE",
+            "13955557777",
+            "13955557777",
+            maskPhone("13955557777"),
+            hashPassword("Demo@123456"),
+            "华北波动采购账号",
+            "风控关注对象",
+            "BUYER",
+            "ACTIVE",
+            now.minusDays(15),
+            now.minusHours(6));
+    userStore.put(blacklistedBuyer.getAccount(), blacklistedBuyer);
+    buyerBlacklistStore.put(
+        blacklistedBuyer.getUserId(),
+        new Admn02BuyerBlacklistRecordEntity(
+            blacklistedBuyer.getUserId(),
+            true,
+            "MULTI_DISPUTE",
+            "近30天争议率偏高，临时拉黑",
+            "seed-risk",
+            now.minusHours(4)));
   }
 
   private void seedNegotiation(AuthUserEntity user) {
