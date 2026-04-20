@@ -27,6 +27,9 @@ import com.huodaizi.backend.dto.auth.H5N08AfterSaleCreateRequest;
 import com.huodaizi.backend.dto.auth.H5N08AfterSaleDetailResponse;
 import com.huodaizi.backend.dto.auth.H5N08AfterSaleListResponse;
 import com.huodaizi.backend.dto.auth.H5N08AfterSaleStatusUpdateRequest;
+import com.huodaizi.backend.dto.auth.H5N09LitePayDetailResponse;
+import com.huodaizi.backend.dto.auth.H5N09LitePayListResponse;
+import com.huodaizi.backend.dto.auth.H5N09LitePaySubmitRequest;
 import com.huodaizi.backend.dto.auth.H5N07ReconcileDetailResponse;
 import com.huodaizi.backend.dto.auth.H5N07ReconcileListResponse;
 import com.huodaizi.backend.dto.auth.H5N07ReconcileStatusUpdateRequest;
@@ -325,6 +328,31 @@ public class AuthController {
       @PathVariable("disputeId") String disputeId,
       @Valid @RequestBody H5N08AfterSaleStatusUpdateRequest request) {
     return ApiResponse.success(service.h5UpdateAfterSaleStatus(token, disputeId, request));
+  }
+
+  @GetMapping("/h5/lite-pay/orders")
+  public ApiResponse<H5N09LitePayListResponse> h5LitePayOrderList(
+      @RequestHeader(name = AUTH_HEADER, required = false) String token,
+      @RequestParam(name = "status", required = false) String status,
+      @RequestParam(name = "keyword", required = false) String keyword,
+      @RequestParam(name = "pageNo", required = false, defaultValue = "1") int pageNo,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "10") int pageSize) {
+    return ApiResponse.success(service.h5LitePayOrderList(token, status, keyword, pageNo, pageSize));
+  }
+
+  @GetMapping("/h5/lite-pay/orders/{cashierOrderId}")
+  public ApiResponse<H5N09LitePayDetailResponse> h5LitePayOrderDetail(
+      @RequestHeader(name = AUTH_HEADER, required = false) String token,
+      @PathVariable("cashierOrderId") String cashierOrderId) {
+    return ApiResponse.success(service.h5LitePayOrderDetail(token, cashierOrderId));
+  }
+
+  @PostMapping("/h5/lite-pay/orders/{cashierOrderId}/submit")
+  public ApiResponse<H5N09LitePayDetailResponse> h5LitePaySubmit(
+      @RequestHeader(name = AUTH_HEADER, required = false) String token,
+      @PathVariable("cashierOrderId") String cashierOrderId,
+      @Valid @RequestBody H5N09LitePaySubmitRequest request) {
+    return ApiResponse.success(service.h5LitePaySubmit(token, cashierOrderId, request));
   }
 
   @GetMapping("/negotiations")

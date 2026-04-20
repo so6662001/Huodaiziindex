@@ -184,6 +184,10 @@ function goAfterSaleCreate() {
   router.push('/h5/after-sale-create')
 }
 
+function goLitePay() {
+  router.push('/h5/lite-pay')
+}
+
 onMounted(() => {
   loadOrders()
 })
@@ -201,6 +205,7 @@ onMounted(() => {
         <button class="btn" @click="goPickupScan">前往H5-N06扫码提货</button>
         <button class="btn" @click="goReconcileDetail">前往H5-N07对账详情</button>
         <button class="btn" @click="goAfterSaleCreate">前往H5-N08售后发起</button>
+        <button class="btn" @click="goLitePay">前往H5-N09轻支付</button>
       </div>
     </section>
 

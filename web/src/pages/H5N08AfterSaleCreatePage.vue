@@ -259,6 +259,10 @@ function goQuickLogin() {
   router.push('/h5/login-quick')
 }
 
+function goLitePay() {
+  router.push('/h5/lite-pay')
+}
+
 onMounted(() => {
   loadAfterSales()
 })
@@ -272,6 +276,7 @@ onMounted(() => {
       <div class="hero-actions">
         <button class="btn" @click="goH5Home">返回H5首页</button>
         <button class="btn" @click="goReconcileDetail">前往H5-N07对账详情</button>
+        <button class="btn" @click="goLitePay">前往H5-N09轻支付</button>
         <button class="btn" @click="goQuickLogin">返回H5-N01快捷登录</button>
       </div>
     </section>

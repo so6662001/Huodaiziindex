@@ -130,6 +130,10 @@ function goH5AfterSaleCreate() {
   router.push('/h5/after-sale-create')
 }
 
+function goH5LitePay() {
+  router.push('/h5/lite-pay')
+}
+
 function colorClass(item) {
   const text = String(item?.changeRate || '')
   if (text.startsWith('+')) return 'up'
@@ -161,6 +165,7 @@ onMounted(() => {
         <button class="btn" @click="goH5PickupScan">H5-N06 扫码提货</button>
         <button class="btn" @click="goH5ReconcileDetail">H5-N07 对账详情</button>
         <button class="btn" @click="goH5AfterSaleCreate">H5-N08 售后发起</button>
+        <button class="btn" @click="goH5LitePay">H5-N09 轻支付</button>
       </div>
       <div class="filters">
         <label>

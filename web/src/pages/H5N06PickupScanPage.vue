@@ -227,6 +227,10 @@ function goAfterSaleCreate() {
   router.push('/h5/after-sale-create')
 }
 
+function goLitePay() {
+  router.push('/h5/lite-pay')
+}
+
 function goQuoteSession() {
   router.push('/h5/quote-session')
 }
@@ -252,6 +256,7 @@ onMounted(() => {
         <button class="btn" @click="goOrderDetail">前往H5-N05订单详情</button>
         <button class="btn" @click="goReconcileDetail">前往H5-N07对账详情</button>
         <button class="btn" @click="goAfterSaleCreate">前往H5-N08售后发起</button>
+        <button class="btn" @click="goLitePay">前往H5-N09轻支付</button>
       </div>
     </section>
 

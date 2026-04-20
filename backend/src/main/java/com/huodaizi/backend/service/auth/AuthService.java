@@ -39,6 +39,10 @@ import com.huodaizi.backend.dto.auth.H5N08AfterSaleDetailResponse;
 import com.huodaizi.backend.dto.auth.H5N08AfterSaleListItemDTO;
 import com.huodaizi.backend.dto.auth.H5N08AfterSaleListResponse;
 import com.huodaizi.backend.dto.auth.H5N08AfterSaleStatusUpdateRequest;
+import com.huodaizi.backend.dto.auth.H5N09LitePayDetailResponse;
+import com.huodaizi.backend.dto.auth.H5N09LitePayListItemDTO;
+import com.huodaizi.backend.dto.auth.H5N09LitePayListResponse;
+import com.huodaizi.backend.dto.auth.H5N09LitePaySubmitRequest;
 import com.huodaizi.backend.dto.auth.N03EnterpriseCertificationDetailResponse;
 import com.huodaizi.backend.dto.auth.N03EnterpriseCertificationSubmitRequest;
 import com.huodaizi.backend.dto.auth.N04OnboardingProgressNodeDTO;
@@ -933,6 +937,76 @@ public class AuthService {
     String fullRemark = remark.isBlank() ? finalOperator : remark + "（" + finalOperator + "）";
     repository.updateAfterSaleDisputeStatus(token, disputeId, targetStatus, finalOperator, fullRemark);
     return h5AfterSaleDetail(token, disputeId);
+  }
+
+  public H5N09LitePayListResponse h5LitePayOrderList(
+      String token, String status, String keyword, int pageNo, int pageSize) {
+    AuthUserEntity user =
+        repository
+            .findUserByToken(token)
+            .orElseThrow(() -> new BaseException(ErrorCode.UNAUTHORIZED.getCode(), "登录态无效"));
+    int safePageNo = Math.max(1, pageNo);
+    int safePageSize = Math.min(Math.max(1, pageSize), 50);
+    N10CashierQuery query = new N10CashierQuery(status, keyword, safePageNo, safePageSize);
+    List<N10CashierOrderEntity> all = repository.listCashierOrders(token, query);
+    int from = Math.min((safePageNo - 1) * safePageSize, all.size());
+    int to = Math.min(from + safePageSize, all.size());
+    List<N10CashierOrderEntity> paged = all.subList(from, to);
+    List<H5N09LitePayListItemDTO> records =
+        paged.stream()
+            .map(
+                item ->
+                    new H5N09LitePayListItemDTO(
+                        item.getCashierId(),
+                        item.getOrderId(),
+                        item.getOrderNo(),
+                        item.getInquiryNo(),
+                        item.getGoodsName(),
+                        item.getSupplierName(),
+                        item.getAmountPayable(),
+                        item.getAmountPaid(),
+                        item.getAmountOutstanding(),
+                        item.getPayStatus(),
+                        h5LitePayStatusText(item.getPayStatus()),
+                        h5LitePayQuickActionText(item.getPayStatus()),
+                        toText(item.getUpdatedAt())))
+            .toList();
+    String activeCashierOrderId = records.isEmpty() ? "" : records.get(0).cashierOrderId();
+    return new H5N09LitePayListResponse(
+        safePageNo,
+        safePageSize,
+        all.size(),
+        "H5",
+        repository.maskPhone(user.getAccount()),
+        activeCashierOrderId,
+        records);
+  }
+
+  public H5N09LitePayDetailResponse h5LitePayOrderDetail(String token, String cashierOrderId) {
+    N10CashierOrderEntity item = repository.getCashierOrderDetail(token, cashierOrderId);
+    return toH5LitePayDetail(item, "可通过轻支付快速完成收款并同步订单状态");
+  }
+
+  public H5N09LitePayDetailResponse h5LitePaySubmit(
+      String token, String cashierOrderId, H5N09LitePaySubmitRequest request) {
+    String method = safeText(request.payMethod()).toUpperCase();
+    if (!method.matches("BANK_TRANSFER|ALIPAY|WECHAT|UNIONPAY")) {
+      throw new BaseException(
+          ErrorCode.BAD_REQUEST.getCode(), "payMethod 仅支持 BANK_TRANSFER/ALIPAY/WECHAT/UNIONPAY");
+    }
+    String operator = safeText(request.operator());
+    String finalOperator = operator.isBlank() ? "h5-n09-lite-pay" : operator;
+    String remark = safeText(request.remark());
+    String finalRemark = remark.isBlank() ? "H5轻支付完成" : remark;
+    N10CashierOrderEntity updated =
+        repository.payCashierOrder(
+            token,
+            cashierOrderId,
+            method,
+            safeText(request.payerName()),
+            finalRemark,
+            finalOperator);
+    return toH5LitePayDetail(updated, "支付已提交成功，可前往支付结果页查看流水");
   }
 
   public N06OrderListResponse orderList(
@@ -2127,6 +2201,51 @@ public class AuthService {
         toText(item.getUpdatedAt()));
   }
 
+  private H5N09LitePayDetailResponse toH5LitePayDetail(N10CashierOrderEntity item, String tipText) {
+    String resultStatus = "PAID".equalsIgnoreCase(item.getPayStatus()) ? "SUCCESS" : "PENDING";
+    String resultStatusText = "PAID".equalsIgnoreCase(item.getPayStatus()) ? "支付成功" : "待支付";
+    List<String> availableActions = h5LitePayAvailableActions(item.getPayStatus());
+    List<N10CashierTimelineNodeDTO> timeline =
+        item.getTimeline().stream()
+            .map(
+                node ->
+                    new N10CashierTimelineNodeDTO(
+                        node.getNodeCode(),
+                        node.getNodeName(),
+                        node.getStatus(),
+                        node.getStatusText(),
+                        node.getHandler(),
+                        node.getRemark(),
+                        node.getHappenedAt()))
+            .toList();
+    return new H5N09LitePayDetailResponse(
+        item.getCashierId(),
+        item.getOrderId(),
+        item.getOrderNo(),
+        item.getInquiryNo(),
+        item.getBuyerCompany(),
+        item.getSupplierName(),
+        item.getGoodsName(),
+        item.getAmountPayable(),
+        item.getAmountPaid(),
+        item.getAmountOutstanding(),
+        item.getPayStatus(),
+        h5LitePayStatusText(item.getPayStatus()),
+        item.getPayChannel(),
+        item.getPayChannelText(),
+        item.getPayStatus().equalsIgnoreCase("PAID") ? "" : toText(item.getUpdatedAt()),
+        item.getPaidAt(),
+        item.getLatestRemark(),
+        "H5",
+        resultStatus,
+        resultStatusText,
+        availableActions,
+        tipText,
+        toText(item.getCreatedAt()),
+        toText(item.getUpdatedAt()),
+        timeline);
+  }
+
   private List<String> h5AfterSaleAvailableActions(String status) {
     return switch (safeText(status).toUpperCase()) {
       case "SUBMITTED" -> List.of("MARK_PROCESSING", "MARK_CLOSED");
@@ -2144,6 +2263,30 @@ public class AuthService {
       case "RESOLVED" -> "关闭争议";
       case "CLOSED" -> "重新打开";
       default -> "查看详情";
+    };
+  }
+
+  private String h5LitePayStatusText(String status) {
+    return switch (safeText(status).toUpperCase()) {
+      case "UNPAID" -> "待支付";
+      case "PAID" -> "已支付";
+      default -> "处理中";
+    };
+  }
+
+  private String h5LitePayQuickActionText(String status) {
+    return switch (safeText(status).toUpperCase()) {
+      case "UNPAID" -> "立即支付";
+      case "PAID" -> "查看结果";
+      default -> "查看详情";
+    };
+  }
+
+  private List<String> h5LitePayAvailableActions(String status) {
+    return switch (safeText(status).toUpperCase()) {
+      case "UNPAID" -> List.of("SUBMIT_PAY");
+      case "PAID" -> List.of("VIEW_RESULT");
+      default -> List.of("VIEW_RESULT");
     };
   }
 

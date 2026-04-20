@@ -148,6 +148,10 @@ function goH5AfterSaleCreate() {
   router.push('/h5/after-sale-create')
 }
 
+function goH5LitePay() {
+  router.push('/h5/lite-pay')
+}
+
 onMounted(() => {
   const cached = localStorage.getItem('H5_N01_AUTH_TOKEN') || localStorage.getItem('N01_AUTH_TOKEN') || ''
   if (cached) {
@@ -170,6 +174,7 @@ onMounted(() => {
         <button class="btn" @click="goH5PickupScan">前往H5-N06扫码提货</button>
         <button class="btn" @click="goH5ReconcileDetail">前往H5-N07对账详情</button>
         <button class="btn" @click="goH5AfterSaleCreate">前往H5-N08售后发起</button>
+        <button class="btn" @click="goH5LitePay">前往H5-N09轻支付</button>
       </div>
     </section>
 

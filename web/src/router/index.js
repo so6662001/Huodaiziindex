@@ -29,6 +29,7 @@ import H5N05OrderDetailPage from '../pages/H5N05OrderDetailPage.vue'
 import H5N06PickupScanPage from '../pages/H5N06PickupScanPage.vue'
 import H5N07ReconcileDetailPage from '../pages/H5N07ReconcileDetailPage.vue'
 import H5N08AfterSaleCreatePage from '../pages/H5N08AfterSaleCreatePage.vue'
+import H5N09LitePayPage from '../pages/H5N09LitePayPage.vue'
 import A01DashboardPage from '../pages/A01DashboardPage.vue'
 import A02LeadOpsPage from '../pages/A02LeadOpsPage.vue'
 import A03QuoteEfficiencyPage from '../pages/A03QuoteEfficiencyPage.vue'
@@ -127,6 +128,14 @@ const routes = [
     component: H5N08AfterSaleCreatePage,
     meta: {
       title: 'H5-N08售后发起页_移动端售后争议提交与处理-货袋子'
+    }
+  },
+  {
+    path: '/h5/lite-pay',
+    name: 'h5N09LitePay',
+    component: H5N09LitePayPage,
+    meta: {
+      title: 'H5-N09轻支付页_移动端收银支付与状态同步-货袋子'
     }
   },
   {
