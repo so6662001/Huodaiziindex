@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.Comparator;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import org.springframework.stereotype.Repository;
@@ -20,6 +21,8 @@ public class InMemoryAuthRepository {
   private final ConcurrentMap<String, AuthUserEntity> userStore = new ConcurrentHashMap<>();
   private final ConcurrentMap<String, SessionEntity> sessionStore = new ConcurrentHashMap<>();
   private final ConcurrentMap<String, EnterpriseCertificationEntity> certificationStore =
+      new ConcurrentHashMap<>();
+  private final ConcurrentMap<String, N05NegotiationSessionEntity> negotiationStore =
       new ConcurrentHashMap<>();
 
   public InMemoryAuthRepository() {
@@ -206,6 +209,85 @@ public class InMemoryAuthRepository {
     return findByToken(token);
   }
 
+  public List<N05NegotiationSessionEntity> listNegotiations(String token, N05NegotiationQuery query) {
+    SessionEntity session = requireSession(token);
+    AuthUserEntity user = userStore.get(session.getAccount());
+    if (user == null) {
+      throw new BaseException(ErrorCode.UNAUTHORIZED.getCode(), "登录态无效");
+    }
+    String statusFilter = query == null ? "" : defaultText(query.status(), "");
+    String keyword = query == null ? "" : defaultText(query.keyword(), "");
+    return negotiationStore.values().stream()
+        .filter(item -> user.getUserId().equals(item.getUserId()))
+        .filter(item -> statusFilter.isBlank() || statusFilter.equalsIgnoreCase(item.getStatus()))
+        .filter(
+            item ->
+                keyword.isBlank()
+                    || item.getSessionNo().contains(keyword)
+                    || item.getInquiryNo().contains(keyword)
+                    || item.getInquiryTitle().contains(keyword)
+                    || item.getProductName().contains(keyword)
+                    || item.getCounterpartyName().contains(keyword))
+        .sorted(Comparator.comparing(N05NegotiationSessionEntity::getUpdatedAt).reversed())
+        .toList();
+  }
+
+  public N05NegotiationSessionEntity getNegotiationDetail(String token, String sessionId) {
+    SessionEntity session = requireSession(token);
+    AuthUserEntity user = userStore.get(session.getAccount());
+    if (user == null) {
+      throw new BaseException(ErrorCode.UNAUTHORIZED.getCode(), "登录态无效");
+    }
+    N05NegotiationSessionEntity entity = negotiationStore.get(defaultText(sessionId, ""));
+    if (entity == null || !user.getUserId().equals(entity.getUserId())) {
+      throw new BaseException(ErrorCode.NOT_FOUND.getCode(), "议价会话不存在");
+    }
+    return entity;
+  }
+
+  public N05NegotiationSessionEntity appendNegotiationMessage(
+      String token, String sessionId, String senderRole, String content, String operator) {
+    N05NegotiationSessionEntity entity = getNegotiationDetail(token, sessionId);
+    String normalizedRole = defaultText(senderRole, "").trim().toUpperCase(Locale.ROOT);
+    if (!normalizedRole.matches("BUYER|SUPPLIER")) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "senderRole 仅支持 BUYER/SUPPLIER");
+    }
+    LocalDateTime now = LocalDateTime.now();
+    N05NegotiationMessageEntity message =
+        new N05NegotiationMessageEntity(
+            "MSG" + UUID.randomUUID().toString().replace("-", "").substring(0, 10),
+            normalizedRole,
+            "TEXT",
+            defaultText(content, ""),
+            "",
+            "SEND",
+            "",
+            now);
+    entity.appendMessage(message);
+    return entity;
+  }
+
+  public N05NegotiationSessionEntity updateNegotiationStatus(
+      String token, String sessionId, String status, String operator) {
+    N05NegotiationSessionEntity entity = getNegotiationDetail(token, sessionId);
+    String normalized = defaultText(status, "").trim().toUpperCase(Locale.ROOT);
+    if (!normalized.matches("ONGOING|WAIT_CONFIRM|DEAL|CLOSED")) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "action 仅支持 ONGOING/WAIT_CONFIRM/DEAL/CLOSED");
+    }
+    entity.updateStatus(normalized, LocalDateTime.now());
+    entity.appendMessage(
+        new N05NegotiationMessageEntity(
+            "MSG" + UUID.randomUUID().toString().replace("-", "").substring(0, 10),
+            "SYSTEM",
+            "SYSTEM",
+            "会话状态已更新为：" + normalized + "（" + defaultText(operator, "n05-pc-update") + "）",
+            "",
+            "STATUS_UPDATE",
+            "",
+            LocalDateTime.now()));
+    return entity;
+  }
+
   public void logout(String token) {
     sessionStore.remove(defaultText(token, ""));
   }
@@ -280,6 +362,123 @@ public class InMemoryAuthRepository {
             LocalDateTime.now().minusDays(3),
             LocalDateTime.now().minusDays(1));
     userStore.put(seed.getAccount(), seed);
+    seedNegotiation(seed);
+  }
+
+  private void seedNegotiation(AuthUserEntity user) {
+    LocalDateTime now = LocalDateTime.now();
+    List<N05NegotiationMessageEntity> firstMessages =
+        List.of(
+            new N05NegotiationMessageEntity(
+                "MSG0001",
+                "BUYER",
+                "TEXT",
+                "当前市场回落，目标 3500 元/吨可否支持？",
+                "",
+                "",
+                "",
+                now.minusHours(3)),
+            new N05NegotiationMessageEntity(
+                "MSG0002",
+                "SUPPLIER",
+                "TEXT",
+                "最低可到 3520 元/吨，含税含运。",
+                "3520",
+                "",
+                "",
+                now.minusHours(2)),
+            new N05NegotiationMessageEntity(
+                "MSG0003",
+                "BUYER",
+                "TEXT",
+                "若 3510 元/吨，我今天可锁单。",
+                "3510",
+                "",
+                "",
+                now.minusMinutes(80)),
+            new N05NegotiationMessageEntity(
+                "MSG0004",
+                "SUPPLIER",
+                "TEXT",
+                "可申请特批，稍后回复。",
+                "",
+                "",
+                "",
+                now.minusMinutes(20)));
+    N05NegotiationSessionEntity first =
+        new N05NegotiationSessionEntity(
+            "NS0001",
+            "NEG-20260419-0001",
+            user.getUserId(),
+            user.getAccount(),
+            "INQ-20260419-3301",
+            "螺纹钢HRB400E Φ20 500吨",
+            "螺纹钢HRB400E",
+            "Φ20*12m",
+            "500吨",
+            "唐山",
+            "唐山弘达钢贸",
+            "BUYER",
+            "演示钢贸有限公司",
+            "唐山弘达钢贸",
+            "ONGOING",
+            "R04",
+            "3520",
+            "3560",
+            "CNY",
+            true,
+            true,
+            2,
+            "因运费调整，建议每吨下调20元",
+            now.minusMinutes(20),
+            now.minusHours(3),
+            now.minusMinutes(20),
+            firstMessages);
+    negotiationStore.put(first.getSessionId(), first);
+
+    List<N05NegotiationMessageEntity> secondMessages =
+        List.of(
+            new N05NegotiationMessageEntity(
+                "MSG0010", "BUYER", "TEXT", "希望在 3680 元/吨内达成。", "3680", "", "", now.minusDays(1)),
+            new N05NegotiationMessageEntity(
+                "MSG0011",
+                "SUPPLIER",
+                "TEXT",
+                "确认 3680 元/吨，支持当日排货。",
+                "3680",
+                "",
+                "",
+                now.minusHours(14)));
+    N05NegotiationSessionEntity second =
+        new N05NegotiationSessionEntity(
+            "NS0002",
+            "NEG-20260418-0010",
+            user.getUserId(),
+            user.getAccount(),
+            "INQ-20260418-2210",
+            "热轧卷板Q235B 3.0*1500 300吨",
+            "热轧卷板Q235B",
+            "3.0*1500*C",
+            "300吨",
+            "无锡",
+            "无锡铭泰供应链",
+            "BUYER",
+            "演示钢贸有限公司",
+            "无锡铭泰供应链",
+            "DEAL",
+            "R02",
+            "3680",
+            "3695",
+            "CNY",
+            true,
+            true,
+            0,
+            "双方确认 3680 元/吨，已转成交确认",
+            now.minusHours(14),
+            now.minusDays(1),
+            now.minusHours(14),
+            secondMessages);
+    negotiationStore.put(second.getSessionId(), second);
   }
 
   public static final class SessionEntity {

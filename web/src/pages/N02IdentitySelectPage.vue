@@ -92,6 +92,10 @@ function goOnboardingProgress() {
   router.push('/account/onboarding-progress')
 }
 
+function goNegotiationSession() {
+  router.push('/account/negotiation-session')
+}
+
 function goTarget(identityCode) {
   if (identityCode === 'BUYER') {
     router.push('/inquiry/create')
@@ -176,6 +180,14 @@ onMounted(() => {
               @click="goOnboardingProgress"
             >
               入驻审核进度
+            </button>
+            <button
+              v-if="identity.identityCode === 'BUYER'"
+              class="btn"
+              :disabled="switching"
+              @click="goNegotiationSession"
+            >
+              议价会话页
             </button>
             <button class="btn" :disabled="switching" @click="goTarget(identity.identityCode)">进入工作台</button>
           </div>

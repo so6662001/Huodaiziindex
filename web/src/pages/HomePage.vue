@@ -193,6 +193,10 @@ function goN04OnboardingProgressPage() {
   router.push('/account/onboarding-progress')
 }
 
+function goN05NegotiationSessionPage() {
+  router.push('/account/negotiation-sessions')
+}
+
 function onSearch() {
   if (!keyword.value.trim()) {
     return
@@ -393,6 +397,7 @@ function onSearch() {
         <button class="btn" @click="goN02IdentitySelectPage">PC-N02身份选择</button>
         <button class="btn" @click="goN03EnterpriseCertificationPage">PC-N03企业认证提交</button>
         <button class="btn" @click="goN04OnboardingProgressPage">PC-N04入驻审核进度</button>
+        <button class="btn" @click="goN05NegotiationSessionPage">PC-N05议价会话页</button>
         <button class="btn" @click="goSubscriptionPage">套餐与订阅</button>
         <button class="btn" @click="goBillingPage">计费与账单</button>
         <button class="btn primary" @click="goInquiry">立即体验AI询价</button>

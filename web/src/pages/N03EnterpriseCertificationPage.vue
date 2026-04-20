@@ -149,6 +149,10 @@ function goOnboardingProgress() {
   router.push('/account/onboarding-progress')
 }
 
+function goNegotiationSession() {
+  router.push('/account/negotiation-session')
+}
+
 function goHome() {
   router.push('/')
 }
@@ -166,6 +170,7 @@ onMounted(() => {
       <div class="hero-actions">
         <button class="btn" @click="goIdentitySelect">返回身份选择</button>
         <button class="btn" @click="goOnboardingProgress">查看入驻审核进度</button>
+        <button class="btn" @click="goNegotiationSession">进入议价会话页</button>
         <button class="btn" @click="goHome">返回首页</button>
       </div>
     </section>

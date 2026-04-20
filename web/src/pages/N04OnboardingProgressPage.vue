@@ -43,6 +43,10 @@ function goIdentitySelect() {
   router.push('/account/identity-select')
 }
 
+function goNegotiationSession() {
+  router.push('/account/negotiation-session')
+}
+
 function goHome() {
   router.push('/')
 }
@@ -59,6 +63,7 @@ onMounted(() => {
       <p>查看企业入驻审核的节点状态、处理人、预计完成时间与当前建议动作。</p>
       <div class="hero-actions">
         <button class="btn" @click="goCertification">返回企业认证</button>
+        <button class="btn" @click="goNegotiationSession">进入议价会话</button>
         <button class="btn" @click="goIdentitySelect">返回身份选择</button>
         <button class="btn" @click="goHome">返回首页</button>
       </div>
