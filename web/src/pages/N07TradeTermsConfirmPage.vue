@@ -137,6 +137,10 @@ function goAfterSaleProgress() {
   router.push('/account/after-sale-progress')
 }
 
+function goCashier() {
+  router.push('/account/cashier')
+}
+
 function goHome() {
   router.push('/')
 }
@@ -156,6 +160,7 @@ onMounted(() => {
         <button class="btn" @click="goNegotiation">返回议价会话</button>
         <button class="btn" @click="goAfterSale">售后/争议发起页</button>
         <button class="btn" @click="goAfterSaleProgress">售后处理进度页</button>
+        <button class="btn" @click="goCashier">前往收银台</button>
         <button class="btn" @click="goHome">返回首页</button>
       </div>
     </section>

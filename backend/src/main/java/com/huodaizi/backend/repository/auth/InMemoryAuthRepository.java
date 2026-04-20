@@ -28,6 +28,7 @@ public class InMemoryAuthRepository {
   private final ConcurrentMap<String, N06OrderEntity> orderStore = new ConcurrentHashMap<>();
   private final ConcurrentMap<String, N07TradeTermsEntity> tradeTermsStore = new ConcurrentHashMap<>();
   private final ConcurrentMap<String, N08AfterSaleDisputeEntity> afterSaleStore = new ConcurrentHashMap<>();
+  private final ConcurrentMap<String, N10CashierOrderEntity> cashierStore = new ConcurrentHashMap<>();
 
   public InMemoryAuthRepository() {
     seed();
@@ -468,6 +469,71 @@ public class InMemoryAuthRepository {
     return entity;
   }
 
+  public List<N10CashierOrderEntity> listCashierOrders(String token, N10CashierQuery query) {
+    SessionEntity session = requireSession(token);
+    AuthUserEntity user = userStore.get(session.getAccount());
+    if (user == null) {
+      throw new BaseException(ErrorCode.UNAUTHORIZED.getCode(), "登录态无效");
+    }
+    String statusFilter = query == null ? "" : defaultText(query.status(), "");
+    String keyword = query == null ? "" : defaultText(query.keyword(), "");
+    return cashierStore.values().stream()
+        .filter(item -> user.getUserId().equals(item.getUserId()))
+        .filter(item -> statusFilter.isBlank() || statusFilter.equalsIgnoreCase(item.getPayStatus()))
+        .filter(
+            item ->
+                keyword.isBlank()
+                    || item.getCashierId().contains(keyword)
+                    || item.getOrderNo().contains(keyword)
+                    || item.getInquiryNo().contains(keyword)
+                    || item.getSupplierName().contains(keyword)
+                    || item.getGoodsName().contains(keyword))
+        .sorted(Comparator.comparing(N10CashierOrderEntity::getUpdatedAt).reversed())
+        .toList();
+  }
+
+  public N10CashierOrderEntity getCashierOrderDetail(String token, String cashierId) {
+    SessionEntity session = requireSession(token);
+    AuthUserEntity user = userStore.get(session.getAccount());
+    if (user == null) {
+      throw new BaseException(ErrorCode.UNAUTHORIZED.getCode(), "登录态无效");
+    }
+    N10CashierOrderEntity entity = cashierStore.get(defaultText(cashierId, ""));
+    if (entity == null || !user.getUserId().equals(entity.getUserId())) {
+      throw new BaseException(ErrorCode.NOT_FOUND.getCode(), "收银单不存在");
+    }
+    return entity;
+  }
+
+  public N10CashierOrderEntity payCashierOrder(
+      String token, String cashierId, String payMethod, String payerName, String remark, String operator) {
+    N10CashierOrderEntity entity = getCashierOrderDetail(token, cashierId);
+    String normalizedMethod = defaultText(payMethod, "").trim().toUpperCase(Locale.ROOT);
+    if (!normalizedMethod.matches("BANK_TRANSFER|ALIPAY|WECHAT|UNIONPAY")) {
+      throw new BaseException(
+          ErrorCode.BAD_REQUEST.getCode(), "payMethod 仅支持 BANK_TRANSFER/ALIPAY/WECHAT/UNIONPAY");
+    }
+    if ("PAID".equalsIgnoreCase(entity.getPayStatus())) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "当前收银单已支付");
+    }
+    String channelText = payChannelText(normalizedMethod);
+    String payer = defaultText(payerName, "采购方财务");
+    String normalizedRemark = defaultText(remark, "收银台支付完成");
+    entity.markPaid(
+        normalizedMethod,
+        channelText,
+        entity.getAmountPayable(),
+        "0",
+        normalizedRemark,
+        LocalDateTime.now(),
+        defaultText(operator, payer));
+    N06OrderEntity order = orderStore.get(entity.getOrderId());
+    if (order != null && !"COMPLETED".equalsIgnoreCase(order.getOrderStatus())) {
+      order.updateStatus("COMPLETED", defaultText(operator, "n10-cashier"), LocalDateTime.now(), normalizedRemark);
+    }
+    return entity;
+  }
+
   public void logout(String token) {
     sessionStore.remove(defaultText(token, ""));
   }
@@ -546,6 +612,7 @@ public class InMemoryAuthRepository {
     seedOrders(seed);
     seedTradeTerms(seed);
     seedAfterSaleDisputes(seed);
+    seedCashierOrders(seed);
   }
 
   private void seedNegotiation(AuthUserEntity user) {
@@ -936,6 +1003,80 @@ public class InMemoryAuthRepository {
     afterSaleStore.put(second.getDisputeId(), second);
   }
 
+  private void seedCashierOrders(AuthUserEntity user) {
+    LocalDateTime now = LocalDateTime.now();
+
+    N10CashierOrderEntity first =
+        new N10CashierOrderEntity(
+            "CS00000001",
+            user.getUserId(),
+            "OD0001",
+            "OD-20260418-0001",
+            "INQ-20260419-3301",
+            "演示钢贸有限公司",
+            "唐山弘达钢贸",
+            "螺纹钢HRB400E Φ20 500吨",
+            "1760000",
+            "0",
+            "1760000",
+            "CNY",
+            "UNPAID",
+            "待支付",
+            "",
+            "",
+            "首付款待支付",
+            "",
+            now.minusHours(8),
+            now.minusHours(2),
+            List.of(
+                new N10CashierOrderEntity.PayTimelineNode(
+                    "CREATE", "创建收银单", "UNPAID", "待支付", "system", "系统已生成收银单", now.minusHours(8).toString()),
+                new N10CashierOrderEntity.PayTimelineNode(
+                    "NOTICE",
+                    "支付提醒",
+                    "UNPAID",
+                    "待支付",
+                    "system",
+                    "请于24小时内完成支付",
+                    now.minusHours(2).toString())));
+    cashierStore.put(first.getCashierId(), first);
+
+    N10CashierOrderEntity second =
+        new N10CashierOrderEntity(
+            "CS00000002",
+            user.getUserId(),
+            "OD0002",
+            "OD-20260416-0008",
+            "INQ-20260418-2210",
+            "演示钢贸有限公司",
+            "无锡铭泰供应链",
+            "热轧卷板Q235B 3.0*1500 300吨",
+            "1104000",
+            "1104000",
+            "0",
+            "CNY",
+            "PAID",
+            "已支付",
+            "BANK_TRANSFER",
+            "对公转账",
+            "历史订单已完成支付",
+            now.minusDays(1).toString(),
+            now.minusDays(3),
+            now.minusDays(1),
+            List.of(
+                new N10CashierOrderEntity.PayTimelineNode(
+                    "CREATE", "创建收银单", "UNPAID", "待支付", "system", "系统已生成收银单", now.minusDays(3).toString()),
+                new N10CashierOrderEntity.PayTimelineNode(
+                    "PAY_SUCCESS",
+                    "支付成功",
+                    "PAID",
+                    "已支付",
+                    "buyer-finance",
+                    "对公转账到账",
+                    now.minusDays(1).toString())));
+    cashierStore.put(second.getCashierId(), second);
+  }
+
   private String issueTypeText(String type) {
     return switch (type) {
       case "QUALITY" -> "质量异议";
@@ -953,6 +1094,16 @@ public class InMemoryAuthRepository {
       case "RESOLVED" -> "已解决";
       case "CLOSED" -> "已关闭";
       default -> "处理中";
+    };
+  }
+
+  private String payChannelText(String channel) {
+    return switch (channel) {
+      case "BANK_TRANSFER" -> "对公转账";
+      case "ALIPAY" -> "支付宝";
+      case "WECHAT" -> "微信支付";
+      case "UNIONPAY" -> "银联";
+      default -> "其他";
     };
   }
 

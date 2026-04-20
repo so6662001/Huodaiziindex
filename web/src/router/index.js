@@ -38,6 +38,7 @@ import N06OrderDetailPage from '../pages/N06OrderDetailPage.vue'
 import N07TradeTermsConfirmPage from '../pages/N07TradeTermsConfirmPage.vue'
 import N08AfterSaleDisputePage from '../pages/N08AfterSaleDisputePage.vue'
 import N09AfterSaleProgressPage from '../pages/N09AfterSaleProgressPage.vue'
+import N10CashierPage from '../pages/N10CashierPage.vue'
 import InquiryMerchantLeadManagePage from '../pages/InquiryMerchantLeadManagePage.vue'
 import InquiryQuoteWorkbenchPage from '../pages/InquiryQuoteWorkbenchPage.vue'
 import SiteAdLeadMinePage from '../pages/SiteAdLeadMinePage.vue'
@@ -266,6 +267,14 @@ const routes = [
     component: N09AfterSaleProgressPage,
     meta: {
       title: 'PC-N09售后处理进度页_货袋子账号中心'
+    }
+  },
+  {
+    path: '/account/cashier',
+    name: 'n10Cashier',
+    component: N10CashierPage,
+    meta: {
+      title: 'PC-N10收银台_货袋子账号中心'
     }
   },
   {

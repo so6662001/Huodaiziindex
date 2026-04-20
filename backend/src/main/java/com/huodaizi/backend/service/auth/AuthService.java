@@ -36,6 +36,11 @@ import com.huodaizi.backend.dto.auth.N09AfterSaleProgressDetailResponse;
 import com.huodaizi.backend.dto.auth.N09AfterSaleProgressListItemDTO;
 import com.huodaizi.backend.dto.auth.N09AfterSaleProgressListResponse;
 import com.huodaizi.backend.dto.auth.N09AfterSaleProgressNodeDTO;
+import com.huodaizi.backend.dto.auth.N10CashierOrderDetailResponse;
+import com.huodaizi.backend.dto.auth.N10CashierOrderListItemDTO;
+import com.huodaizi.backend.dto.auth.N10CashierOrderListResponse;
+import com.huodaizi.backend.dto.auth.N10CashierPayRequest;
+import com.huodaizi.backend.dto.auth.N10CashierTimelineNodeDTO;
 import com.huodaizi.backend.repository.auth.AuthUserEntity;
 import com.huodaizi.backend.repository.auth.EnterpriseCertificationDraft;
 import com.huodaizi.backend.repository.auth.EnterpriseCertificationEntity;
@@ -50,6 +55,8 @@ import com.huodaizi.backend.repository.auth.N06OrderQuery;
 import com.huodaizi.backend.repository.auth.N07TradeTermsEntity;
 import com.huodaizi.backend.repository.auth.N08AfterSaleDisputeEntity;
 import com.huodaizi.backend.repository.auth.N08AfterSaleQuery;
+import com.huodaizi.backend.repository.auth.N10CashierOrderEntity;
+import com.huodaizi.backend.repository.auth.N10CashierQuery;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -600,6 +607,90 @@ public class AuthService {
         progressPercentByAfterSaleStatus(item.getStatus()),
         currentStageByStatus(item.getStatus()),
         nodes);
+  }
+
+  public N10CashierOrderListResponse cashierOrderList(
+      String token, String status, String keyword, int pageNo, int pageSize) {
+    int safePageNo = Math.max(1, pageNo);
+    int safePageSize = Math.min(Math.max(1, pageSize), 50);
+    N10CashierQuery query = new N10CashierQuery(status, keyword, safePageNo, safePageSize);
+    List<N10CashierOrderEntity> all = repository.listCashierOrders(token, query);
+    int from = Math.min((safePageNo - 1) * safePageSize, all.size());
+    int to = Math.min(from + safePageSize, all.size());
+    List<N10CashierOrderEntity> paged = all.subList(from, to);
+    List<N10CashierOrderListItemDTO> records =
+        paged.stream()
+            .map(
+                item ->
+                    new N10CashierOrderListItemDTO(
+                        item.getCashierId(),
+                        item.getOrderId(),
+                        item.getOrderNo(),
+                        item.getSupplierName(),
+                        item.getAmountPayable(),
+                        item.getAmountPaid(),
+                        item.getAmountOutstanding(),
+                        item.getPayStatus(),
+                        item.getPayStatusText(),
+                        toText(item.getCreatedAt()),
+                        toText(item.getUpdatedAt())))
+            .toList();
+    return new N10CashierOrderListResponse(safePageNo, safePageSize, all.size(), records);
+  }
+
+  public N10CashierOrderDetailResponse cashierOrderDetail(String token, String cashierId) {
+    N10CashierOrderEntity item = repository.getCashierOrderDetail(token, cashierId);
+    List<N10CashierTimelineNodeDTO> timeline =
+        item.getTimeline().stream()
+            .map(
+                node ->
+                    new N10CashierTimelineNodeDTO(
+                        node.getNodeCode(),
+                        node.getNodeName(),
+                        node.getStatus(),
+                        node.getStatusText(),
+                        node.getHandler(),
+                        node.getRemark(),
+                        node.getHappenedAt()))
+            .toList();
+    String finalPayAmount = item.getAmountPayable();
+    return new N10CashierOrderDetailResponse(
+        item.getCashierId(),
+        item.getOrderId(),
+        item.getOrderNo(),
+        item.getInquiryNo(),
+        item.getBuyerCompany(),
+        item.getSupplierName(),
+        item.getGoodsName(),
+        "-",
+        "FULL",
+        "全额支付",
+        item.getAmountPayable(),
+        item.getAmountPaid(),
+        "0",
+        "0",
+        finalPayAmount,
+        item.getPayStatus(),
+        item.getPayStatusText(),
+        item.getLatestRemark(),
+        toText(item.getUpdatedAt()),
+        item.getPaidAt(),
+        toText(item.getCreatedAt()),
+        toText(item.getUpdatedAt()),
+        timeline);
+  }
+
+  public N10CashierOrderDetailResponse payCashierOrder(
+      String token, String cashierId, N10CashierPayRequest request) {
+    N10CashierOrderEntity updated =
+        repository.payCashierOrder(
+            token,
+            cashierId,
+            safeText(request.payMethod()),
+            safeText(request.payerName()),
+            safeText(request.remark()),
+            safeText(request.operator()));
+    return cashierOrderDetail(token, updated.getCashierId());
   }
 
   private N07TradeTermsDetailResponse toTradeTermsDetail(N07TradeTermsEntity entity) {

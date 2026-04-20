@@ -93,6 +93,10 @@ function goAfterSaleDispute() {
   router.push('/account/after-sale-dispute')
 }
 
+function goCashier() {
+  router.push('/account/cashier')
+}
+
 function goTradeTerms() {
   router.push('/account/trade-terms-confirm')
 }
@@ -113,6 +117,7 @@ onMounted(() => {
       <p>查看售后争议从提交、处理、方案达成到结案关闭的全链路处理进度。</p>
       <div class="hero-actions">
         <button class="btn" @click="goAfterSaleDispute">返回售后争议发起页</button>
+        <button class="btn" @click="goCashier">前往收银台</button>
         <button class="btn" @click="goTradeTerms">返回交易条款确认页</button>
         <button class="btn" @click="goHome">返回首页</button>
       </div>

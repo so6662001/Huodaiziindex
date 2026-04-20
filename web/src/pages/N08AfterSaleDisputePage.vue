@@ -218,6 +218,10 @@ function goAfterSaleProgress() {
   router.push('/account/after-sale-progress')
 }
 
+function goCashierPage() {
+  router.push('/account/cashier')
+}
+
 function goOrderDetail() {
   router.push('/account/order-detail')
 }
@@ -239,6 +243,7 @@ onMounted(() => {
       <div class="hero-actions">
         <button class="btn" @click="goTradeTerms">返回交易条款确认页</button>
         <button class="btn" @click="goAfterSaleProgress">售后处理进度页</button>
+        <button class="btn" @click="goCashierPage">前往收银台</button>
         <button class="btn" @click="goOrderDetail">返回订单详情页</button>
         <button class="btn" @click="goHome">返回首页</button>
       </div>

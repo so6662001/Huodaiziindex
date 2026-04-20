@@ -24,6 +24,9 @@ import com.huodaizi.backend.dto.auth.N08AfterSaleDisputeListResponse;
 import com.huodaizi.backend.dto.auth.N08AfterSaleDisputeStatusUpdateRequest;
 import com.huodaizi.backend.dto.auth.N09AfterSaleProgressDetailResponse;
 import com.huodaizi.backend.dto.auth.N09AfterSaleProgressListResponse;
+import com.huodaizi.backend.dto.auth.N10CashierOrderDetailResponse;
+import com.huodaizi.backend.dto.auth.N10CashierOrderListResponse;
+import com.huodaizi.backend.dto.auth.N10CashierPayRequest;
 import com.huodaizi.backend.service.auth.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -200,6 +203,31 @@ public class AuthController {
       @RequestHeader(name = AUTH_HEADER, required = false) String token,
       @PathVariable("disputeId") String disputeId) {
     return ApiResponse.success(service.afterSaleProgressDetail(token, disputeId));
+  }
+
+  @GetMapping("/cashier/orders")
+  public ApiResponse<N10CashierOrderListResponse> cashierOrderList(
+      @RequestHeader(name = AUTH_HEADER, required = false) String token,
+      @RequestParam(name = "status", required = false) String status,
+      @RequestParam(name = "keyword", required = false) String keyword,
+      @RequestParam(name = "pageNo", required = false, defaultValue = "1") int pageNo,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "10") int pageSize) {
+    return ApiResponse.success(service.cashierOrderList(token, status, keyword, pageNo, pageSize));
+  }
+
+  @GetMapping("/cashier/orders/{cashierOrderId}")
+  public ApiResponse<N10CashierOrderDetailResponse> cashierOrderDetail(
+      @RequestHeader(name = AUTH_HEADER, required = false) String token,
+      @PathVariable("cashierOrderId") String cashierOrderId) {
+    return ApiResponse.success(service.cashierOrderDetail(token, cashierOrderId));
+  }
+
+  @PostMapping("/cashier/orders/{cashierOrderId}/pay")
+  public ApiResponse<N10CashierOrderDetailResponse> payCashierOrder(
+      @RequestHeader(name = AUTH_HEADER, required = false) String token,
+      @PathVariable("cashierOrderId") String cashierOrderId,
+      @Valid @RequestBody N10CashierPayRequest request) {
+    return ApiResponse.success(service.payCashierOrder(token, cashierOrderId, request));
   }
 
   @PostMapping("/logout")
