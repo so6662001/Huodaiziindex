@@ -7,6 +7,7 @@ import com.huodaizi.backend.dto.admn01.Admn01MerchantCertificationItemDTO;
 import com.huodaizi.backend.dto.admn01.Admn01MerchantCertificationListRequest;
 import com.huodaizi.backend.dto.admn01.Admn01MerchantCertificationListResponse;
 import com.huodaizi.backend.dto.admn01.Admn01MerchantCertificationReviewRequest;
+import com.huodaizi.backend.repository.auth.Admn04AuditLogEntity;
 import com.huodaizi.backend.repository.auth.EnterpriseCertificationEntity;
 import com.huodaizi.backend.repository.auth.InMemoryAuthRepository;
 import java.util.List;
@@ -60,6 +61,23 @@ public class Admn01MerchantCertificationService {
     EnterpriseCertificationEntity entity =
         repository.reviewCertification(
             certificationId, action, request.reviewRemark(), request.reviewer());
+    Admn04AuditLogEntity audit =
+        repository.appendAuditLogForAdmin(
+            "ADMN01",
+            "CERT_REVIEW",
+            "CERTIFICATION",
+            certificationId,
+            safeText(request.reviewer()),
+            "ADMIN",
+            "TRACE_ADMN01_" + certificationId,
+            "SUCCESS",
+            "MEDIUM",
+            "认证单审核动作：" + action,
+            "{\"action\":\"" + action + "\"}",
+            "{\"status\":\"" + entity.getStatus() + "\"}",
+            "127.0.0.1",
+            "admn01-service");
+    repository.getAuditLogForAdmin(audit.getLogId());
     return toDetail(entity);
   }
 

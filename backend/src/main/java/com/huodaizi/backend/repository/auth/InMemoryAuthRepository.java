@@ -41,6 +41,8 @@ public class InMemoryAuthRepository {
       new ConcurrentHashMap<>();
   private final ConcurrentMap<String, Admn03RolePermissionEntity> admn03RoleStore =
       new ConcurrentHashMap<>();
+  private final ConcurrentMap<String, Admn04AuditLogEntity> admn04AuditLogStore =
+      new ConcurrentHashMap<>();
 
   public InMemoryAuthRepository() {
     seed();
@@ -555,8 +557,94 @@ public class InMemoryAuthRepository {
       case "ADMN01_CERT_REVIEW" -> "商家认证审核";
       case "ADMN02_BLACKLIST_MANAGE" -> "买家黑名单管理";
       case "ADMN03_RBAC_MANAGE" -> "角色权限管理";
+      case "ADMN04_AUDIT_LOG_VIEW" -> "操作审计日志查看";
       default -> "未命名权限";
     };
+  }
+
+  public Admn04AuditLogEntity appendAuditLogForAdmin(
+      String moduleCode,
+      String actionCode,
+      String targetType,
+      String targetId,
+      String operator,
+      String operatorType,
+      String requestId,
+      String result,
+      String riskLevel,
+      String summary,
+      String beforeSnapshot,
+      String afterSnapshot,
+      String clientIp,
+      String userAgent) {
+    LocalDateTime now = LocalDateTime.now();
+    Admn04AuditLogEntity entity =
+        new Admn04AuditLogEntity(
+            "AUDIT_" + UUID.randomUUID().toString().replace("-", "").substring(0, 12).toUpperCase(Locale.ROOT),
+            defaultText(moduleCode, "UNKNOWN"),
+            defaultText(actionCode, "UNKNOWN"),
+            defaultText(targetType, "UNKNOWN"),
+            defaultText(targetId, "-"),
+            defaultText(operator, "system"),
+            defaultText(operatorType, "ADMIN"),
+            defaultText(requestId, ""),
+            defaultText(result, "SUCCESS").toUpperCase(Locale.ROOT),
+            defaultText(riskLevel, "LOW").toUpperCase(Locale.ROOT),
+            defaultText(summary, ""),
+            defaultText(beforeSnapshot, ""),
+            defaultText(afterSnapshot, ""),
+            defaultText(clientIp, ""),
+            defaultText(userAgent, ""),
+            now);
+    admn04AuditLogStore.put(entity.getLogId(), entity);
+    return entity;
+  }
+
+  public List<Admn04AuditLogEntity> listAuditLogsForAdmin(
+      String moduleCode, String actionCode, String resultStatus, String operator, String keyword) {
+    String moduleFilter = defaultText(moduleCode, "").toUpperCase(Locale.ROOT);
+    String actionFilter = defaultText(actionCode, "").toUpperCase(Locale.ROOT);
+    String resultFilter = defaultText(resultStatus, "").toUpperCase(Locale.ROOT);
+    String operatorFilter = defaultText(operator, "").toLowerCase(Locale.ROOT);
+    String keywordFilter = defaultText(keyword, "").toLowerCase(Locale.ROOT);
+    return admn04AuditLogStore.values().stream()
+        .filter(
+            item ->
+                moduleFilter.isBlank()
+                    || moduleFilter.equals(defaultText(item.getModuleCode(), "").toUpperCase(Locale.ROOT)))
+        .filter(
+            item ->
+                actionFilter.isBlank()
+                    || actionFilter.equals(defaultText(item.getActionCode(), "").toUpperCase(Locale.ROOT)))
+        .filter(
+            item ->
+                resultFilter.isBlank()
+                    || resultFilter.equals(defaultText(item.getResult(), "").toUpperCase(Locale.ROOT)))
+        .filter(
+            item ->
+                operatorFilter.isBlank()
+                    || defaultText(item.getOperator(), "").toLowerCase(Locale.ROOT).contains(operatorFilter))
+        .filter(
+            item ->
+                keywordFilter.isBlank()
+                    || defaultText(item.getLogId(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                    || defaultText(item.getSummary(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                    || defaultText(item.getTargetId(), "").toLowerCase(Locale.ROOT).contains(keywordFilter)
+                    || defaultText(item.getRequestId(), "").toLowerCase(Locale.ROOT).contains(keywordFilter))
+        .sorted(Comparator.comparing(Admn04AuditLogEntity::getOperateAt).reversed())
+        .toList();
+  }
+
+  public Admn04AuditLogEntity getAuditLogForAdmin(String logId) {
+    String normalizedLogId = defaultText(logId, "");
+    if (normalizedLogId.isBlank()) {
+      throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "logId 不能为空");
+    }
+    Admn04AuditLogEntity entity = admn04AuditLogStore.get(normalizedLogId);
+    if (entity == null) {
+      throw new BaseException(ErrorCode.NOT_FOUND.getCode(), "审计日志不存在");
+    }
+    return entity;
   }
 
   public Optional<AuthUserEntity> findUserByToken(String token) {
@@ -1408,6 +1496,51 @@ public class InMemoryAuthRepository {
     return normalized;
   }
 
+  public String admn04ModuleName(String moduleCode) {
+    return switch (defaultText(moduleCode, "").toUpperCase(Locale.ROOT)) {
+      case "ADMN01" -> "商家认证审核";
+      case "ADMN02" -> "买家与黑名单管理";
+      case "ADMN03" -> "角色权限管理";
+      case "ADMN04" -> "操作审计日志";
+      default -> "其他模块";
+    };
+  }
+
+  public String admn04ActionName(String actionCode) {
+    return switch (defaultText(actionCode, "").toUpperCase(Locale.ROOT)) {
+      case "CERT_REVIEW" -> "审核认证单";
+      case "BUYER_BLACKLIST" -> "买家黑名单操作";
+      case "ROLE_UPSERT" -> "角色新增/编辑";
+      case "ROLE_PERMISSION_UPDATE" -> "角色权限更新";
+      case "AUDIT_QUERY" -> "审计日志查询";
+      default -> "通用操作";
+    };
+  }
+
+  public String admn04ResultText(String resultCode) {
+    return switch (defaultText(resultCode, "").toUpperCase(Locale.ROOT)) {
+      case "SUCCESS" -> "成功";
+      case "FAILED" -> "失败";
+      default -> "未知";
+    };
+  }
+
+  public String admn04OperatorRole(String operatorType) {
+    return switch (defaultText(operatorType, "").toUpperCase(Locale.ROOT)) {
+      case "ADMIN" -> "管理端账号";
+      case "SYSTEM" -> "系统任务";
+      default -> "未知";
+    };
+  }
+
+  public List<String> admn04Tags(String moduleCode, String riskLevel, String resultCode) {
+    List<String> tags = new ArrayList<>();
+    tags.add(defaultText(moduleCode, "UNKNOWN").toUpperCase(Locale.ROOT));
+    tags.add(defaultText(riskLevel, "LOW").toUpperCase(Locale.ROOT));
+    tags.add(defaultText(resultCode, "SUCCESS").toUpperCase(Locale.ROOT));
+    return tags;
+  }
+
   private String defaultText(String text, String fallback) {
     return text == null || text.isBlank() ? fallback : text.trim();
   }
@@ -1431,6 +1564,7 @@ public class InMemoryAuthRepository {
     seedAdmn02BuyerBlacklist(seed);
     seedAdmn02ExtraBuyers();
     seedAdmn03Roles();
+    seedAdmn04AuditLogs();
     seedNegotiation(seed);
     seedOrders(seed);
     seedTradeTerms(seed);
@@ -1523,7 +1657,8 @@ public class InMemoryAuthRepository {
                 "RISK_ALERT_MANAGE",
                 "ADMN01_CERT_REVIEW",
                 "ADMN02_BLACKLIST_MANAGE",
-                "ADMN03_RBAC_MANAGE"),
+                "ADMN03_RBAC_MANAGE",
+                "ADMN04_AUDIT_LOG_VIEW"),
             "seed",
             now.minusDays(30),
             now.minusDays(1));
@@ -1537,7 +1672,11 @@ public class InMemoryAuthRepository {
             "SYSTEM",
             "ACTIVE",
             "负责风控预警与黑名单治理",
-            List.of("RISK_ALERT_MANAGE", "ADMN02_BLACKLIST_MANAGE", "DASHBOARD_VIEW"),
+            List.of(
+                "RISK_ALERT_MANAGE",
+                "ADMN02_BLACKLIST_MANAGE",
+                "DASHBOARD_VIEW",
+                "ADMN04_AUDIT_LOG_VIEW"),
             "seed",
             now.minusDays(20),
             now.minusDays(2));
@@ -1556,6 +1695,54 @@ public class InMemoryAuthRepository {
             now.minusDays(18),
             now.minusHours(12));
     admn03RoleStore.put(certReviewer.getRoleId(), certReviewer);
+  }
+
+  private void seedAdmn04AuditLogs() {
+    appendAuditLogForAdmin(
+        "ADMN01",
+        "CERT_REVIEW",
+        "CERTIFICATION",
+        "EC_SAMPLE_0001",
+        "seed-admin",
+        "ADMIN",
+        "TRACE_SEED_ADMN01",
+        "SUCCESS",
+        "MEDIUM",
+        "初始化审计日志：商家认证审核通过",
+        "{\"status\":\"PENDING_REVIEW\"}",
+        "{\"status\":\"APPROVED\"}",
+        "127.0.0.1",
+        "seed");
+    appendAuditLogForAdmin(
+        "ADMN02",
+        "BUYER_BLACKLIST",
+        "BUYER",
+        "U000000000022",
+        "seed-risk",
+        "ADMIN",
+        "TRACE_SEED_ADMN02",
+        "SUCCESS",
+        "HIGH",
+        "初始化审计日志：买家加入黑名单",
+        "{\"blacklisted\":false}",
+        "{\"blacklisted\":true,\"reason\":\"MULTI_DISPUTE\"}",
+        "127.0.0.1",
+        "seed");
+    appendAuditLogForAdmin(
+        "ADMN03",
+        "ROLE_PERMISSION_UPDATE",
+        "ROLE",
+        "RL00000002",
+        "seed",
+        "ADMIN",
+        "TRACE_SEED_ADMN03",
+        "SUCCESS",
+        "LOW",
+        "初始化审计日志：角色权限调整",
+        "{\"permissions\":[\"RISK_ALERT_MANAGE\"]}",
+        "{\"permissions\":[\"RISK_ALERT_MANAGE\",\"ADMN04_AUDIT_LOG_VIEW\"]}",
+        "127.0.0.1",
+        "seed");
   }
 
   private void seedNegotiation(AuthUserEntity user) {

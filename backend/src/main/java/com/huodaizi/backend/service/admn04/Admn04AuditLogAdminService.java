@@ -1,0 +1,304 @@
+package com.huodaizi.backend.service.admn04;
+
+import com.huodaizi.backend.dto.admn04.Admn04AuditLogDetailResponse;
+import com.huodaizi.backend.dto.admn04.Admn04AuditLogListItemDTO;
+import com.huodaizi.backend.dto.admn04.Admn04AuditLogListRequest;
+import com.huodaizi.backend.dto.admn04.Admn04AuditLogListResponse;
+import com.huodaizi.backend.repository.auth.Admn04AuditLogEntity;
+import com.huodaizi.backend.repository.auth.InMemoryAuthRepository;
+import java.time.LocalDateTime;
+import java.util.List;
+import org.springframework.stereotype.Service;
+
+@Service
+public class Admn04AuditLogAdminService {
+  private final InMemoryAuthRepository repository;
+
+  public Admn04AuditLogAdminService(InMemoryAuthRepository repository) {
+    this.repository = repository;
+  }
+
+  public Admn04AuditLogListResponse list(Admn04AuditLogListRequest request) {
+    int page = request == null ? 1 : request.safePage();
+    int pageSize = request == null ? 10 : request.safePageSize();
+    List<Admn04AuditLogEntity> all =
+        repository.listAuditLogsForAdmin(
+            request == null ? null : request.moduleCode(),
+            request == null ? null : request.actionCode(),
+            request == null ? null : request.resultStatus(),
+            request == null ? null : request.operator(),
+            request == null ? null : request.keyword());
+    int from = Math.min((page - 1) * pageSize, all.size());
+    int to = Math.min(from + pageSize, all.size());
+    List<Admn04AuditLogListItemDTO> records =
+        all.subList(from, to).stream().map(this::toListItem).toList();
+    int successCount =
+        (int) all.stream().filter(item -> "SUCCESS".equalsIgnoreCase(safeText(item.getResult()))).count();
+    return new Admn04AuditLogListResponse(
+        all.size(),
+        page,
+        pageSize,
+        request == null ? "" : safeText(request.keyword()),
+        request == null ? "" : safeText(request.moduleCode()),
+        request == null ? "" : safeText(request.actionCode()),
+        request == null ? "" : safeText(request.resultStatus()),
+        successCount,
+        all.size() - successCount,
+        records);
+  }
+
+  public Admn04AuditLogDetailResponse detail(String logId) {
+    Admn04AuditLogEntity entity = repository.getAuditLogForAdmin(logId);
+    return toDetail(entity);
+  }
+
+  public void appendAuditQueryLogForAdmin(String operator, String summary, String traceId, String targetId) {
+    repository.appendAuditLogForAdmin(
+        "ADMN04",
+        "AUDIT_QUERY",
+        "AUDIT_LOG",
+        safeText(targetId).isBlank() ? "LIST" : targetId,
+        operator,
+        "ADMIN",
+        traceId,
+        "SUCCESS",
+        "LOW",
+        summary,
+        "",
+        "",
+        "127.0.0.1",
+        "admn04-service");
+  }
+
+  private Admn04AuditLogListItemDTO toListItem(Admn04AuditLogEntity entity) {
+    return new Admn04AuditLogListItemDTO(
+        entity.getLogId(),
+        entity.getModuleCode(),
+        repository.admn04ModuleName(entity.getModuleCode()),
+        entity.getActionCode(),
+        repository.admn04ActionName(entity.getActionCode()),
+        entity.getTargetType(),
+        entity.getTargetId(),
+        entity.getOperator(),
+        entity.getClientIp(),
+        entity.getResult(),
+        repository.admn04ResultText(entity.getResult()),
+        entity.getSummary(),
+        toText(entity.getOperateAt()));
+  }
+
+  private Admn04AuditLogDetailResponse toDetail(Admn04AuditLogEntity entity) {
+    String actionCode = safeText(entity.getActionCode()).toUpperCase();
+    String operatorRole =
+        "SYSTEM".equalsIgnoreCase(safeText(entity.getOperatorType()))
+            ? "SYSTEM"
+            : repository.admn04OperatorRole(entity.getOperatorType());
+    return new Admn04AuditLogDetailResponse(
+        entity.getLogId(),
+        entity.getModuleCode(),
+        repository.admn04ModuleName(entity.getModuleCode()),
+        entity.getActionCode(),
+        repository.admn04ActionName(entity.getActionCode()),
+        entity.getTargetType(),
+        entity.getTargetId(),
+        entity.getOperator(),
+        operatorRole,
+        requestMethodByAction(actionCode),
+        requestPathByModule(entity.getModuleCode()),
+        entity.getClientIp(),
+        entity.getRequestId(),
+        entity.getResult(),
+        repository.admn04ResultText(entity.getResult()),
+        entity.getSummary(),
+        entity.getBeforeSnapshot(),
+        entity.getAfterSnapshot(),
+        repository.admn04Tags(entity.getModuleCode(), entity.getRiskLevel(), entity.getResult()),
+        toText(entity.getOperateAt()));
+  }
+
+  private String safeText(String value) {
+    return value == null ? "" : value.trim();
+  }
+
+  private String requestPathByModule(String moduleCode) {
+    return switch (safeText(moduleCode).toUpperCase()) {
+      case "ADMN01" -> "/api/admin/merchant-certifications/{certificationId}/review";
+      case "ADMN02" -> "/api/admin/buyers/{userId}/blacklist";
+      case "ADMN03" -> "/api/admin/rbac/roles/{roleId}/permissions";
+      case "ADMN04" -> "/api/admin/audit-logs";
+      default -> "/api/admin/unknown";
+    };
+  }
+
+  private String requestMethodByAction(String actionCode) {
+    return actionCode.contains("QUERY") ? "GET" : "PUT";
+  }
+
+  private String toText(LocalDateTime value) {
+    return value == null ? "" : value.toString();
+  }
+}
+package com.huodaizi.backend.service.admn04;
+
+import com.huodaizi.backend.dto.admn04.Admn04AuditLogDetailResponse;
+import com.huodaizi.backend.dto.admn04.Admn04AuditLogListItemDTO;
+import com.huodaizi.backend.dto.admn04.Admn04AuditLogListRequest;
+import com.huodaizi.backend.dto.admn04.Admn04AuditLogListResponse;
+import com.huodaizi.backend.repository.auth.Admn04AuditLogEntity;
+import com.huodaizi.backend.repository.auth.InMemoryAuthRepository;
+import java.time.LocalDateTime;
+import java.util.List;
+import org.springframework.stereotype.Service;
+
+@Service
+public class Admn04AuditLogAdminService {
+  private final InMemoryAuthRepository repository;
+
+  public Admn04AuditLogAdminService(InMemoryAuthRepository repository) {
+    this.repository = repository;
+  }
+
+  public Admn04AuditLogListResponse list(Admn04AuditLogListRequest request) {
+    repository.appendAuditLogForAdmin(
+        "ADMN04",
+        "AUDIT_QUERY",
+        "AUDIT_LOG",
+        "LIST",
+        request == null ? "admn04-query" : safeText(request.operator()).isBlank() ? "admn04-query" : safeText(request.operator()),
+        "ADMIN",
+        "TRACE_ADMN04_LIST_" + System.currentTimeMillis(),
+        "SUCCESS",
+        "LOW",
+        "查询审计日志列表",
+        "{}",
+        "{}",
+        "127.0.0.1",
+        "backend-service");
+    int page = request == null ? 1 : request.safePage();
+    int pageSize = request == null ? 10 : request.safePageSize();
+    List<Admn04AuditLogEntity> all =
+        repository.listAuditLogsForAdmin(
+            request == null ? null : request.moduleCode(),
+            request == null ? null : request.actionCode(),
+            request == null ? null : request.resultStatus(),
+            request == null ? null : request.operator(),
+            request == null ? null : request.keyword());
+    int from = Math.min((page - 1) * pageSize, all.size());
+    int to = Math.min(from + pageSize, all.size());
+    List<Admn04AuditLogListItemDTO> records =
+        all.subList(from, to).stream().map(this::toListItem).toList();
+    int successCount =
+        (int) all.stream().filter(item -> "SUCCESS".equalsIgnoreCase(safeText(item.getResult()))).count();
+    return new Admn04AuditLogListResponse(
+        all.size(),
+        page,
+        pageSize,
+        request == null ? "" : safeText(request.keyword()),
+        request == null ? "" : safeText(request.moduleCode()),
+        request == null ? "" : safeText(request.actionCode()),
+        request == null ? "" : safeText(request.resultStatus()),
+        successCount,
+        all.size() - successCount,
+        records);
+  }
+
+  public Admn04AuditLogDetailResponse detail(String logId) {
+    Admn04AuditLogEntity entity = repository.getAuditLogForAdmin(logId);
+    return toDetail(entity);
+  }
+
+  private Admn04AuditLogListItemDTO toListItem(Admn04AuditLogEntity entity) {
+    return new Admn04AuditLogListItemDTO(
+        entity.getLogId(),
+        entity.getModuleCode(),
+        repository.admn04ModuleName(entity.getModuleCode()),
+        entity.getActionCode(),
+        repository.admn04ActionName(entity.getActionCode()),
+        entity.getTargetType(),
+        entity.getTargetId(),
+        entity.getOperator(),
+        entity.getClientIp(),
+        entity.getResult(),
+        repository.admn04ResultText(entity.getResult()),
+        entity.getSummary(),
+        toText(entity.getOperateAt()));
+  }
+
+  private Admn04AuditLogDetailResponse toDetail(Admn04AuditLogEntity entity) {
+    String actionCode = safeText(entity.getActionCode()).toUpperCase();
+    String requestMethod = requestMethodByAction(actionCode);
+    return new Admn04AuditLogDetailResponse(
+        entity.getLogId(),
+        entity.getModuleCode(),
+        repository.admn04ModuleName(entity.getModuleCode()),
+        entity.getActionCode(),
+        repository.admn04ActionName(entity.getActionCode()),
+        entity.getTargetType(),
+        entity.getTargetId(),
+        entity.getOperator(),
+        repository.admn04OperatorRole(entity.getOperatorType()),
+        requestMethod,
+        requestPathByModule(entity.getModuleCode()),
+        entity.getClientIp(),
+        entity.getRequestId(),
+        entity.getResult(),
+        repository.admn04ResultText(entity.getResult()),
+        entity.getSummary(),
+        entity.getBeforeSnapshot(),
+        entity.getAfterSnapshot(),
+        repository.admn04Tags(entity.getModuleCode(), entity.getRiskLevel(), entity.getResult()),
+        toText(entity.getOperateAt()));
+  }
+
+  private String safeText(String value) {
+    return value == null ? "" : value.trim();
+  }
+
+  private String requestPathByModule(String moduleCode) {
+    return switch (safeText(moduleCode).toUpperCase()) {
+      case "ADMN01" -> "/api/admin/merchant-certifications/{certificationId}/review";
+      case "ADMN02" -> "/api/admin/buyers/{userId}/blacklist";
+      case "ADMN03" -> "/api/admin/rbac/roles/{roleId}/permissions";
+      case "ADMN04" -> "/api/admin/audit-logs";
+      default -> "/api/admin/unknown";
+    };
+  }
+
+  private String requestMethodByAction(String actionCode) {
+    return actionCode.contains("QUERY") ? "GET" : "PUT";
+  }
+
+  public void appendAuditQueryLogForAdmin(String operator, String summary, String traceId) {
+    repository.appendAuditLogForAdmin(
+        "ADMN04",
+        "AUDIT_QUERY",
+        "AUDIT_LOG",
+        "LIST",
+        operator,
+        "ADMIN",
+        traceId,
+        "SUCCESS",
+        "LOW",
+        summary,
+        "",
+        "",
+        "127.0.0.1",
+        "admn04-service");
+  }
+
+  public String roleIdFromListItemCode(String roleCode) {
+    if (safeText(roleCode).isBlank()) {
+      return "";
+    }
+    return repository.listRolesForAdmin(roleCode, "")
+        .stream()
+        .filter(item -> safeText(item.getRoleCode()).equalsIgnoreCase(roleCode))
+        .map(Admn04AuditLogEntity::getLogId)
+        .findFirst()
+        .orElse("");
+  }
+
+  private String toText(LocalDateTime value) {
+    return value == null ? "" : value.toString();
+  }
+}

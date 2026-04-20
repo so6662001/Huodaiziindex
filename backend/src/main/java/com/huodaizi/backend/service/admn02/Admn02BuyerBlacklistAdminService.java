@@ -53,8 +53,24 @@ public class Admn02BuyerBlacklistAdminService {
   }
 
   public Admn02BuyerDetailResponse blacklist(String userId, Admn02BuyerBlacklistUpdateRequest request) {
-    repository.updateBuyerBlacklistForAdmin(
+    Admn02BuyerBlacklistRecordEntity updated =
+        repository.updateBuyerBlacklistForAdmin(
         userId, request.action(), request.reasonCode(), request.remark(), request.operator());
+    repository.appendAuditLogForAdmin(
+        "ADMN02",
+        "BUYER_BLACKLIST",
+        "BUYER",
+        userId,
+        safeText(request.operator()),
+        "ADMIN",
+        "TRACE_ADMN02_" + userId,
+        "SUCCESS",
+        updated.isBlacklisted() ? "HIGH" : "LOW",
+        "买家黑名单状态更新：" + request.action(),
+        "",
+        "{\"action\":\"" + safeText(request.action()) + "\",\"reasonCode\":\"" + safeText(request.reasonCode()) + "\"}",
+        "127.0.0.1",
+        "admn02-service");
     return detail(userId);
   }
 

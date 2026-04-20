@@ -230,7 +230,11 @@ function goAdmn02BuyerBlacklistPage() {
 }
 
 function goAdmn03RbacPage() {
-  router.push('/admin/rbac/admn03')
+  router.push('/admin/rbac-role-permission/admn03')
+}
+
+function goAdmn04AuditLogPage() {
+  router.push('/admin/audit-log/admn04')
 }
 
 function goN01LoginRegisterPage() {
@@ -499,6 +503,7 @@ function onSearch() {
         <button class="btn" @click="goAdmn01MerchantCertificationReviewPage">ADM-N01商家认证审核台</button>
         <button class="btn" @click="goAdmn02BuyerBlacklistPage">ADM-N02买家与黑名单管理</button>
         <button class="btn" @click="goAdmn03RbacPage">ADM-N03角色权限管理（RBAC）</button>
+        <button class="btn" @click="goAdmn04AuditLogPage">ADM-N04操作审计日志</button>
         <button class="btn" @click="goN01LoginRegisterPage">PC-N01登录/注册</button>
         <button class="btn" @click="goN02IdentitySelectPage">PC-N02身份选择</button>
         <button class="btn" @click="goN03EnterpriseCertificationPage">PC-N03企业认证提交</button>

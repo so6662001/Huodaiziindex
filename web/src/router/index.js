@@ -43,6 +43,7 @@ import A08RiskAlertCenterPage from '../pages/A08RiskAlertCenterPage.vue'
 import Admn01MerchantCertificationReviewPage from '../pages/Admn01MerchantCertificationReviewPage.vue'
 import Admn02BuyerBlacklistPage from '../pages/Admn02BuyerBlacklistPage.vue'
 import Admn03RbacRolePermissionPage from '../pages/Admn03RbacRolePermissionPage.vue'
+import Admn04AuditLogPage from '../pages/Admn04AuditLogPage.vue'
 import N01LoginRegisterPage from '../pages/N01LoginRegisterPage.vue'
 import N02IdentitySelectPage from '../pages/N02IdentitySelectPage.vue'
 import N03EnterpriseCertificationPage from '../pages/N03EnterpriseCertificationPage.vue'
@@ -325,6 +326,14 @@ const routes = [
     component: Admn03RbacRolePermissionPage,
     meta: {
       title: 'ADM-N03角色权限管理_管理端RBAC角色权限治理-货袋子'
+    }
+  },
+  {
+    path: '/admin/audit-log/admn04',
+    name: 'admn04AuditLog',
+    component: Admn04AuditLogPage,
+    meta: {
+      title: 'ADM-N04操作审计日志_管理端关键操作全量留痕-货袋子'
     }
   },
   {

@@ -49,12 +49,42 @@ public class Admn03RolePermissionAdminService {
     Admn03RolePermissionEntity entity =
         repository.upsertRoleForAdmin(
             request.roleCode(), request.roleName(), request.description(), request.permissionCodes(), request.operator());
+    repository.appendAuditLogForAdmin(
+        "ADMN03",
+        "ROLE_UPSERT",
+        "ROLE",
+        entity.getRoleId(),
+        safeText(request.operator()),
+        "ADMIN",
+        "TRACE_ADMN03_" + entity.getRoleId(),
+        "SUCCESS",
+        "LOW",
+        "角色新增/编辑：" + entity.getRoleCode(),
+        "",
+        "roleCode=" + entity.getRoleCode() + ", permissions=" + String.join(",", entity.getPermissionCodes()),
+        "127.0.0.1",
+        "admin-console");
     return toDetail(entity);
   }
 
   public Admn03RoleDetailResponse updatePermissions(String roleId, Admn03RolePermissionUpdateRequest request) {
     Admn03RolePermissionEntity entity =
         repository.updateRolePermissionsForAdmin(roleId, request.permissionCodes(), request.operator());
+    repository.appendAuditLogForAdmin(
+        "ADMN03",
+        "ROLE_PERMISSION_UPDATE",
+        "ROLE",
+        entity.getRoleId(),
+        safeText(request.operator()),
+        "ADMIN",
+        "TRACE_ADMN03_PERM_" + entity.getRoleId(),
+        "SUCCESS",
+        "MEDIUM",
+        "角色权限更新：" + entity.getRoleCode(),
+        "",
+        "permissions=" + String.join(",", entity.getPermissionCodes()),
+        "127.0.0.1",
+        "admin-console");
     return toDetail(entity);
   }
 
