@@ -142,6 +142,7 @@ public class Admn03RolePermissionAdminService {
       case "ADMN04_AUDIT_LOG_VIEW" -> "操作审计日志查看";
       case "ADMN05_DICT_MANAGE" -> "类目规格词库管理";
       case "ADMN06_LEAD_QA_MANAGE" -> "线索质检中心";
+      case "ADMN08_FUNNEL_VIEW" -> "成交漏斗分析";
       default -> "权限-" + safeText(permissionCode);
     };
   }

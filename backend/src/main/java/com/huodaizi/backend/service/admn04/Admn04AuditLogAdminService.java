@@ -128,6 +128,7 @@ public class Admn04AuditLogAdminService {
       case "ADMN04" -> "/api/admin/audit-logs";
       case "ADMN05" -> "/api/admin/category-spec-dicts";
       case "ADMN06" -> "/api/admin/lead-quality";
+      case "ADMN08" -> "/api/admin/deal-funnel";
       default -> "/api/admin/unknown";
     };
   }

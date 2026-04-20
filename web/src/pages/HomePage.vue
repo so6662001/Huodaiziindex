@@ -245,6 +245,10 @@ function goAdmn06LeadQualityCenterPage() {
   router.push('/admin/lead-quality/admn06')
 }
 
+function goAdmn08DealFunnelAnalysisPage() {
+  router.push('/admin/deal-funnel/admn08')
+}
+
 function goN01LoginRegisterPage() {
   router.push('/account/login-register')
 }
@@ -514,6 +518,7 @@ function onSearch() {
         <button class="btn" @click="goAdmn04AuditLogPage">ADM-N04操作审计日志</button>
         <button class="btn" @click="goAdmn05CategorySpecDictPage">ADM-N05类目/规格词库管理</button>
         <button class="btn" @click="goAdmn06LeadQualityCenterPage">ADM-N06线索质检中心</button>
+        <button class="btn" @click="goAdmn08DealFunnelAnalysisPage">ADM-N08成交漏斗分析</button>
         <button class="btn" @click="goN01LoginRegisterPage">PC-N01登录/注册</button>
         <button class="btn" @click="goN02IdentitySelectPage">PC-N02身份选择</button>
         <button class="btn" @click="goN03EnterpriseCertificationPage">PC-N03企业认证提交</button>

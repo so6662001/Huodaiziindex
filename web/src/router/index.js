@@ -46,6 +46,7 @@ import Admn03RbacRolePermissionPage from '../pages/Admn03RbacRolePermissionPage.
 import Admn04AuditLogPage from '../pages/Admn04AuditLogPage.vue'
 import Admn05CategorySpecDictPage from '../pages/Admn05CategorySpecDictPage.vue'
 import Admn06LeadQualityCenterPage from '../pages/Admn06LeadQualityCenterPage.vue'
+import Admn08DealFunnelAnalysisPage from '../pages/Admn08DealFunnelAnalysisPage.vue'
 import N01LoginRegisterPage from '../pages/N01LoginRegisterPage.vue'
 import N02IdentitySelectPage from '../pages/N02IdentitySelectPage.vue'
 import N03EnterpriseCertificationPage from '../pages/N03EnterpriseCertificationPage.vue'
@@ -352,6 +353,14 @@ const routes = [
     component: Admn06LeadQualityCenterPage,
     meta: {
       title: 'ADM-N06线索质检中心_管理端线索质量巡检与复核-货袋子'
+    }
+  },
+  {
+    path: '/admin/deal-funnel-analysis/admn08',
+    name: 'admn08DealFunnelAnalysis',
+    component: Admn08DealFunnelAnalysisPage,
+    meta: {
+      title: 'ADM-N08成交漏斗分析_管理端成交转化链路分析-货袋子'
     }
   },
   {

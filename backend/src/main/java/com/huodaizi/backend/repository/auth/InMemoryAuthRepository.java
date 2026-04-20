@@ -564,6 +564,7 @@ public class InMemoryAuthRepository {
       case "ADMN04_AUDIT_LOG_VIEW" -> "操作审计日志查看";
       case "ADMN05_DICT_MANAGE" -> "类目规格词库管理";
       case "ADMN06_LEAD_QA_MANAGE" -> "线索质检中心";
+      case "ADMN08_FUNNEL_VIEW" -> "成交漏斗分析";
       default -> "未命名权限";
     };
   }
@@ -1765,6 +1766,7 @@ public class InMemoryAuthRepository {
       case "ADMN04" -> "操作审计日志";
       case "ADMN05" -> "类目规格词库管理";
       case "ADMN06" -> "线索质检中心";
+      case "ADMN08" -> "成交漏斗分析";
       default -> "其他模块";
     };
   }
@@ -1780,6 +1782,7 @@ public class InMemoryAuthRepository {
       case "DICT_QUERY" -> "词库查询";
       case "LEAD_QA_REVIEW" -> "线索质检复核";
       case "LEAD_QA_QUERY" -> "线索质检查询";
+      case "DEAL_FUNNEL_QUERY" -> "成交漏斗查询";
       default -> "通用操作";
     };
   }
