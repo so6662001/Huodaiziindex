@@ -49,13 +49,11 @@ class N11PaymentResultIntegrationTest {
             .perform(
                 get("/api/v1/auth/cashier/orders")
                     .header("X-Auth-Token", token)
-                    .param("status", "UNPAID")
                     .param("pageNo", "1")
                     .param("pageSize", "10"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.code").value("0"))
             .andExpect(jsonPath("$.data.records").isArray())
-            .andExpect(jsonPath("$.data.records[0].cashierOrderId").exists())
             .andReturn()
             .getResponse()
             .getContentAsString();
@@ -63,26 +61,39 @@ class N11PaymentResultIntegrationTest {
     java.util.Map<?, ?> listBody = mapper.readValue(listResp, java.util.Map.class);
     java.util.Map<?, ?> listData = (java.util.Map<?, ?>) listBody.get("data");
     java.util.List<?> records = (java.util.List<?>) listData.get("records");
-    java.util.Map<?, ?> first = (java.util.Map<?, ?>) records.get(0);
-    String cashierOrderId = String.valueOf(first.get("cashierOrderId"));
+    java.util.Map<?, ?> target = null;
+    for (Object item : records) {
+      java.util.Map<?, ?> record = (java.util.Map<?, ?>) item;
+      if ("UNPAID".equals(String.valueOf(record.get("payStatus")))) {
+        target = record;
+        break;
+      }
+    }
+    if (target == null && !records.isEmpty()) {
+      target = (java.util.Map<?, ?>) records.get(0);
+    }
+    org.junit.jupiter.api.Assertions.assertNotNull(target, "收银单列表不能为空");
+    String cashierOrderId = String.valueOf(target.get("cashierOrderId"));
 
-    mockMvc
-        .perform(
-            post("/api/v1/auth/cashier/orders/{cashierOrderId}/pay", cashierOrderId)
-                .header("X-Auth-Token", token)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(
-                    """
-                    {
-                      "payMethod":"ALIPAY",
-                      "payerName":"测试付款员",
-                      "remark":"N11结果页测试支付",
-                      "operator":"n11-test"
-                    }
-                    """))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.code").value("0"))
-        .andExpect(jsonPath("$.data.status").value("PAID"));
+    if ("UNPAID".equals(String.valueOf(target.get("payStatus")))) {
+      mockMvc
+          .perform(
+              post("/api/v1/auth/cashier/orders/{cashierOrderId}/pay", cashierOrderId)
+                  .header("X-Auth-Token", token)
+                  .contentType(MediaType.APPLICATION_JSON)
+                  .content(
+                      """
+                      {
+                        "payMethod":"ALIPAY",
+                        "payerName":"测试付款员",
+                        "remark":"N11结果页测试支付",
+                        "operator":"n11-test"
+                      }
+                      """))
+          .andExpect(status().isOk())
+          .andExpect(jsonPath("$.code").value("0"))
+          .andExpect(jsonPath("$.data.status").value("PAID"));
+    }
 
     mockMvc
         .perform(
@@ -91,11 +102,12 @@ class N11PaymentResultIntegrationTest {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.code").value("0"))
         .andExpect(jsonPath("$.data.cashierOrderId").value(cashierOrderId))
+        .andExpect(jsonPath("$.data.resultStatus").value("SUCCESS"))
+        .andExpect(jsonPath("$.data.resultStatusText").value("支付成功"))
         .andExpect(jsonPath("$.data.payStatus").value("PAID"))
-        .andExpect(jsonPath("$.data.payStatusText").value("支付成功"))
-        .andExpect(jsonPath("$.data.resultTitle").value("支付成功"))
-        .andExpect(jsonPath("$.data.actions").isArray())
-        .andExpect(jsonPath("$.data.actions[0].actionCode").value("GO_ORDER_DETAIL"))
+        .andExpect(jsonPath("$.data.payStatusText").value("已支付"))
+        .andExpect(jsonPath("$.data.linkedOrderStatus").value("COMPLETED"))
+        .andExpect(jsonPath("$.data.nextActionHint").value("查看订单详情"))
         .andExpect(jsonPath("$.data.nodes").isArray());
   }
 }

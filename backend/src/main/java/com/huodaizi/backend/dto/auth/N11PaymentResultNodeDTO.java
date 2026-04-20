@@ -5,5 +5,6 @@ public record N11PaymentResultNodeDTO(
     String nodeName,
     String status,
     String statusText,
+    String handler,
     String happenedAt,
     String remark) {}

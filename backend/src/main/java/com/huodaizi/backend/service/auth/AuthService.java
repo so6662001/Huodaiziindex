@@ -697,7 +697,7 @@ public class AuthService {
 
   public N11PaymentResultResponse paymentResult(String token, String cashierId) {
     N10CashierOrderEntity item = repository.getCashierOrderDetail(token, cashierId);
-    List<N11PaymentResultNodeDTO> timeline =
+    List<N11PaymentResultNodeDTO> nodes =
         item.getTimeline().stream()
             .map(
                 node ->
@@ -707,25 +707,28 @@ public class AuthService {
                         node.getStatus(),
                         node.getStatusText(),
                         node.getHandler(),
-                        node.getRemark(),
-                        node.getHappenedAt()))
+                        node.getHappenedAt(),
+                        node.getRemark()))
             .toList();
-    boolean success = "PAID".equalsIgnoreCase(item.getPayStatus());
-    String resultStatus = success ? "SUCCESS" : "PENDING";
-    String resultStatusText = success ? "支付成功" : "待支付";
-    String resultMessage =
-        success ? "货款支付已完成，系统已同步更新订单履约状态。" : "当前订单尚未完成支付，请返回收银台继续支付。";
-    String nextActionCode = success ? "GO_ORDER_DETAIL" : "GO_CASHIER";
-    String nextActionText = success ? "查看订单详情" : "返回收银台";
-    String orderStatus = "PAID";
-    String orderStatusText = "已回款";
+
+    String payStatus = item.getPayStatus();
+    String payStatusText = item.getPayStatusText();
+    String resultStatus = "PAID".equalsIgnoreCase(payStatus) ? "SUCCESS" : "PENDING";
+    String resultStatusText = "PAID".equalsIgnoreCase(payStatus) ? "支付成功" : "待支付";
+    String nextActionHint = "PAID".equalsIgnoreCase(payStatus) ? "查看订单详情" : "返回收银台继续支付";
+
+    String orderStatus = "UNKNOWN";
+    String orderStatusText = "待同步";
+    String orderSyncRemark = "订单状态同步处理中";
     try {
       N06OrderEntity order = repository.getOrderDetail(token, item.getOrderId());
-      orderStatus = mapOrderToReconcile(order.getOrderStatus());
-      orderStatusText = reconcileStatusText(orderStatus);
+      orderStatus = order.getOrderStatus();
+      orderStatusText = order.getOrderStatusText();
+      orderSyncRemark = "订单状态已同步";
     } catch (BaseException ignore) {
       // 支付结果页优先展示支付结果，不因订单详情缺失中断。
     }
+
     return new N11PaymentResultResponse(
         item.getCashierId(),
         item.getOrderId(),
@@ -734,22 +737,24 @@ public class AuthService {
         item.getBuyerCompany(),
         item.getSupplierName(),
         item.getGoodsName(),
+        payStatus,
+        payStatusText,
+        resultStatus,
+        resultStatusText,
         item.getPayChannel(),
         item.getPayChannelText(),
         item.getAmountPayable(),
         item.getAmountPaid(),
         item.getAmountOutstanding(),
-        resultStatus,
-        resultStatusText,
-        resultMessage,
-        item.getLatestRemark(),
         item.getPaidAt(),
-        toText(item.getUpdatedAt()),
+        item.getLatestRemark(),
         orderStatus,
         orderStatusText,
-        nextActionCode,
-        nextActionText,
-        timeline);
+        orderSyncRemark,
+        nextActionHint,
+        toText(item.getCreatedAt()),
+        toText(item.getUpdatedAt()),
+        nodes);
   }
 
   private N07TradeTermsDetailResponse toTradeTermsDetail(N07TradeTermsEntity entity) {
