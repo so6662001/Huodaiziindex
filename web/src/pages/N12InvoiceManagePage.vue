@@ -296,6 +296,10 @@ function goCreditScoreDetail() {
   router.push('/account/credit-score-detail')
 }
 
+function goDispatchAppeal() {
+  router.push('/account/dispatch-appeal')
+}
+
 function goCashier() {
   router.push('/account/cashier')
 }
@@ -318,6 +322,7 @@ onMounted(async () => {
       <div class="hero-actions">
         <button class="btn" @click="goPaymentResult">返回支付结果页</button>
         <button class="btn" @click="goCreditScoreDetail">信用评分明细</button>
+        <button class="btn" @click="goDispatchAppeal">分发异议申诉</button>
         <button class="btn" @click="goCashier">返回收银台</button>
         <button class="btn" @click="goHome">返回首页</button>
       </div>

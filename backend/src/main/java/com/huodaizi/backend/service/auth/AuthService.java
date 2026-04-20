@@ -57,6 +57,11 @@ import com.huodaizi.backend.dto.auth.N13CreditScoreFactorDTO;
 import com.huodaizi.backend.dto.auth.N13CreditScoreListItemDTO;
 import com.huodaizi.backend.dto.auth.N13CreditScoreListResponse;
 import com.huodaizi.backend.dto.auth.N13CreditScoreTrendPointDTO;
+import com.huodaizi.backend.dto.auth.N14DispatchAppealCreateRequest;
+import com.huodaizi.backend.dto.auth.N14DispatchAppealDetailResponse;
+import com.huodaizi.backend.dto.auth.N14DispatchAppealListItemDTO;
+import com.huodaizi.backend.dto.auth.N14DispatchAppealListResponse;
+import com.huodaizi.backend.dto.auth.N14DispatchAppealStatusUpdateRequest;
 import com.huodaizi.backend.repository.auth.AuthUserEntity;
 import com.huodaizi.backend.repository.auth.EnterpriseCertificationDraft;
 import com.huodaizi.backend.repository.auth.EnterpriseCertificationEntity;
@@ -78,6 +83,8 @@ import com.huodaizi.backend.repository.auth.N12InvoiceApplicationQuery;
 import com.huodaizi.backend.repository.auth.N12InvoiceTitleEntity;
 import com.huodaizi.backend.repository.auth.N13CreditScoreEntity;
 import com.huodaizi.backend.repository.auth.N13CreditScoreQuery;
+import com.huodaizi.backend.repository.auth.N14DispatchAppealEntity;
+import com.huodaizi.backend.repository.auth.N14DispatchAppealQuery;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -956,6 +963,112 @@ public class AuthService {
         toText(item.getUpdatedAt()),
         factors,
         trend);
+  }
+
+  public N14DispatchAppealListResponse dispatchAppealList(
+      String token, String status, String keyword, int pageNo, int pageSize) {
+    int safePageNo = Math.max(1, pageNo);
+    int safePageSize = Math.min(Math.max(1, pageSize), 50);
+    N14DispatchAppealQuery query = new N14DispatchAppealQuery(status, keyword, safePageNo, safePageSize);
+    List<N14DispatchAppealEntity> all = repository.listDispatchAppeals(token, query);
+    int from = Math.min((safePageNo - 1) * safePageSize, all.size());
+    int to = Math.min(from + safePageSize, all.size());
+    List<N14DispatchAppealEntity> paged = all.subList(from, to);
+    List<N14DispatchAppealListItemDTO> records =
+        paged.stream()
+            .map(
+                item ->
+                    new N14DispatchAppealListItemDTO(
+                        item.getAppealId(),
+                        item.getMerchantId(),
+                        item.getMerchantName(),
+                        item.getSceneCode(),
+                        item.getSceneName(),
+                        item.getAppealType(),
+                        item.getAppealTypeText(),
+                        item.getStatus(),
+                        item.getStatusText(),
+                        item.getLatestRemark(),
+                        toText(item.getCreatedAt()),
+                        toText(item.getUpdatedAt())))
+            .toList();
+    return new N14DispatchAppealListResponse(safePageNo, safePageSize, all.size(), records);
+  }
+
+  public N14DispatchAppealDetailResponse dispatchAppealDetail(String token, String appealId) {
+    N14DispatchAppealEntity item = repository.getDispatchAppealDetail(token, appealId);
+    List<String> processLogs =
+        item.getTimeline().stream()
+            .map(
+                node ->
+                    "%s｜%s｜%s｜%s"
+                        .formatted(
+                            node.getHappenedAt(),
+                            node.getNodeName(),
+                            node.getOperator(),
+                            node.getRemark()))
+            .toList();
+    return new N14DispatchAppealDetailResponse(
+        item.getAppealId(),
+        item.getMerchantId(),
+        item.getMerchantName(),
+        item.getSceneCode(),
+        item.getSceneName(),
+        "-",
+        item.getTargetObjectId(),
+        item.getScoreVersion(),
+        "-",
+        item.getAppealType(),
+        item.getAppealTypeText(),
+        item.getDescription(),
+        item.getEvidenceFiles(),
+        item.getStatus(),
+        item.getStatusText(),
+        item.getLatestRemark(),
+        processLogs,
+        toText(item.getCreatedAt()),
+        toText(item.getUpdatedAt()));
+  }
+
+  public N14DispatchAppealDetailResponse createDispatchAppeal(
+      String token, N14DispatchAppealCreateRequest request) {
+    N14DispatchAppealEntity created =
+        repository.createDispatchAppeal(
+            token,
+            safeText(request.sceneCode()),
+            "",
+            safeText(request.targetId()),
+            "",
+            "",
+            safeText(request.appealType()),
+            safeText(request.appealReason()),
+            safeText(request.evidenceFiles()),
+            safeText(request.operator()));
+    return dispatchAppealDetail(token, created.getAppealId());
+  }
+
+  public N14DispatchAppealDetailResponse updateDispatchAppealStatus(
+      String token, String appealId, N14DispatchAppealStatusUpdateRequest request) {
+    N14DispatchAppealEntity updated =
+        repository.updateDispatchAppealStatus(
+            token,
+            appealId,
+            toAppealStatus(request.status()),
+            safeText(request.operator()),
+            safeText(request.remark()));
+    return dispatchAppealDetail(token, updated.getAppealId());
+  }
+
+  private String toAppealStatus(String status) {
+    String normalized = safeText(status).toUpperCase();
+    return switch (normalized) {
+      case "MARK_PROCESSING", "PROCESSING" -> "PROCESSING";
+      case "MARK_APPROVED", "APPROVED", "RESOLVED" -> "APPROVED";
+      case "MARK_REJECTED", "REJECTED" -> "REJECTED";
+      case "MARK_CLOSED", "CLOSED" -> "CLOSED";
+      case "SUBMITTED", "REOPEN" -> "SUBMITTED";
+      default -> throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "status 不支持");
+    };
   }
 
   private N07TradeTermsDetailResponse toTradeTermsDetail(N07TradeTermsEntity entity) {

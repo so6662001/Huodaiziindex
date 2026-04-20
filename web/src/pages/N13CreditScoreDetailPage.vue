@@ -106,6 +106,10 @@ function goHome() {
   router.push('/')
 }
 
+function goDispatchAppeal() {
+  router.push('/account/dispatch-appeal')
+}
+
 onMounted(async () => {
   await loadScoreList()
 })
@@ -118,6 +122,7 @@ onMounted(async () => {
       <p>查看各期信用评分、维度因子、趋势变化与改进建议，支撑商家运营持续优化。</p>
       <div class="hero-actions">
         <button class="btn" @click="goInvoiceManage">前往发票与抬头管理</button>
+        <button class="btn" @click="goDispatchAppeal">分发异议申诉</button>
         <button class="btn" @click="goHome">返回首页</button>
       </div>
     </section>

@@ -42,6 +42,7 @@ import N10CashierPage from '../pages/N10CashierPage.vue'
 import N11PaymentResultPage from '../pages/N11PaymentResultPage.vue'
 import N12InvoiceManagePage from '../pages/N12InvoiceManagePage.vue'
 import N13CreditScoreDetailPage from '../pages/N13CreditScoreDetailPage.vue'
+import N14DispatchAppealPage from '../pages/N14DispatchAppealPage.vue'
 import InquiryMerchantLeadManagePage from '../pages/InquiryMerchantLeadManagePage.vue'
 import InquiryQuoteWorkbenchPage from '../pages/InquiryQuoteWorkbenchPage.vue'
 import SiteAdLeadMinePage from '../pages/SiteAdLeadMinePage.vue'
@@ -302,6 +303,14 @@ const routes = [
     component: N13CreditScoreDetailPage,
     meta: {
       title: 'PC-N13信用评分明细页_货袋子账号中心'
+    }
+  },
+  {
+    path: '/account/dispatch-appeal',
+    name: 'n14DispatchAppeal',
+    component: N14DispatchAppealPage,
+    meta: {
+      title: 'PC-N14分发异议申诉页_货袋子账号中心'
     }
   },
   {

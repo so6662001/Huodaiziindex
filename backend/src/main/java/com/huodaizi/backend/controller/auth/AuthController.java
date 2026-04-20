@@ -38,6 +38,10 @@ import com.huodaizi.backend.dto.auth.N12InvoiceTitleSetStatusRequest;
 import com.huodaizi.backend.dto.auth.N12InvoiceTitleUpsertRequest;
 import com.huodaizi.backend.dto.auth.N13CreditScoreDetailResponse;
 import com.huodaizi.backend.dto.auth.N13CreditScoreListResponse;
+import com.huodaizi.backend.dto.auth.N14DispatchAppealCreateRequest;
+import com.huodaizi.backend.dto.auth.N14DispatchAppealDetailResponse;
+import com.huodaizi.backend.dto.auth.N14DispatchAppealListResponse;
+import com.huodaizi.backend.dto.auth.N14DispatchAppealStatusUpdateRequest;
 import com.huodaizi.backend.service.auth.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -316,6 +320,46 @@ public class AuthController {
       @RequestHeader(name = AUTH_HEADER, required = false) String token,
       @PathVariable("scoreId") String scoreId) {
     return ApiResponse.success(service.creditScoreDetail(token, scoreId));
+  }
+
+  @GetMapping("/dispatch-appeals")
+  public ApiResponse<N14DispatchAppealListResponse> dispatchAppealList(
+      @RequestHeader(name = AUTH_HEADER, required = false) String token,
+      @RequestParam(name = "status", required = false) String status,
+      @RequestParam(name = "keyword", required = false) String keyword,
+      @RequestParam(name = "pageNo", required = false, defaultValue = "1") int pageNo,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "10") int pageSize) {
+    return ApiResponse.success(service.dispatchAppealList(token, status, keyword, pageNo, pageSize));
+  }
+
+  @GetMapping("/dispatch-appeals/{appealId}")
+  public ApiResponse<N14DispatchAppealDetailResponse> dispatchAppealDetail(
+      @RequestHeader(name = AUTH_HEADER, required = false) String token,
+      @PathVariable("appealId") String appealId) {
+    return ApiResponse.success(service.dispatchAppealDetail(token, appealId));
+  }
+
+  @PostMapping("/dispatch-appeals")
+  public ApiResponse<N14DispatchAppealDetailResponse> createDispatchAppeal(
+      @RequestHeader(name = AUTH_HEADER, required = false) String token,
+      @Valid @RequestBody N14DispatchAppealCreateRequest request) {
+    return ApiResponse.success(service.createDispatchAppeal(token, request));
+  }
+
+  @PostMapping("/dispatch-appeals/{appealId}/status")
+  public ApiResponse<N14DispatchAppealDetailResponse> updateDispatchAppealStatus(
+      @RequestHeader(name = AUTH_HEADER, required = false) String token,
+      @PathVariable("appealId") String appealId,
+      @Valid @RequestBody N14DispatchAppealStatusUpdateRequest request) {
+    return ApiResponse.success(service.updateDispatchAppealStatus(token, appealId, request));
+  }
+
+  @PostMapping("/dispatch-appeals/{appealId}/action")
+  public ApiResponse<N14DispatchAppealDetailResponse> updateDispatchAppealAction(
+      @RequestHeader(name = AUTH_HEADER, required = false) String token,
+      @PathVariable("appealId") String appealId,
+      @Valid @RequestBody N14DispatchAppealStatusUpdateRequest request) {
+    return ApiResponse.success(service.updateDispatchAppealStatus(token, appealId, request));
   }
 
   @PostMapping("/logout")

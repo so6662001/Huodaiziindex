@@ -33,6 +33,7 @@ public class InMemoryAuthRepository {
   private final ConcurrentMap<String, N12InvoiceApplicationEntity> invoiceApplicationStore =
       new ConcurrentHashMap<>();
   private final ConcurrentMap<String, N13CreditScoreEntity> creditScoreStore = new ConcurrentHashMap<>();
+  private final ConcurrentMap<String, N14DispatchAppealEntity> dispatchAppealStore = new ConcurrentHashMap<>();
 
   public InMemoryAuthRepository() {
     seed();
@@ -800,6 +801,120 @@ public class InMemoryAuthRepository {
     return entity;
   }
 
+  public List<N14DispatchAppealEntity> listDispatchAppeals(String token, N14DispatchAppealQuery query) {
+    SessionEntity session = requireSession(token);
+    AuthUserEntity user = userStore.get(session.getAccount());
+    if (user == null) {
+      throw new BaseException(ErrorCode.UNAUTHORIZED.getCode(), "登录态无效");
+    }
+    String statusFilter = query == null ? "" : defaultText(query.status(), "");
+    String keyword = query == null ? "" : defaultText(query.keyword(), "");
+    return dispatchAppealStore.values().stream()
+        .filter(item -> user.getUserId().equals(item.getUserId()))
+        .filter(item -> statusFilter.isBlank() || statusFilter.equalsIgnoreCase(item.getStatus()))
+        .filter(
+            item ->
+                keyword.isBlank()
+                    || item.getAppealId().contains(keyword)
+                    || item.getSceneCode().contains(keyword)
+                    || item.getMerchantName().contains(keyword)
+                    || item.getDescription().contains(keyword)
+                    || item.getTitle().contains(keyword))
+        .sorted(Comparator.comparing(N14DispatchAppealEntity::getUpdatedAt).reversed())
+        .toList();
+  }
+
+  public N14DispatchAppealEntity getDispatchAppealDetail(String token, String appealId) {
+    SessionEntity session = requireSession(token);
+    AuthUserEntity user = userStore.get(session.getAccount());
+    if (user == null) {
+      throw new BaseException(ErrorCode.UNAUTHORIZED.getCode(), "登录态无效");
+    }
+    N14DispatchAppealEntity entity = dispatchAppealStore.get(defaultText(appealId, ""));
+    if (entity == null || !user.getUserId().equals(entity.getUserId())) {
+      throw new BaseException(ErrorCode.NOT_FOUND.getCode(), "分发异议申诉单不存在");
+    }
+    return entity;
+  }
+
+  public N14DispatchAppealEntity createDispatchAppeal(
+      String token,
+      String sceneCode,
+      String sceneName,
+      String merchantId,
+      String merchantName,
+      String relatedRuleVersion,
+      String appealReason,
+      String appealDetail,
+      String evidenceUrls,
+      String operator) {
+    SessionEntity session = requireSession(token);
+    AuthUserEntity user = userStore.get(session.getAccount());
+    if (user == null) {
+      throw new BaseException(ErrorCode.UNAUTHORIZED.getCode(), "登录态无效");
+    }
+    String normalizedSceneCode = defaultText(sceneCode, "MERCHANT_LEAD").trim().toUpperCase(Locale.ROOT);
+    if (!normalizedSceneCode.matches("MERCHANT_LEAD|QUOTE_DISTRIBUTION|PICKUP_DISTRIBUTION")) {
+      throw new BaseException(
+          ErrorCode.BAD_REQUEST.getCode(),
+          "sceneCode 仅支持 MERCHANT_LEAD/QUOTE_DISTRIBUTION/PICKUP_DISTRIBUTION");
+    }
+    String normalizedReason = defaultText(appealReason, "").trim().toUpperCase(Locale.ROOT);
+    if (!normalizedReason.matches("SCORE_MISMATCH|RULE_MISREAD|DATA_ERROR|UNFAIR_TRAFFIC|OTHER")) {
+      throw new BaseException(
+          ErrorCode.BAD_REQUEST.getCode(),
+          "appealReason 仅支持 SCORE_MISMATCH/RULE_MISREAD/DATA_ERROR/UNFAIR_TRAFFIC/OTHER");
+    }
+    LocalDateTime now = LocalDateTime.now();
+    String appealId = "DA" + UUID.randomUUID().toString().replace("-", "").substring(0, 10).toUpperCase(Locale.ROOT);
+    List<N14DispatchAppealEntity.TimelineItem> timeline = new ArrayList<>();
+    timeline.add(
+        new N14DispatchAppealEntity.TimelineItem(
+            "SUBMITTED", "已提交", defaultText(operator, "n14-create-appeal"), "申诉已提交，待平台审核", now.toString()));
+    N14DispatchAppealEntity created =
+        new N14DispatchAppealEntity(
+            appealId,
+            user.getUserId(),
+            defaultText(merchantId, "S001"),
+            defaultText(merchantName, user.getCompanyName()),
+            normalizedSceneCode,
+            defaultText(sceneName, sceneNameText(normalizedSceneCode)),
+            defaultText(relatedRuleVersion, "v2026.04"),
+            defaultText(merchantId, "S001"),
+            "MERCHANT",
+            normalizedReason,
+            appealReasonText(normalizedReason),
+            "分发评分争议申诉",
+            defaultText(appealDetail, ""),
+            defaultText(evidenceUrls, ""),
+            "SUBMITTED",
+            dispatchAppealStatusText("SUBMITTED"),
+            "申诉已提交，待平台审核",
+            timeline,
+            now,
+            now);
+    dispatchAppealStore.put(created.getAppealId(), created);
+    return created;
+  }
+
+  public N14DispatchAppealEntity updateDispatchAppealStatus(
+      String token, String appealId, String status, String operator, String remark) {
+    N14DispatchAppealEntity target = getDispatchAppealDetail(token, appealId);
+    String normalizedStatus = defaultText(status, "").trim().toUpperCase(Locale.ROOT);
+    if (!normalizedStatus.matches("SUBMITTED|PROCESSING|APPROVED|REJECTED|CLOSED")) {
+      throw new BaseException(
+          ErrorCode.BAD_REQUEST.getCode(),
+          "status 仅支持 SUBMITTED/PROCESSING/APPROVED/REJECTED/CLOSED");
+    }
+    target.updateStatus(
+        normalizedStatus,
+        dispatchAppealStatusText(normalizedStatus),
+        defaultText(operator, "n14-update-status"),
+        defaultText(remark, ""),
+        LocalDateTime.now());
+    return target;
+  }
+
   public void logout(String token) {
     sessionStore.remove(defaultText(token, ""));
   }
@@ -882,6 +997,7 @@ public class InMemoryAuthRepository {
     seedInvoiceTitles(seed);
     seedInvoiceApplications(seed);
     seedCreditScores(seed);
+    seedDispatchAppeals(seed);
   }
 
   private void seedNegotiation(AuthUserEntity user) {
@@ -1507,6 +1623,89 @@ public class InMemoryAuthRepository {
     creditScoreStore.put(second.getScoreId(), second);
   }
 
+  private void seedDispatchAppeals(AuthUserEntity user) {
+    LocalDateTime now = LocalDateTime.now();
+    N14DispatchAppealEntity first =
+        new N14DispatchAppealEntity(
+            "DA00000001",
+            user.getUserId(),
+            "S001",
+            "唐山弘达钢贸",
+            "MERCHANT_LEAD",
+            "线索分发",
+            "v2026.04",
+            "S001",
+            "MERCHANT",
+            "SCORE_MISMATCH",
+            appealReasonText("SCORE_MISMATCH"),
+            "分发评分偏低复核申请",
+            "系统显示响应时效评分偏低，与实际工单响应记录不一致。",
+            "https://cdn.huodaizi.com/appeal/da0001-evidence.png",
+            "PROCESSING",
+            dispatchAppealStatusText("PROCESSING"),
+            "平台已受理，正在核对响应日志",
+            new ArrayList<>(
+                List.of(
+                    new N14DispatchAppealEntity.TimelineItem(
+                        "SUBMITTED",
+                        "已提交",
+                        "n14-seed",
+                        "申诉已提交，待平台审核",
+                        now.minusDays(2).toString()),
+                    new N14DispatchAppealEntity.TimelineItem(
+                        "PROCESSING",
+                        "处理中",
+                        "n14-seed",
+                        "平台已受理，正在核对响应日志",
+                        now.minusHours(6).toString()))),
+            now.minusDays(2),
+            now.minusHours(6));
+    dispatchAppealStore.put(first.getAppealId(), first);
+
+    N14DispatchAppealEntity second =
+        new N14DispatchAppealEntity(
+            "DA00000002",
+            user.getUserId(),
+            "S001",
+            "唐山弘达钢贸",
+            "MERCHANT_LEAD",
+            "线索分发",
+            "v2026.03",
+            "S001",
+            "MERCHANT",
+            "DATA_ERROR",
+            appealReasonText("DATA_ERROR"),
+            "履约数据漏计复核申请",
+            "部分履约回单已上传但评分未计入，申请复核。",
+            "https://cdn.huodaizi.com/appeal/da0002-evidence.pdf",
+            "APPROVED",
+            dispatchAppealStatusText("APPROVED"),
+            "复核通过，评分将于下轮更新修正",
+            new ArrayList<>(
+                List.of(
+                    new N14DispatchAppealEntity.TimelineItem(
+                        "SUBMITTED",
+                        "已提交",
+                        "n14-seed",
+                        "申诉已提交，待平台审核",
+                        now.minusDays(8).toString()),
+                    new N14DispatchAppealEntity.TimelineItem(
+                        "PROCESSING",
+                        "处理中",
+                        "n14-seed",
+                        "平台已受理，核查数据中",
+                        now.minusDays(6).toString()),
+                    new N14DispatchAppealEntity.TimelineItem(
+                        "APPROVED",
+                        "审核通过",
+                        "n14-seed",
+                        "复核通过，评分将于下轮更新修正",
+                        now.minusDays(3).toString()))),
+            now.minusDays(8),
+            now.minusDays(3));
+    dispatchAppealStore.put(second.getAppealId(), second);
+  }
+
   private String issueTypeText(String type) {
     return switch (type) {
       case "QUALITY" -> "质量异议";
@@ -1561,6 +1760,36 @@ public class InMemoryAuthRepository {
       case "ACTIVE" -> "启用";
       case "INACTIVE" -> "停用";
       default -> "未知";
+    };
+  }
+
+  private String sceneNameText(String sceneCode) {
+    return switch (defaultText(sceneCode, "").toUpperCase(Locale.ROOT)) {
+      case "MERCHANT_LEAD" -> "线索分发";
+      case "QUOTE_DISTRIBUTION" -> "报价分发";
+      case "PICKUP_DISTRIBUTION" -> "提货协同分发";
+      default -> "线索分发";
+    };
+  }
+
+  private String appealReasonText(String reason) {
+    return switch (defaultText(reason, "").toUpperCase(Locale.ROOT)) {
+      case "SCORE_MISMATCH" -> "评分结果异议";
+      case "RULE_MISREAD" -> "规则解读异议";
+      case "DATA_ERROR" -> "数据错误申诉";
+      case "UNFAIR_TRAFFIC" -> "流量分发不公";
+      default -> "其他申诉";
+    };
+  }
+
+  private String dispatchAppealStatusText(String status) {
+    return switch (defaultText(status, "").toUpperCase(Locale.ROOT)) {
+      case "SUBMITTED" -> "已提交";
+      case "PROCESSING" -> "处理中";
+      case "APPROVED" -> "申诉通过";
+      case "REJECTED" -> "申诉驳回";
+      case "CLOSED" -> "已关闭";
+      default -> "处理中";
     };
   }
 

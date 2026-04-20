@@ -60,6 +60,10 @@ function goCreditScoreDetail() {
   router.push('/account/credit-score-detail')
 }
 
+function goDispatchAppeal() {
+  router.push('/account/dispatch-appeal')
+}
+
 onMounted(() => {
   loadPaymentResult()
 })
@@ -75,6 +79,7 @@ onMounted(() => {
         <button class="btn" @click="goOrderDetail">查看订单详情</button>
         <button class="btn" @click="goInvoiceManage">发票与抬头管理</button>
         <button class="btn" @click="goCreditScoreDetail">信用评分明细</button>
+        <button class="btn" @click="goDispatchAppeal">分发异议申诉</button>
         <button class="btn" @click="goHome">返回首页</button>
       </div>
     </section>

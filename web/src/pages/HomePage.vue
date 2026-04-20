@@ -229,6 +229,10 @@ function goN13CreditScoreDetailPage() {
   router.push('/account/credit-score-detail')
 }
 
+function goN14DispatchAppealPage() {
+  router.push('/account/dispatch-appeal')
+}
+
 function onSearch() {
   if (!keyword.value.trim()) {
     return
@@ -438,6 +442,7 @@ function onSearch() {
         <button class="btn" @click="goN11PaymentResultPage">PC-N11支付结果页</button>
         <button class="btn" @click="goN12InvoiceManagePage">PC-N12发票与抬头管理</button>
         <button class="btn" @click="goN13CreditScoreDetailPage">PC-N13信用评分明细页</button>
+        <button class="btn" @click="goN14DispatchAppealPage">PC-N14分发异议申诉页</button>
         <button class="btn" @click="goSubscriptionPage">套餐与订阅</button>
         <button class="btn" @click="goBillingPage">计费与账单</button>
         <button class="btn primary" @click="goInquiry">立即体验AI询价</button>
