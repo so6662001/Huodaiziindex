@@ -34,6 +34,7 @@ import N02IdentitySelectPage from '../pages/N02IdentitySelectPage.vue'
 import N03EnterpriseCertificationPage from '../pages/N03EnterpriseCertificationPage.vue'
 import N04OnboardingProgressPage from '../pages/N04OnboardingProgressPage.vue'
 import N05NegotiationSessionPage from '../pages/N05NegotiationSessionPage.vue'
+import N06OrderDetailPage from '../pages/N06OrderDetailPage.vue'
 import InquiryMerchantLeadManagePage from '../pages/InquiryMerchantLeadManagePage.vue'
 import InquiryQuoteWorkbenchPage from '../pages/InquiryQuoteWorkbenchPage.vue'
 import SiteAdLeadMinePage from '../pages/SiteAdLeadMinePage.vue'
@@ -230,6 +231,14 @@ const routes = [
     component: N05NegotiationSessionPage,
     meta: {
       title: 'PC-N05议价会话页_货袋子账号中心'
+    }
+  },
+  {
+    path: '/account/order-detail',
+    name: 'n06OrderDetail',
+    component: N06OrderDetailPage,
+    meta: {
+      title: 'PC-N06订单详情页_货袋子账号中心'
     }
   },
   {

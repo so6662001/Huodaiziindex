@@ -7,6 +7,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.util.Base64;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -24,6 +25,7 @@ public class InMemoryAuthRepository {
       new ConcurrentHashMap<>();
   private final ConcurrentMap<String, N05NegotiationSessionEntity> negotiationStore =
       new ConcurrentHashMap<>();
+  private final ConcurrentMap<String, N06OrderEntity> orderStore = new ConcurrentHashMap<>();
 
   public InMemoryAuthRepository() {
     seed();
@@ -288,6 +290,57 @@ public class InMemoryAuthRepository {
     return entity;
   }
 
+  public List<N06OrderEntity> listOrders(String token, N06OrderQuery query) {
+    SessionEntity session = requireSession(token);
+    AuthUserEntity user = userStore.get(session.getAccount());
+    if (user == null) {
+      throw new BaseException(ErrorCode.UNAUTHORIZED.getCode(), "登录态无效");
+    }
+    String statusFilter = query == null ? "" : defaultText(query.status(), "");
+    String keyword = query == null ? "" : defaultText(query.keyword(), "");
+    return orderStore.values().stream()
+        .filter(item -> user.getUserId().equals(item.getUserId()))
+        .filter(item -> statusFilter.isBlank() || statusFilter.equalsIgnoreCase(item.getOrderStatus()))
+        .filter(
+            item ->
+                keyword.isBlank()
+                    || item.getOrderNo().contains(keyword)
+                    || item.getInquiryNo().contains(keyword)
+                    || item.getSupplierName().contains(keyword)
+                    || item.getGoodsName().contains(keyword))
+        .sorted(Comparator.comparing(N06OrderEntity::getUpdatedAt).reversed())
+        .toList();
+  }
+
+  public N06OrderEntity getOrderDetail(String token, String orderId) {
+    SessionEntity session = requireSession(token);
+    AuthUserEntity user = userStore.get(session.getAccount());
+    if (user == null) {
+      throw new BaseException(ErrorCode.UNAUTHORIZED.getCode(), "登录态无效");
+    }
+    N06OrderEntity entity = orderStore.get(defaultText(orderId, ""));
+    if (entity == null || !user.getUserId().equals(entity.getUserId())) {
+      throw new BaseException(ErrorCode.NOT_FOUND.getCode(), "订单不存在");
+    }
+    return entity;
+  }
+
+  public N06OrderEntity updateOrderStatus(
+      String token, String orderId, String targetStatus, String operator, String remark) {
+    N06OrderEntity entity = getOrderDetail(token, orderId);
+    String normalized = defaultText(targetStatus, "").trim().toUpperCase(Locale.ROOT);
+    if (!normalized.matches("PENDING_SIGN|SIGNED|PICKUP_IN_PROGRESS|RECONCILING|COMPLETED|CANCELLED")) {
+      throw new BaseException(
+          ErrorCode.BAD_REQUEST.getCode(),
+          "targetStatus 仅支持 PENDING_SIGN/SIGNED/PICKUP_IN_PROGRESS/RECONCILING/COMPLETED/CANCELLED");
+    }
+    String normalizedOperator = defaultText(operator, "pc-n06-action");
+    String normalizedRemark = defaultText(remark, "");
+    LocalDateTime now = LocalDateTime.now();
+    entity.updateStatus(normalized, normalizedOperator, now, normalizedRemark);
+    return entity;
+  }
+
   public void logout(String token) {
     sessionStore.remove(defaultText(token, ""));
   }
@@ -363,6 +416,7 @@ public class InMemoryAuthRepository {
             LocalDateTime.now().minusDays(1));
     userStore.put(seed.getAccount(), seed);
     seedNegotiation(seed);
+    seedOrders(seed);
   }
 
   private void seedNegotiation(AuthUserEntity user) {
@@ -479,6 +533,136 @@ public class InMemoryAuthRepository {
             now.minusHours(14),
             secondMessages);
     negotiationStore.put(second.getSessionId(), second);
+  }
+
+  private void seedOrders(AuthUserEntity user) {
+    LocalDateTime now = LocalDateTime.now();
+    List<N06OrderEntity.OrderTimelineNode> firstTimeline = new ArrayList<>();
+    firstTimeline.add(
+        new N06OrderEntity.OrderTimelineNode(
+            "CREATED",
+            "创建成交订单",
+            "已完成",
+            "DEAL_CONFIRMED",
+            "成交确认已完成",
+            "system",
+            now.minusDays(2).toString()));
+    firstTimeline.add(
+        new N06OrderEntity.OrderTimelineNode(
+            "SIGN",
+            "合同签署",
+            "进行中",
+            "PENDING_SIGN",
+            "待双方签署合同",
+            "buyer",
+            now.minusDays(1).toString()));
+    firstTimeline.add(
+        new N06OrderEntity.OrderTimelineNode(
+            "PICKUP",
+            "提货履约",
+            "待开始",
+            "PENDING",
+            "签署后可发起提货计划",
+            "logistics",
+            ""));
+
+    N06OrderEntity first =
+        new N06OrderEntity(
+            "OD0001",
+            "OD-20260418-0001",
+            user.getUserId(),
+            user.getAccount(),
+            "INQ-20260419-3301",
+            "螺纹钢HRB400E Φ20 500吨",
+            "500吨",
+            "唐山",
+            "唐山弘达钢贸",
+            "演示钢贸有限公司",
+            "3520",
+            "1760000",
+            "PENDING_SIGN",
+            "待签署",
+            "CONTRACT_PENDING",
+            "待签署",
+            "签署后48小时内安排提货",
+            now.plusDays(2).toString(),
+            "NO",
+            "",
+            "NONE",
+            "",
+            "",
+            now.minusDays(2),
+            now.minusHours(8),
+            firstTimeline);
+    orderStore.put(first.getOrderId(), first);
+
+    List<N06OrderEntity.OrderTimelineNode> secondTimeline = new ArrayList<>();
+    secondTimeline.add(
+        new N06OrderEntity.OrderTimelineNode(
+            "CREATED",
+            "创建成交订单",
+            "已完成",
+            "DEAL_CONFIRMED",
+            "成交确认已完成",
+            "system",
+            now.minusDays(4).toString()));
+    secondTimeline.add(
+        new N06OrderEntity.OrderTimelineNode(
+            "SIGN",
+            "合同签署",
+            "已完成",
+            "SIGNED",
+            "合同已签署",
+            "buyer",
+            now.minusDays(3).toString()));
+    secondTimeline.add(
+        new N06OrderEntity.OrderTimelineNode(
+            "PICKUP",
+            "提货履约",
+            "已完成",
+            "COMPLETED",
+            "提货完成并签收",
+            "logistics",
+            now.minusDays(2).toString()));
+    secondTimeline.add(
+        new N06OrderEntity.OrderTimelineNode(
+            "RECONCILE",
+            "对账回款",
+            "已完成",
+            "PAID",
+            "账款已结清",
+            "finance",
+            now.minusDays(1).toString()));
+
+    N06OrderEntity second =
+        new N06OrderEntity(
+            "OD0002",
+            "OD-20260416-0008",
+            user.getUserId(),
+            user.getAccount(),
+            "INQ-20260418-2210",
+            "热轧卷板Q235B 3.0*1500 300吨",
+            "300吨",
+            "无锡",
+            "无锡铭泰供应链",
+            "演示钢贸有限公司",
+            "3680",
+            "1104000",
+            "COMPLETED",
+            "已完成",
+            "SETTLED",
+            "已结算",
+            "可发起复购或复制订单",
+            "",
+            "YES",
+            now.minusDays(1).toString(),
+            "FULLY_PAID",
+            now.minusDays(1).toString(),
+            "订单履约与回款均已完成",
+            now.minusDays(4),
+            now.minusDays(1),
+            secondTimeline);
+    orderStore.put(second.getOrderId(), second);
   }
 
   public static final class SessionEntity {

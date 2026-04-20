@@ -178,6 +178,10 @@ function goOnboarding() {
   router.push('/account/onboarding-progress')
 }
 
+function goOrderDetail() {
+  router.push('/account/order-detail')
+}
+
 function goIdentity() {
   router.push('/account/identity-select')
 }
@@ -198,6 +202,7 @@ onMounted(() => {
       <p>查看采购与供应双方议价消息流，支持发言与会话状态流转。</p>
       <div class="hero-actions">
         <button class="btn" @click="goOnboarding">返回入驻进度</button>
+        <button class="btn" @click="goOrderDetail">订单详情页</button>
         <button class="btn" @click="goIdentity">返回身份选择</button>
         <button class="btn" @click="goHome">返回首页</button>
       </div>

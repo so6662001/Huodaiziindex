@@ -13,6 +13,9 @@ import com.huodaizi.backend.dto.auth.N05NegotiationDetailResponse;
 import com.huodaizi.backend.dto.auth.N05NegotiationSendMessageRequest;
 import com.huodaizi.backend.dto.auth.N05NegotiationSessionListResponse;
 import com.huodaizi.backend.dto.auth.N05NegotiationStatusUpdateRequest;
+import com.huodaizi.backend.dto.auth.N06OrderActionRequest;
+import com.huodaizi.backend.dto.auth.N06OrderDetailResponse;
+import com.huodaizi.backend.dto.auth.N06OrderListResponse;
 import com.huodaizi.backend.service.auth.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -100,6 +103,31 @@ public class AuthController {
       @PathVariable("sessionId") String sessionId,
       @Valid @RequestBody N05NegotiationStatusUpdateRequest request) {
     return ApiResponse.success(service.updateNegotiationStatus(token, sessionId, request));
+  }
+
+  @GetMapping("/orders")
+  public ApiResponse<N06OrderListResponse> orderList(
+      @RequestHeader(name = AUTH_HEADER, required = false) String token,
+      @RequestParam(name = "status", required = false) String status,
+      @RequestParam(name = "keyword", required = false) String keyword,
+      @RequestParam(name = "pageNo", required = false, defaultValue = "1") int pageNo,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "10") int pageSize) {
+    return ApiResponse.success(service.orderList(token, status, keyword, pageNo, pageSize));
+  }
+
+  @GetMapping("/orders/{orderId}")
+  public ApiResponse<N06OrderDetailResponse> orderDetail(
+      @RequestHeader(name = AUTH_HEADER, required = false) String token,
+      @PathVariable("orderId") String orderId) {
+    return ApiResponse.success(service.orderDetail(token, orderId));
+  }
+
+  @PostMapping("/orders/{orderId}/action")
+  public ApiResponse<N06OrderDetailResponse> orderAction(
+      @RequestHeader(name = AUTH_HEADER, required = false) String token,
+      @PathVariable("orderId") String orderId,
+      @Valid @RequestBody N06OrderActionRequest request) {
+    return ApiResponse.success(service.orderAction(token, orderId, request));
   }
 
   @PostMapping("/logout")

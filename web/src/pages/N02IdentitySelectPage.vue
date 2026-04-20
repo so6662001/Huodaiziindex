@@ -96,6 +96,10 @@ function goNegotiationSession() {
   router.push('/account/negotiation-session')
 }
 
+function goOrderDetail() {
+  router.push('/account/order-detail')
+}
+
 function goTarget(identityCode) {
   if (identityCode === 'BUYER') {
     router.push('/inquiry/create')
@@ -188,6 +192,14 @@ onMounted(() => {
               @click="goNegotiationSession"
             >
               议价会话页
+            </button>
+            <button
+              v-if="identity.identityCode === 'BUYER'"
+              class="btn"
+              :disabled="switching"
+              @click="goOrderDetail"
+            >
+              订单详情页
             </button>
             <button class="btn" :disabled="switching" @click="goTarget(identity.identityCode)">进入工作台</button>
           </div>

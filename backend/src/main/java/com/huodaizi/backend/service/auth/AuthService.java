@@ -17,6 +17,12 @@ import com.huodaizi.backend.dto.auth.N05NegotiationSendMessageRequest;
 import com.huodaizi.backend.dto.auth.N05NegotiationSessionItemDTO;
 import com.huodaizi.backend.dto.auth.N05NegotiationSessionListResponse;
 import com.huodaizi.backend.dto.auth.N05NegotiationStatusUpdateRequest;
+import com.huodaizi.backend.dto.auth.N06OrderActionDTO;
+import com.huodaizi.backend.dto.auth.N06OrderActionRequest;
+import com.huodaizi.backend.dto.auth.N06OrderDetailResponse;
+import com.huodaizi.backend.dto.auth.N06OrderListItemDTO;
+import com.huodaizi.backend.dto.auth.N06OrderListResponse;
+import com.huodaizi.backend.dto.auth.N06OrderTimelineNodeDTO;
 import com.huodaizi.backend.repository.auth.AuthUserEntity;
 import com.huodaizi.backend.repository.auth.EnterpriseCertificationDraft;
 import com.huodaizi.backend.repository.auth.EnterpriseCertificationEntity;
@@ -26,6 +32,8 @@ import com.huodaizi.backend.repository.auth.InMemoryAuthRepository.SessionEntity
 import com.huodaizi.backend.repository.auth.N05NegotiationMessageEntity;
 import com.huodaizi.backend.repository.auth.N05NegotiationQuery;
 import com.huodaizi.backend.repository.auth.N05NegotiationSessionEntity;
+import com.huodaizi.backend.repository.auth.N06OrderEntity;
+import com.huodaizi.backend.repository.auth.N06OrderQuery;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -321,6 +329,104 @@ public class AuthService {
     return negotiationDetail(token, sessionId);
   }
 
+  public N06OrderListResponse orderList(
+      String token, String status, String keyword, int pageNo, int pageSize) {
+    int safePageNo = Math.max(1, pageNo);
+    int safePageSize = Math.min(Math.max(1, pageSize), 50);
+    N06OrderQuery query = new N06OrderQuery(status, keyword, safePageNo, safePageSize);
+    List<N06OrderEntity> all = repository.listOrders(token, query);
+    int from = Math.min((safePageNo - 1) * safePageSize, all.size());
+    int to = Math.min(from + safePageSize, all.size());
+    List<N06OrderEntity> paged = all.subList(from, to);
+
+    List<N06OrderListItemDTO> records =
+        paged.stream()
+            .map(
+                item ->
+                    new N06OrderListItemDTO(
+                        item.getOrderId(),
+                        item.getOrderNo(),
+                        item.getInquiryNo(),
+                        item.getGoodsName(),
+                        item.getGoodsName(),
+                        item.getQuantityTon(),
+                        item.getSupplierName(),
+                        item.getBuyerCompany(),
+                        item.getOrderStatus(),
+                        item.getOrderStatusText(),
+                        item.getDealTotalAmount(),
+                        toText(item.getCreatedAt()),
+                        toText(item.getUpdatedAt())))
+            .toList();
+    return new N06OrderListResponse(safePageNo, safePageSize, all.size(), records);
+  }
+
+  public N06OrderDetailResponse orderDetail(String token, String orderId) {
+    N06OrderEntity order = repository.getOrderDetail(token, orderId);
+    List<N06OrderTimelineNodeDTO> timeline =
+        order.getTimeline().stream()
+            .map(
+                node ->
+                    new N06OrderTimelineNodeDTO(
+                        node.getNodeCode(),
+                        node.getNodeName(),
+                        node.getStatus(),
+                        node.getStatusText(),
+                        node.getOwner(),
+                        node.getHappenedAt(),
+                        node.getRemark()))
+            .toList();
+    List<N06OrderActionDTO> actions = orderActionsForStatus(order.getOrderStatus());
+    String reconcileStatus = mapOrderToReconcile(order.getOrderStatus());
+    String pickupStatus = mapOrderToPickup(order.getOrderStatus());
+    String receivable = order.getDealTotalAmount();
+    String paidAmount = "PAID".equalsIgnoreCase(order.getPaymentStatus()) ? receivable : "0";
+    String outstanding = "PAID".equalsIgnoreCase(order.getPaymentStatus()) ? "0" : receivable;
+    return new N06OrderDetailResponse(
+        order.getOrderId(),
+        order.getOrderNo(),
+        order.getInquiryNo(),
+        order.getInquiryNo(),
+        "Q-" + order.getOrderNo(),
+        "NS-" + order.getOrderId(),
+        order.getOrderStatus(),
+        order.getOrderStatusText(),
+        order.getBuyerCompany(),
+        "采购经理",
+        repository.maskPhone("13800138000"),
+        order.getSupplierName(),
+        order.getGoodsName(),
+        order.getGoodsName(),
+        order.getQuantityTon(),
+        order.getDealUnitPrice(),
+        order.getDealTotalAmount(),
+        "YES",
+        "月结30天",
+        order.getExpectedDeliveryAt(),
+        order.getLatestRemark(),
+        pickupStatus,
+        pickupStatusText(pickupStatus),
+        "PU-" + order.getOrderId(),
+        order.getDeliveryCity() + "一号仓",
+        reconcileStatus,
+        reconcileStatusText(reconcileStatus),
+        "RC-" + order.getOrderId(),
+        receivable,
+        paidAmount,
+        outstanding,
+        toText(order.getCreatedAt()),
+        toText(order.getUpdatedAt()),
+        timeline,
+        actions);
+  }
+
+  public N06OrderDetailResponse orderAction(String token, String orderId, N06OrderActionRequest request) {
+    String targetStatus = mapOrderActionToStatus(request.action());
+    repository.updateOrderStatus(
+        token, orderId, targetStatus, safeText(request.operator()), safeText(request.remark()));
+    return orderDetail(token, orderId);
+  }
+
   private N03EnterpriseCertificationDetailResponse toCertificationDetail(
       EnterpriseCertificationEntity entity) {
     return new N03EnterpriseCertificationDetailResponse(
@@ -498,6 +604,76 @@ public class AuthService {
       case "MARK_CLOSED", "CLOSED", "CANCEL" -> "CLOSED";
       case "RESUME", "ONGOING" -> "ONGOING";
       default -> throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "action 不支持");
+    };
+  }
+
+  private List<N06OrderActionDTO> orderActionsForStatus(String status) {
+    return switch (safeText(status).toUpperCase()) {
+      case "PENDING_SIGN" -> List.of(
+          new N06OrderActionDTO("CONFIRM_SIGNED", "确认签署", true, ""),
+          new N06OrderActionDTO("CLOSE_ORDER", "关闭订单", true, ""));
+      case "SIGNED" -> List.of(
+          new N06OrderActionDTO("MARK_PICKUP_IN_PROGRESS", "标记提货中", true, ""),
+          new N06OrderActionDTO("CLOSE_ORDER", "关闭订单", true, ""));
+      case "PICKUP_IN_PROGRESS" -> List.of(
+          new N06OrderActionDTO("MARK_RECONCILING", "进入对账", true, ""),
+          new N06OrderActionDTO("CLOSE_ORDER", "关闭订单", true, ""));
+      case "RECONCILING" -> List.of(
+          new N06OrderActionDTO("MARK_COMPLETED", "确认完结", true, ""),
+          new N06OrderActionDTO("CLOSE_ORDER", "关闭订单", true, ""));
+      case "CANCELLED" -> List.of(new N06OrderActionDTO("RESUME_ORDER", "恢复订单", true, ""));
+      default -> List.of();
+    };
+  }
+
+  private String mapOrderActionToStatus(String action) {
+    return switch (safeText(action).toUpperCase()) {
+      case "CONFIRM_SIGNED", "MARK_SIGNED" -> "SIGNED";
+      case "MARK_PICKUP_IN_PROGRESS" -> "PICKUP_IN_PROGRESS";
+      case "MARK_RECONCILING" -> "RECONCILING";
+      case "MARK_COMPLETED", "CONFIRM_COMPLETED" -> "COMPLETED";
+      case "CLOSE_ORDER" -> "CANCELLED";
+      case "RESUME_ORDER" -> "SIGNED";
+      default -> throw new BaseException(ErrorCode.BAD_REQUEST.getCode(), "action 不支持");
+    };
+  }
+
+  private String mapOrderToPickup(String orderStatus) {
+    return switch (safeText(orderStatus).toUpperCase()) {
+      case "PENDING_SIGN" -> "CREATED";
+      case "SIGNED", "PICKUP_IN_PROGRESS" -> "IN_TRANSIT";
+      case "RECONCILING", "COMPLETED" -> "COMPLETED";
+      case "CANCELLED" -> "CANCELLED";
+      default -> "CREATED";
+    };
+  }
+
+  private String mapOrderToReconcile(String orderStatus) {
+    return switch (safeText(orderStatus).toUpperCase()) {
+      case "RECONCILING" -> "PARTIAL_PAID";
+      case "COMPLETED" -> "PAID";
+      case "CANCELLED" -> "DISPUTED";
+      default -> "CREATED";
+    };
+  }
+
+  private String pickupStatusText(String status) {
+    return switch (safeText(status).toUpperCase()) {
+      case "CREATED" -> "待确认";
+      case "IN_TRANSIT" -> "提货中";
+      case "COMPLETED" -> "已完成";
+      case "CANCELLED" -> "已取消";
+      default -> "处理中";
+    };
+  }
+
+  private String reconcileStatusText(String status) {
+    return switch (safeText(status).toUpperCase()) {
+      case "CREATED" -> "待对账";
+      case "PARTIAL_PAID" -> "部分回款";
+      case "PAID" -> "已回款";
+      case "DISPUTED" -> "异常";
+      default -> "处理中";
     };
   }
 }

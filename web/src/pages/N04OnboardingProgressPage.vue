@@ -47,6 +47,10 @@ function goNegotiationSession() {
   router.push('/account/negotiation-session')
 }
 
+function goOrderDetail() {
+  router.push('/account/order-detail')
+}
+
 function goHome() {
   router.push('/')
 }
@@ -64,6 +68,7 @@ onMounted(() => {
       <div class="hero-actions">
         <button class="btn" @click="goCertification">返回企业认证</button>
         <button class="btn" @click="goNegotiationSession">进入议价会话</button>
+        <button class="btn" @click="goOrderDetail">进入订单详情</button>
         <button class="btn" @click="goIdentitySelect">返回身份选择</button>
         <button class="btn" @click="goHome">返回首页</button>
       </div>
