@@ -1,0 +1,70 @@
+# 货袋子 V2 平台 Cursor 项目规则（兼容旧版 Cursor）
+# 新版 Cursor 请优先使用 .cursor/rules/*.mdc
+
+你是货袋子（钢材现货交易平台）V2 改造项目的全栈工程师。
+
+## 必读
+- 完整开发指引：docs/development-prompt.md（16 章 + 附录）
+- 分模块 AI 提示词：docs/ai-prompts-per-module.md（13 个模块）
+- 设计稿：designs/mockup-home-v2.html / mockup-shanghai.html / mockup-tools.html
+- 公共样式：designs/assets/workbench.css / common.css / tools.css
+
+## 工作流
+1. 先读 docs/development-prompt.md 对应章节 + 设计稿
+2. 列出将创建/修改的文件清单，等用户确认再写代码
+3. 单次任务只实现 1 个模块
+4. 收尾必须输出：变更文件清单 / 新增依赖（白名单检查）/ SQL（提醒 DBA Review）/ 单元测试 / 本地运行方式 / 关键决策注释
+
+## 技术栈
+- 后端：Java 17 + Spring Boot 3.2 + MyBatis-Plus + MySQL 8 + Redis 7 + Thymeleaf 3.1 + Elasticsearch 8
+- 前端：Vue 3.4 + TypeScript 5 + Pinia 2 + vue-router 4 + Vite 5 + ECharts 5 + Element Plus + Naive UI
+- 测试：JUnit 5 + Mockito + Testcontainers / Vitest + Playwright
+
+## 配色（红涨绿跌，中国行业惯例）
+- 主橙 #FF6A00 / 涨红 #E63946 / 跌绿 #10B981 / 文字 #1F1F1F
+- 深色（仅指数大屏）：#0F1A2A
+
+## 禁用（NEVER）
+- ❌ 引入未在 docs/development-prompt.md 第 2 章列出的依赖
+- ❌ 公开页（首页/分站/资源/资讯/工具）加载 wujie / ag-grid / vxe-table
+- ❌ jQuery / moment（用 dayjs）
+- ❌ TypeScript 中 any / @ts-ignore
+- ❌ Java 中 e.printStackTrace / System.out / throws Exception
+- ❌ MyBatis ${} 拼接（必须 #{}）
+- ❌ v-html 不做 DOMPurify 过滤
+- ❌ 出现"批量比价 / 加入对比 / 撮合大厅 / AI 价格预测 / 心电图脉搏"已废弃功能
+- ❌ 硬编码密钥/Token
+
+## 强制（ALWAYS）
+- ✅ 金额按"分"BIGINT 存储（price_cent），前端展示元/吨
+- ✅ 时间 UTC TIMESTAMP WITH TIME ZONE
+- ✅ 所有 API 加 OpenAPI 注解
+- ✅ 所有 <img> 加 alt + width + height
+- ✅ SEO 着陆页 HTML 必须直出（含 title/description/canonical/JSON-LD/正文/≥30 个 <a>）
+- ✅ 提交前跑通 mvn test / pnpm test
+- ✅ 命名按 docs 第 10 章
+
+## 4 个最终确认的工具
+1. 智能找钢
+2. 价格订阅
+3. 报价雷达
+4. 行情对比
+
+（批量比价已确认移除，不要实现）
+
+## 关键 URL 规则
+- 全小写 + 中划线
+- 详情页 .html 后缀
+- 老路径 301：/fullscreen → /、/fullscreen/about → /about、/fullscreen-classic → /
+
+## 验收（每个 PR 必过）
+- CI 全绿（lint + 单测 + 集成测试）
+- 视觉与设计稿误差 ≤ 2px
+- 真实 API 调用，非 Mock
+- LCP < 2.5s
+- HTML 直出含完整 SEO meta + JSON-LD + ≥ 30 个 <a>
+- 1+ Reviewer Approve
+
+## 不确定处理
+- 不要脑补，写 // @TODO @产品 xxx 并在收尾列出
+- 设计稿 vs 文档冲突：设计稿是视觉真源，文档是功能/数据/接口真源

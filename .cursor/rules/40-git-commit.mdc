@@ -1,0 +1,66 @@
+---
+description: Git 提交规范与分支策略
+alwaysApply: true
+---
+
+# Git 提交规范
+
+## 分支策略
+- `main`：生产分支（保护，禁止直接 push）
+- `develop`：集成分支
+- `feature/<module>-<desc>`：功能分支，例 `feature/home-index-dashboard`
+- `fix/<module>-<desc>`：修复分支
+- `hotfix/<desc>`：紧急修复
+- `chore/<desc>`：杂项（依赖/配置/文档）
+
+## Commit Message（Conventional Commits）
+```
+<type>(<scope>): <subject>
+
+<body>
+
+<footer>
+```
+
+### type
+- `feat`：新功能
+- `fix`：修复
+- `refactor`：重构（不改功能）
+- `perf`：性能优化
+- `test`：测试
+- `docs`：文档
+- `style`：代码格式（不影响功能）
+- `chore`：构建/依赖/配置
+- `seo`：SEO 专项变更
+
+### scope（项目内常用）
+- `home` / `substation` / `resource` / `news` / `tools-find` / `tools-subscribe` / `tools-radar` / `tools-compare`
+- `seo` / `sitemap` / `mill` / `index` / `ad`
+- `api` / `db` / `cache` / `nginx`
+
+### 示例
+- `feat(home): 实现钢材指数大屏组件`
+- `feat(tools-find): 添加 AI 自然语言解析接口`
+- `fix(seo): 修复分站 canonical 错误`
+- `perf(home): 首页 JS chunk 体积从 380KB 优化到 195KB`
+- `docs(dev): 更新 API 接口表`
+
+## PR 要求
+- 标题用 commit message 同款格式
+- 描述必须包含：① 需求/Issue 链接 ② 变更点列表 ③ 截图/录屏（UI 变更必加） ④ 自测清单
+- 必须 1+ Reviewer Approve
+- 必须 CI 全绿（lint + 单测 + 集成测试 + Lighthouse SEO ≥ 90）
+- 必须关联 Issue 编号 `Closes #123`
+
+## 提交前必做
+- 后端：`mvn clean test` 全绿
+- 前端：`pnpm lint && pnpm typecheck && pnpm test` 全绿
+- SEO 变更：用 Baiduspider UA curl 验证 HTML 直出
+- 数据库变更：DBA 已 Review SQL
+
+## 禁止
+- ❌ 直接 push 到 `main` / `develop`
+- ❌ commit message 用 `update` `fix bug` `wip` 等模糊词
+- ❌ 一个 commit 混多个无关变更
+- ❌ 提交 node_modules / target / .env / *.log
+- ❌ 提交未运行测试的代码

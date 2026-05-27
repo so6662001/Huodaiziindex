@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="zh-cmn-Hans">
+<head>
+<meta charset="UTF-8">
+<title>货袋子 - 设计稿索引</title>
+<link rel="stylesheet" href="./assets/common.css">
+<style>
+.box{max-width:920px;margin:50px auto;background:#fff;padding:40px;border-radius:8px;box-shadow:0 4px 24px rgba(0,0,0,.06)}
+h1{font-size:26px;margin-bottom:8px}
+.sub{color:var(--c-text-2);margin-bottom:30px}
+.list a{display:flex;justify-content:space-between;align-items:center;padding:18px 20px;border:1px solid var(--c-line);border-radius:6px;margin-bottom:12px;text-decoration:none;color:var(--c-text)}
+.list a:hover{border-color:var(--c-primary);background:var(--c-primary-bg)}
+.list a .t{font-size:16px;font-weight:600}
+.list a .d{color:var(--c-text-2);font-size:13px;margin-top:4px}
+.list a .arrow{color:var(--c-primary);font-size:20px}
+.tip{background:#FFF4EC;border-left:4px solid var(--c-primary);padding:12px 16px;font-size:13px;color:var(--c-text-2);border-radius:4px;margin-top:24px}
+.reco{border-color:var(--c-primary) !important;background:var(--c-primary-bg) !important}
+.reco .t{color:var(--c-primary) !important;font-size:17px !important}
+.dark{background:linear-gradient(135deg,#0F1A2A,#0A1320);color:#fff;border-color:#FF6A00 !important}
+.dark .t{color:#FF8533 !important}
+.dark .d{color:#8AA3BD !important}
+.dark .arrow{color:#FF8533 !important}
+</style>
+</head>
+<body>
+<div class="box">
+  <h1>货袋子 · 视觉稿（HTML 高保真版）</h1>
+  <div class="sub">v1 门户 → v2 工作台 → v3 终端 → v4 行情中心（专业版）四版迭代对比</div>
+
+  <div class="list">
+    <a href="./mockup-home-v4.html" target="_blank" class="reco">
+      <div>
+        <div class="t">⭐ 首页 v4「行情中心 · 专业版」mockup-home-v4.html ← 最新推荐</div>
+        <div class="d">浅色专业版 · 顶部深色指数大屏 · K线+雷达 · 3D 钢材品类 · 中国价格地图 · 钢厂出厂价/调价快报（代替撮合）· 20 城价差监控 · 智能找钢漏斗 · 多空对比 · 钢厂动态</div>
+      </div>
+      <div class="arrow">→</div>
+    </a>
+    <a href="./mockup-home-v3.html" target="_blank" class="dark">
+      <div>
+        <div class="t">v3 钢市作战大厅（暗色终端版，参考）</div>
+        <div class="d">全暗模式 · K线 · 雷达 · 中国地图脉冲 · 撮合大厅 · AI 预测 · 心电图脉搏（钢贸用户可能偏年轻人风）</div>
+      </div>
+      <div class="arrow">→</div>
+    </a>
+    <a href="./mockup-home-v2.html" target="_blank">
+      <div>
+        <div class="t">v2 工作台风格（参考）</div>
+        <div class="d">钢材指数大屏 · 三栏作战台 · 涨跌双榜 · 热力图</div>
+      </div>
+      <div class="arrow">→</div>
+    </a>
+    <a href="./mockup-home.html" target="_blank">
+      <div>
+        <div class="t">v1 门户风格（参考）</div>
+        <div class="d">扁平 Banner · 列表行资源 · 20 城市瓷砖</div>
+      </div>
+      <div class="arrow">→</div>
+    </a>
+    <a href="./mockup-shanghai.html" target="_blank" class="reco">
+      <div>
+        <div class="t">🏙️ 上海分站（v2 工作台风格）mockup-shanghai.html ← 最新</div>
+        <div class="d">本地化指数大屏 + 6 个广告位 + 三栏作战台 + 钢厂在沪代理价 + 长三角热力图 + 本地资讯 + SEO 文字区</div>
+      </div>
+      <div class="arrow">→</div>
+    </a>
+    <a href="./mockup-tools.html" target="_blank" class="reco">
+      <div>
+        <div class="t">⚙️ 4 大工具详细设计（基于 v2 工作台版）mockup-tools.html ← 最新</div>
+        <div class="d">🎯 智能找钢 · 🔔 价格订阅 · 📡 报价雷达 · 📊 行情对比 全部工具页详细设计（暂不提供批量比价）</div>
+      </div>
+      <div class="arrow">→</div>
+    </a>
+  </div>
+
+  <div class="tip">
+    📌 v2 工作台版已最终定稿（首页 + 4 工具 + 上海分站），可直接进入编码。
+  </div>
+
+  <div style="margin-top:30px;padding:20px;background:#FFF4EC;border:1px solid #FFD2A6;border-radius:6px">
+    <h3 style="font-size:16px;color:var(--c-primary);margin-bottom:12px">📚 开发提示词文档（给开发团队 / AI 编程助手）</h3>
+    <div class="list">
+      <a href="../docs/cursor-usage-guide.md" target="_blank" style="margin-bottom:8px;background:#FFF4EC;border-color:var(--c-primary)">
+        <div>
+          <div class="t" style="color:var(--c-primary)">🎯 docs/cursor-usage-guide.md ← 开发先读这个</div>
+          <div class="d">Cursor 实操指南：5 步法 / 三种开发模式 / 10 个高效技巧 / 端到端示例 / 常见踩坑</div>
+        </div>
+        <div class="arrow">→</div>
+      </a>
+      <a href="../docs/development-prompt.md" target="_blank" style="margin-bottom:8px">
+        <div>
+          <div class="t" style="color:var(--c-primary)">📘 docs/development-prompt.md</div>
+          <div class="d">完整开发指引（16 章 + 附录）：技术栈/数据模型/API/SEO 架构/URL 规则/代码规范/里程碑/验收清单</div>
+        </div>
+        <div class="arrow">→</div>
+      </a>
+      <a href="../docs/ai-prompts-per-module.md" target="_blank">
+        <div>
+          <div class="t" style="color:var(--c-primary)">🤖 docs/ai-prompts-per-module.md</div>
+          <div class="d">13 个分模块 AI 编程提示词（可直接复制给 Cursor / Claude / Copilot 使用）</div>
+        </div>
+        <div class="arrow">→</div>
+      </a>
+    </div>
+    <div style="margin-top:14px;padding:12px;background:#fff;border:1px dashed var(--c-primary);border-radius:4px;font-size:12px;color:#6B6B6B;line-height:1.7">
+      <strong style="color:var(--c-primary)">.cursor/rules/ 项目规则（已就绪）</strong><br>
+      把代码克隆到本地后，在 Cursor 打开项目，规则文件会自动生效：<br>
+      · <code>.cursor/rules/00-core.mdc</code> · 核心约束（始终生效）<br>
+      · <code>.cursor/rules/10-backend-java.mdc</code> · Java 文件触发<br>
+      · <code>.cursor/rules/20-frontend-vue.mdc</code> · Vue/TS 文件触发<br>
+      · <code>.cursor/rules/30-seo.mdc</code> · SEO 相关文件触发<br>
+      · <code>.cursor/rules/40-git-commit.mdc</code> · Git 提交规范<br>
+      · <code>.cursorrules</code> · 兼容旧版本
+    </div>
+  </div>
+</div>
+</body>
+</html>

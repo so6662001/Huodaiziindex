@@ -1,0 +1,89 @@
+---
+description: SEO 着陆页与 sitemap 规范
+globs: ["**/seo/**/*.java", "**/templates/seo/**/*.html", "**/sitemap*.xml", "**/robots.txt"]
+---
+
+# SEO 着陆页与 sitemap 规范
+
+## 渲染方式
+- 公开页采用 **Java + Thymeleaf SSR**（仅给爬虫看，Nginx 按 UA 分流）
+- 普通用户走 Vue3 SPA
+- 完整方案见 `docs/development-prompt.md` 第 6 章
+
+## 每个 SEO 模板必须包含
+1. `<title>` 含核心关键词，长度 ≤ 60 字
+2. `<meta name="description">` ≤ 160 字
+3. `<meta name="keywords">` 5-10 个关键词
+4. `<link rel="canonical" href="...">` 指向规范 URL
+5. 完整 og:* 与 twitter:* meta
+6. JSON-LD（必含 `Organization` + `WebSite`，详情页加 `Product` / `LocalBusiness` / `NewsArticle`；列表/详情都加 `BreadcrumbList`）
+7. 正文直出（所有数据由后端渲染）
+8. 内链 ≥ 30 个业务 `<a href>`
+9. 所有 `<img>` 必填 `alt` + `width` + `height`
+
+## 7 个 SEO Controller（必做）
+1. `HomeSeoController` GET /
+2. `CategorySeoController` GET /resource[/{cat}]
+3. `ResourceSeoController` GET /resource/{slug}.html
+4. `ShopSeoController` GET /shop/{id}
+5. `SubstationSeoController` GET /s/{cityCode}
+6. `NewsSeoController` GET /news[/{cat}], /news/{id}.html
+7. `AboutSeoController` GET /about, /help, /join
+
+## URL 规则（与 docs/development-prompt.md 第 7 章一致）
+- 全小写 + 中划线分词
+- 详情页 `.html` 后缀（百度偏好）
+- slug 含核心关键词（如 `rebar-hrb400e-d20-shanghai-202605`）
+
+## 老路径 301（Nginx 层处理）
+- `/fullscreen` → `/`
+- `/fullscreen/about` → `/about`
+- `/fullscreen-classic` → `/`
+- `/home/*` → `/`（或 410）
+
+## Sitemap 结构
+```
+/sitemap.xml             ← 索引
+├── /sitemap-static.xml
+├── /sitemap-resource.xml   每片 ≤ 50000 URLs
+├── /sitemap-shop.xml
+├── /sitemap-site.xml
+├── /sitemap-news.xml       Google News Sitemap 规范
+└── /sitemap-category.xml
+```
+
+## 站长平台
+- 百度普通收录 API：发文/发资源时实时推送
+- 百度快速收录（如开通）
+- Bing IndexNow
+- 推送日志写 `t_seo_push_log`，失败重试 + 钉钉告警
+
+## robots.txt 内容
+```
+User-agent: *
+Allow: /
+Allow: /s/
+Allow: /resource/
+Allow: /shop/
+Allow: /news/
+Disallow: /login
+Disallow: /auth_redirect
+Disallow: /home/
+Disallow: /api/
+Disallow: /fullscreen-classic
+Sitemap: https://www.huodaizi.com/sitemap.xml
+```
+
+## 验证清单（每个 SEO PR 必须通过）
+- [ ] `curl -A "Baiduspider/2.0" https://...` 返回完整 HTML（含 title/description/正文/JSON-LD/≥ 30 个 `<a>`）
+- [ ] 用 Schema.org Validator 验证 JSON-LD 通过
+- [ ] Lighthouse SEO 分数 ≥ 90
+- [ ] 老路径 301 全部生效
+- [ ] sitemap.xml 可访问且格式正确
+
+## 禁止做
+- ❌ SEO 着陆页里使用 JS 异步加载数据（必须 SSR 直出）
+- ❌ SEO 模板里出现 `<div id="app"></div>` 空壳
+- ❌ 加载 wujie / ag-grid / vxe-table
+- ❌ 重复 canonical 或缺失 canonical
+- ❌ title/description 在不同页面完全一样

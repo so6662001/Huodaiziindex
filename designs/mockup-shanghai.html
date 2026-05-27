@@ -1,0 +1,688 @@
+<!doctype html>
+<html lang="zh-cmn-Hans">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280">
+<title>上海钢材现货价格今日报价_上海钢贸商家_货袋子上海分站</title>
+<meta name="keywords" content="上海钢材,上海螺纹钢,上海热轧卷板,上海冷轧板,上海钢贸,上海钢材市场,宝山钢市,货袋子上海站,长三角钢材">
+<meta name="description" content="货袋子上海分站，提供上海螺纹钢、热轧卷板、冷轧板、中厚板、镀锌板等钢材现货实时报价，覆盖宝山、浦东、嘉定、青浦等钢材市场，对接上海优质钢贸商家。">
+<link rel="stylesheet" href="./assets/common.css">
+<link rel="stylesheet" href="./assets/workbench.css">
+<style>
+/* === 上海分站专属（本地化 + 广告位） === */
+body.wb{background:#F1F2F5}
+
+/* 上海标签 */
+.sh-tag{display:inline-block;background:linear-gradient(90deg,#FF6A00,#FF8533);color:#fff;font-size:11px;padding:2px 8px;border-radius:3px;margin-left:8px;vertical-align:2px;font-weight:700;letter-spacing:1px}
+
+/* 广告位通栏（顶部 + 中部 + 商家下方） */
+.sh-ad-banner{position:relative;background:linear-gradient(120deg,#2A1810 0%,#4A2400 40%,#FF6A00 100%);color:#fff;height:120px;border-radius:6px;margin-top:14px;display:flex;align-items:center;padding:0 36px;overflow:hidden}
+.sh-ad-banner:after{content:"广告 AD";position:absolute;top:8px;right:10px;background:rgba(0,0,0,.4);color:#fff;font-size:10px;padding:1px 6px;border-radius:2px;letter-spacing:1px;z-index:2}
+.sh-ad-banner .ic{font-size:48px;margin-right:24px;opacity:.95}
+.sh-ad-banner .body{flex:1}
+.sh-ad-banner .title{font-size:22px;font-weight:800;letter-spacing:1px}
+.sh-ad-banner .desc{font-size:13px;opacity:.9;margin-top:6px}
+.sh-ad-banner .phone{background:#fff;color:var(--c-primary);padding:10px 20px;border-radius:4px;font-weight:700;font-size:15px;font-family:"DIN","Helvetica Neue",sans-serif}
+
+.sh-ad-thin{position:relative;background:linear-gradient(90deg,#FFF4EC 0%,#FFE0C8 50%,#FFF4EC 100%);border:1px solid #FFD2A6;border-radius:6px;height:80px;padding:0 28px;display:flex;align-items:center;margin-top:14px}
+.sh-ad-thin:after{content:"广告 AD";position:absolute;top:6px;right:8px;background:rgba(0,0,0,.4);color:#fff;font-size:10px;padding:1px 5px;border-radius:2px;letter-spacing:1px}
+.sh-ad-thin .ic{font-size:34px;margin-right:18px}
+.sh-ad-thin .body{flex:1}
+.sh-ad-thin .t{font-size:16px;font-weight:700;color:var(--c-primary)}
+.sh-ad-thin .d{font-size:12px;color:#6B6B6B;margin-top:3px}
+.sh-ad-thin .b{background:var(--c-primary);color:#fff;padding:8px 18px;border-radius:4px;font-size:13px;font-weight:600}
+.sh-ad-thin .b:hover{background:var(--c-primary-dark)}
+
+/* 右侧侧边广告 */
+.sh-side-ad{position:relative;background:#fff;border:1px solid var(--c-line);border-radius:4px;overflow:hidden}
+.sh-side-ad:after{content:"广告 AD";position:absolute;top:6px;right:6px;background:rgba(0,0,0,.35);color:#fff;font-size:9px;padding:1px 5px;border-radius:2px;letter-spacing:1px;z-index:2}
+.sh-side-ad .img{height:90px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:14px;text-align:center;padding:0 10px;line-height:1.4;letter-spacing:1px}
+.sh-side-ad .body{padding:10px 12px}
+.sh-side-ad .t{font-size:13px;font-weight:700;color:var(--c-text);margin-bottom:3px}
+.sh-side-ad .d{font-size:11px;color:#6B6B6B;line-height:1.5}
+.sh-side-ad .b{display:inline-block;margin-top:6px;color:#fff;background:var(--c-primary);font-size:11px;padding:3px 10px;border-radius:2px;font-weight:600}
+
+/* 钢厂在沪代理 表 */
+.shmill-tbl{width:100%;border-collapse:collapse;font-size:13px}
+.shmill-tbl thead th{background:#FAFBFC;color:#6B6B6B;font-weight:500;padding:9px 12px;text-align:left;font-size:12px;border-bottom:1px solid var(--c-line)}
+.shmill-tbl thead th.num{text-align:right}
+.shmill-tbl tbody td{padding:10px 12px;border-bottom:1px solid #F0F0F0;vertical-align:middle}
+.shmill-tbl tbody tr:hover{background:#FFF8F1}
+.shmill-tbl .num{text-align:right;font-family:"DIN","Helvetica Neue",sans-serif}
+.shmill-tbl .nm{font-weight:700;color:var(--c-text);font-size:14px}
+.shmill-tbl .nm small{display:block;color:#9CA3AF;font-weight:400;font-size:11px;margin-top:2px}
+.shmill-tbl .px{font-weight:800;color:var(--c-text);font-size:15px}
+.shmill-tbl .d{font-weight:700;font-size:12px}
+.shmill-tbl .d.up{color:var(--c-up)}
+.shmill-tbl .d.down{color:var(--c-down)}
+.shmill-tbl .d.flat{color:#9CA3AF}
+.shmill-tbl .tg{display:inline-block;font-size:11px;padding:2px 7px;border-radius:2px;font-weight:600}
+.shmill-tbl .tg.up{background:#FEE2E2;color:var(--c-up)}
+.shmill-tbl .tg.flat{background:#F3F4F6;color:#6B7280}
+
+/* 长三角热力（精简版） */
+.sh-heat{display:grid;grid-template-columns:repeat(6,1fr);gap:1px;background:#E5E7EB;padding:1px}
+.sh-hm{display:block;padding:12px 14px;background:#fff;color:var(--c-text);transition:all .15s;position:relative}
+.sh-hm:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.08);z-index:2}
+.sh-hm-t{font-size:14px;font-weight:700;display:flex;align-items:center;gap:6px}
+.sh-hm-b{font-size:10px;background:var(--c-primary);color:#fff;padding:1px 5px;border-radius:2px;font-weight:600}
+.sh-hm-p{font-size:17px;font-weight:800;margin-top:3px;font-family:"DIN","Helvetica Neue",sans-serif}
+.sh-hm-p.up{color:var(--c-up)}.sh-hm-p.down{color:var(--c-down)}.sh-hm-p.flat{color:var(--c-text)}
+.sh-hm-r{font-size:11px;color:#6B6B6B;margin-top:2px}
+.sh-hm.l1{background:#FFEBD8}
+.sh-hm.l2{background:#FFD0A6}
+.sh-hm.l3{background:#FFA961;color:#fff}
+.sh-hm.l3 .sh-hm-r{color:rgba(255,255,255,.85)}
+.sh-hm.l3 .sh-hm-b{background:rgba(0,0,0,.18)}
+.sh-hm.l4{background:#FF8533;color:#fff}
+.sh-hm.l4 .sh-hm-r{color:rgba(255,255,255,.85)}
+.sh-hm.l4 .sh-hm-b{background:rgba(0,0,0,.18)}
+.sh-hm.l5{background:#E55A00;color:#fff}
+.sh-hm.l5 .sh-hm-r{color:rgba(255,255,255,.9)}
+.sh-hm.l5 .sh-hm-b{background:rgba(0,0,0,.2)}
+
+/* 仓库 list */
+.sh-wh-list li a{display:flex;justify-content:space-between;align-items:center;padding:8px 14px;font-size:13px;color:var(--c-text)}
+.sh-wh-list li a:hover{background:var(--c-primary-bg);color:var(--c-primary)}
+.sh-wh-list li a i{font-style:normal;font-size:11px;color:#9CA3AF;font-family:"DIN","Helvetica Neue",sans-serif}
+
+/* SEO 文字区（沿用 v1，浅色） */
+.sh-seo{background:#fff;border:1px solid var(--c-line);border-radius:6px;padding:20px 24px;margin-top:14px}
+.sh-seo h2{font-size:18px;color:var(--c-text);margin-bottom:10px;font-weight:700}
+.sh-seo h2:before{content:"";display:inline-block;width:4px;height:16px;background:var(--c-primary);vertical-align:-2px;margin-right:8px;border-radius:2px}
+.sh-seo p{color:#6B6B6B;font-size:13px;line-height:1.9}
+.sh-seo p a{color:var(--c-primary)}
+.sh-seo p strong{color:var(--c-text)}
+.sh-seo .links{margin-top:12px;color:#6B6B6B;font-size:13px;padding-top:10px;border-top:1px dashed var(--c-line)}
+.sh-seo .links strong{color:var(--c-text)}
+.sh-seo .links a{margin:0 5px;color:#6B6B6B}
+.sh-seo .links a:hover{color:var(--c-primary)}
+</style>
+</head>
+<body class="wb">
+
+<!-- 顶部条 -->
+<div class="topbar">
+  <div class="wrap">
+    <div class="left">
+      <a class="city">📍 上海站</a>
+      <a>切换城市 ▾</a>
+      <a>← 返回总站</a>
+      <span style="margin-left:14px">上海钢材现货交易工作台</span>
+    </div>
+    <div class="right">
+      <a>登录</a><span>|</span><a>注册</a><span>|</span><a>下载APP</a><span>|</span><a>商家入驻</a><span>|</span><a>API</a><span>|</span><a>客服 400-888-xxxx</a>
+    </div>
+  </div>
+</div>
+
+<!-- Header -->
+<header class="header header-wb">
+  <div class="wrap">
+    <div class="logo">
+      <div class="mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><ellipse cx="12" cy="6" rx="8" ry="2.5"/><path d="M4 6v12c0 1.4 3.6 2.5 8 2.5s8-1.1 8-2.5V6"/><path d="M4 12c0 1.4 3.6 2.5 8 2.5s8-1.1 8-2.5"/></svg>
+      </div>
+      <div>
+        <div class="name">货袋子<span class="sh-tag">SHANGHAI</span></div>
+      </div>
+      <div class="sub">HUODAIZI<br>上海钢材现货平台</div>
+    </div>
+    <div class="search search-pro">
+      <select><option>上海资源</option><option>上海求购</option><option>上海商家</option><option>上海资讯</option></select>
+      <input placeholder="搜索上海本地钢材：螺纹 HRB400E φ20 宝山">
+      <button>🔍 搜 索</button>
+    </div>
+    <div class="qtools">
+      <a class="qt hot"><span class="qt-i">🎯</span><span>智能找钢</span></a>
+      <a class="qt"><span class="qt-i">🔔</span><span>价格订阅</span></a>
+      <a class="qt"><span class="qt-i">📡</span><span>报价雷达</span></a>
+      <a class="qt"><span class="qt-i">📊</span><span>行情对比</span></a>
+    </div>
+  </div>
+</header>
+
+<!-- Nav -->
+<nav class="nav">
+  <div class="wrap">
+    <a class="active">上海首页</a>
+    <a>上海资源</a>
+    <a>上海求购</a>
+    <a>上海行情</a>
+    <a>钢厂在沪代理</a>
+    <a>上海商家</a>
+    <a>上海资讯</a>
+    <a>全国分站</a>
+    <a>关于</a>
+  </div>
+</nav>
+
+<!-- ========== 上海钢市指数大屏（深色） ========== -->
+<section class="ticker">
+  <div class="wrap">
+    <div class="ticker-grid">
+
+      <!-- 上海综合指数 -->
+      <div class="t-cell t-main">
+        <div class="t-tag">上海钢材综合指数</div>
+        <div class="t-row">
+          <div class="t-big up">3,712</div>
+          <div class="t-delta up">+22 +0.60%</div>
+        </div>
+        <svg class="t-spark" viewBox="0 0 280 56" preserveAspectRatio="none">
+          <defs><linearGradient id="sgrad" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#E63946" stop-opacity=".5"/><stop offset="1" stop-color="#E63946" stop-opacity="0"/></linearGradient></defs>
+          <path d="M0,40 L20,38 40,42 60,32 80,36 100,28 120,30 140,22 160,26 180,18 200,22 220,14 240,18 260,10 280,12 L280,56 L0,56 Z" fill="url(#sgrad)"/>
+          <polyline fill="none" stroke="#E63946" stroke-width="1.8" points="0,40 20,38 40,42 60,32 80,36 100,28 120,30 140,22 160,26 180,18 200,22 220,14 240,18 260,10 280,12"/>
+        </svg>
+        <div class="t-foot">华东第一大现货市场 · 累计成交 152.6 万吨</div>
+      </div>
+
+      <!-- 4 品类（上海现货均价） -->
+      <div class="t-cell"><div class="t-tag">螺纹 HRB400E φ20</div><div class="t-mid up">3,680</div><div class="t-d up">+20 ↑ +0.55%</div><svg class="t-mini" viewBox="0 0 100 24"><polyline fill="none" stroke="#FF8533" stroke-width="1.5" points="0,18 12,15 24,16 36,12 48,14 60,9 72,11 84,6 100,4"/></svg></div>
+      <div class="t-cell"><div class="t-tag">热卷 Q235B 5.75</div><div class="t-mid down">3,520</div><div class="t-d down">−10 ↓ −0.28%</div><svg class="t-mini" viewBox="0 0 100 24"><polyline fill="none" stroke="#2BA471" stroke-width="1.5" points="0,6 12,9 24,8 36,12 48,11 60,15 72,14 84,17 100,18"/></svg></div>
+      <div class="t-cell"><div class="t-tag">冷轧 SPCC 1.0</div><div class="t-mid up">4,150</div><div class="t-d up">+5 ↑ +0.12%</div><svg class="t-mini" viewBox="0 0 100 24"><polyline fill="none" stroke="#FF8533" stroke-width="1.5" points="0,14 12,12 24,13 36,10 48,11 60,9 72,10 84,8 100,7"/></svg></div>
+      <div class="t-cell"><div class="t-tag">中厚板 Q235B 20</div><div class="t-mid flat">3,780</div><div class="t-d flat">持平 →</div><svg class="t-mini" viewBox="0 0 100 24"><polyline fill="none" stroke="#888" stroke-width="1.5" points="0,12 12,11 24,12 36,11 48,12 60,11 72,12 84,11 100,12"/></svg></div>
+
+      <!-- 上海速报 -->
+      <div class="t-cell t-dist">
+        <div class="t-tag">上海速报</div>
+        <ul class="t-stats-list" style="margin-top:4px">
+          <li><span>本地新发资源</span><b class="up">486 条</b></li>
+          <li><span>本地在售</span><b>5.2 万条</b></li>
+          <li><span>钢厂在沪代理</span><b class="up">12 家</b></li>
+        </ul>
+      </div>
+
+      <!-- 上海市场 -->
+      <div class="t-cell t-stats">
+        <div class="t-tag">市场分布</div>
+        <ul class="t-stats-list" style="margin-top:4px">
+          <li><span>宝山钢市</span><b>2.4 万</b></li>
+          <li><span>浦东外高桥</span><b>1.3 万</b></li>
+          <li><span>嘉定/青浦/松江</span><b>1.5 万</b></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 滚动 ticker（上海本地资源） -->
+    <div class="ticker-stream">
+      <span class="ts-label">上海资源</span>
+      <div class="ts-track">
+        <span><b>螺纹φ20·沙钢·宝山</b> <em class="up">3680 +20</em></span>
+        <span><b>热卷5.75·本钢·外高桥</b> <em class="down">3520 −10</em></span>
+        <span><b>线材φ8·永钢·宝山</b> <em class="up">3720 +15</em></span>
+        <span><b>冷轧1.0·武钢·浦东</b> <em class="up">4150 +5</em></span>
+        <span><b>中厚板20·鞍钢·嘉定</b> <em class="flat">4180 持平</em></span>
+        <span><b>镀锌1.0·首钢·宝山</b> <em class="up">4520 +30</em></span>
+        <span><b>盘螺φ8·日照·宝山</b> <em class="down">3710 −5</em></span>
+        <span><b>角钢50·马钢·青浦</b> <em class="up">3850 +10</em></span>
+        <span><b>H型钢200·马钢·宝山</b> <em class="up">3950 +12</em></span>
+        <span><b>无缝管108·包钢·浦东</b> <em class="down">4680 −15</em></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== ① 顶部广告通栏 ========== -->
+<div class="wrap">
+  <div class="sh-ad-banner">
+    <div class="ic">🏭</div>
+    <div class="body">
+      <div class="title">沙钢上海直营仓 · 万吨现货 · 当日提货</div>
+      <div class="desc">宝山钢市 A 区中心仓 · 螺纹 / 热卷 / 冷轧 全品类直供 · 价格直降 ¥30/吨 · 5 月限时优惠</div>
+    </div>
+    <div class="phone">📞 138-xxxx-xxxx</div>
+  </div>
+</div>
+
+<!-- ========== 三栏作战台 ========== -->
+<section class="workbench">
+  <div class="wrap wb-grid">
+
+    <!-- 左 -->
+    <aside class="wb-left">
+
+      <div class="panel">
+        <div class="panel-h"><span>找钢工具</span><a class="more">全部 →</a></div>
+        <div class="tools-grid">
+          <a class="tool hot"><span class="ic">🎯</span><div><div class="n">智能找钢</div><div class="d">AI 本地资源</div></div></a>
+          <a class="tool"><span class="ic">🔔</span><div><div class="n">价格订阅</div><div class="d">本地行情推送</div></div></a>
+          <a class="tool"><span class="ic">📡</span><div><div class="n">报价雷达</div><div class="d">本地求购撮合</div></div></a>
+          <a class="tool"><span class="ic">📊</span><div><div class="n">行情对比</div><div class="d">长三角联动</div></div></a>
+          <a class="tool new"><span class="ic">📦</span><div><div class="n">库存核仓</div><div class="d">本地仓库验货</div></div></a>
+          <a class="tool"><span class="ic">🚚</span><div><div class="n">同城物流</div><div class="d">上海 4 小时达</div></div></a>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-h"><span>上海热门品类</span><a class="more">全部 →</a></div>
+        <ul class="cat-list">
+          <li><a><span>螺纹钢</span><i class="up">1,486</i></a></li>
+          <li><a><span>热轧卷板</span><i class="up">2,420</i></a></li>
+          <li><a><span>线材</span><i class="up">920</i></a></li>
+          <li><a><span>盘螺</span><i class="down">640</i></a></li>
+          <li><a><span>冷轧板</span><i class="up">980</i></a></li>
+          <li><a><span>中厚板</span><i class="flat">820</i></a></li>
+          <li><a><span>镀锌板</span><i class="up">540</i></a></li>
+          <li><a><span>型钢</span><i class="up">480</i></a></li>
+          <li><a><span>管材</span><i class="down">390</i></a></li>
+        </ul>
+      </div>
+
+      <div class="panel">
+        <div class="panel-h"><span>上海主要钢市</span><a class="more">全部 →</a></div>
+        <ul class="sh-wh-list">
+          <li><a><span><span class="badge-mini">主</span>宝山钢市 A 区</span><i>2.4 万</i></a></li>
+          <li><a><span>宝山钢市 B / C 区</span><i>1.2 万</i></a></li>
+          <li><a><span>宝山宝业仓</span><i>0.8 万</i></a></li>
+          <li><a><span>浦东外高桥保税</span><i>1.3 万</i></a></li>
+          <li><a><span>嘉定钢市</span><i>0.6 万</i></a></li>
+          <li><a><span>青浦钢材城</span><i>0.5 万</i></a></li>
+          <li><a><span>松江工业仓储</span><i>0.4 万</i></a></li>
+        </ul>
+      </div>
+
+    </aside>
+
+    <!-- 中 -->
+    <main class="wb-main">
+
+      <!-- 上海资源流 -->
+      <div class="panel">
+        <div class="panel-tabs">
+          <a class="active">⚡ 上海热门资源</a>
+          <a>📈 涨幅榜</a>
+          <a>📉 跌幅榜</a>
+          <a>🔥 热度榜</a>
+          <a>🆕 新发</a>
+          <div class="panel-tabs-r">
+            <span class="live"><i></i>实时</span>
+            <a class="ic-btn">⟲</a>
+          </div>
+        </div>
+
+        <div class="filterbar">
+          <select><option>品类 全部</option></select>
+          <select><option>材质 全部</option></select>
+          <select><option>产地 全部</option></select>
+          <select><option>区域 全部</option><option>宝山</option><option>浦东</option><option>嘉定</option><option>青浦</option></select>
+          <select><option>仓库 全部</option></select>
+          <input class="range" placeholder="价格区间 ¥3000 ~ ¥5000">
+          <button class="btn-solid sm">应用</button>
+          <a class="link">💾 保存方案 + 订阅</a>
+        </div>
+
+        <table class="stream">
+          <thead>
+            <tr><th style="width:18px"></th><th>品名 · 规格</th><th>材质</th><th>产地</th><th>仓库</th><th class="num">库存</th><th class="num">现价</th><th class="num">涨跌</th><th class="num">趋势</th><th>发布</th><th></th></tr>
+          </thead>
+          <tbody>
+            <tr><td><span class="fav">★</span></td><td><b>螺纹钢 φ20×9000</b><small>HRB400E 国标</small></td><td>HRB400E</td><td><span class="tag-mini">沙钢</span></td><td>上海·宝山 A 区</td><td class="num">286 吨</td><td class="num price-cell up">3680</td><td class="num up">+20 ↑0.55%</td><td><svg class="rs" viewBox="0 0 60 20"><polyline fill="none" stroke="#E63946" stroke-width="1.4" points="0,14 10,12 20,13 30,8 40,10 50,5 60,3"/></svg></td><td class="t-c">8 分钟前</td><td><a class="btn-solid xs">询价</a></td></tr>
+            <tr><td><span class="fav on">★</span></td><td><b>热轧卷板 5.75×1500×C</b><small>开平定尺</small></td><td>Q235B</td><td><span class="tag-mini">本钢</span></td><td>上海·外高桥</td><td class="num">1240 吨</td><td class="num price-cell down">3520</td><td class="num down">−10 ↓0.28%</td><td><svg class="rs" viewBox="0 0 60 20"><polyline fill="none" stroke="#2BA471" stroke-width="1.4" points="0,5 10,7 20,6 30,10 40,9 50,13 60,15"/></svg></td><td class="t-c">22 分钟前</td><td><a class="btn-solid xs">询价</a></td></tr>
+            <tr><td><span class="fav">★</span></td><td><b>线材 φ8 盘卷</b><small>10 吨/卷</small></td><td>HPB300</td><td><span class="tag-mini">永钢</span></td><td>上海·宝山 B 区</td><td class="num">520 吨</td><td class="num price-cell up">3720</td><td class="num up">+15 ↑0.40%</td><td><svg class="rs" viewBox="0 0 60 20"><polyline fill="none" stroke="#E63946" stroke-width="1.4" points="0,15 10,13 20,14 30,10 40,11 50,7 60,5"/></svg></td><td class="t-c">35 分钟前</td><td><a class="btn-solid xs">询价</a></td></tr>
+            <tr><td><span class="fav">★</span></td><td><b>冷轧板 1.0×1250×C</b><small>原厂塑封</small></td><td>SPCC</td><td><span class="tag-mini">武钢</span></td><td>上海·浦东外高桥</td><td class="num">340 吨</td><td class="num price-cell up">4150</td><td class="num up">+5 ↑0.12%</td><td><svg class="rs" viewBox="0 0 60 20"><polyline fill="none" stroke="#E63946" stroke-width="1.4" points="0,12 10,10 20,11 30,9 40,10 50,7 60,6"/></svg></td><td class="t-c">48 分钟前</td><td><a class="btn-solid xs">询价</a></td></tr>
+            <tr><td><span class="fav">★</span></td><td><b>中厚板 20×2200×C</b><small>切割可定尺</small></td><td>Q345B</td><td><span class="tag-mini">鞍钢</span></td><td>上海·嘉定钢市</td><td class="num">860 吨</td><td class="num price-cell flat">4180</td><td class="num flat">持平</td><td><svg class="rs" viewBox="0 0 60 20"><polyline fill="none" stroke="#888" stroke-width="1.4" points="0,10 10,9 20,10 30,9 40,10 50,9 60,10"/></svg></td><td class="t-c">1 小时前</td><td><a class="btn-solid xs">询价</a></td></tr>
+            <tr><td><span class="fav">★</span></td><td><b>镀锌板 DX51D+Z 1.0×1250</b><small>锌层 80g</small></td><td>DX51D</td><td><span class="tag-mini">首钢</span></td><td>上海·宝山宝业</td><td class="num">180 吨</td><td class="num price-cell up">4520</td><td class="num up">+30 ↑0.67%</td><td><svg class="rs" viewBox="0 0 60 20"><polyline fill="none" stroke="#E63946" stroke-width="1.4" points="0,14 10,12 20,13 30,8 40,9 50,4 60,2"/></svg></td><td class="t-c">1 小时前</td><td><a class="btn-solid xs">询价</a></td></tr>
+            <tr><td><span class="fav">★</span></td><td><b>盘螺 φ8</b><small>HRB400E</small></td><td>HRB400E</td><td><span class="tag-mini">日照</span></td><td>上海·宝山 C 区</td><td class="num">720 吨</td><td class="num price-cell down">3710</td><td class="num down">−5 ↓0.13%</td><td><svg class="rs" viewBox="0 0 60 20"><polyline fill="none" stroke="#2BA471" stroke-width="1.4" points="0,6 10,7 20,6 30,9 40,8 50,11 60,12"/></svg></td><td class="t-c">2 小时前</td><td><a class="btn-solid xs">询价</a></td></tr>
+            <tr><td><span class="fav">★</span></td><td><b>H 型钢 200×200</b><small>定尺 12 米</small></td><td>Q235B</td><td><span class="tag-mini">马钢</span></td><td>上海·宝山钢市</td><td class="num">320 吨</td><td class="num price-cell up">3950</td><td class="num up">+12 ↑0.30%</td><td><svg class="rs" viewBox="0 0 60 20"><polyline fill="none" stroke="#E63946" stroke-width="1.4" points="0,13 10,12 20,12 30,10 40,11 50,8 60,7"/></svg></td><td class="t-c">3 小时前</td><td><a class="btn-solid xs">询价</a></td></tr>
+          </tbody>
+        </table>
+        <div class="stream-foot">
+          <span>上海本地共 <b style="color:var(--c-primary)">5,260</b> 条资源 · 每 30 秒自动刷新</span>
+          <span class="pg"><a>← 上一页</a><b>1</b> / 658<a>下一页 →</a></span>
+        </div>
+      </div>
+
+      <!-- 涨跌双榜（上海本地） -->
+      <div class="rank-grid">
+        <div class="panel">
+          <div class="panel-h"><span>📈 上海涨幅榜 TOP 6</span><a class="more">查看全部</a></div>
+          <table class="rank-table">
+            <tbody>
+              <tr><td><i class="r-no n1">1</i></td><td>镀锌 DX51D 1.0</td><td>宝山·宝业</td><td class="num">4520</td><td class="num up">+0.67%</td></tr>
+              <tr><td><i class="r-no n2">2</i></td><td>螺纹 φ20 HRB400E</td><td>宝山·A 区</td><td class="num">3680</td><td class="num up">+0.55%</td></tr>
+              <tr><td><i class="r-no n3">3</i></td><td>线材 φ8</td><td>宝山·B 区</td><td class="num">3720</td><td class="num up">+0.40%</td></tr>
+              <tr><td><i class="r-no">4</i></td><td>H 型钢 200</td><td>宝山钢市</td><td class="num">3950</td><td class="num up">+0.30%</td></tr>
+              <tr><td><i class="r-no">5</i></td><td>角钢 50×5</td><td>青浦钢市</td><td class="num">3850</td><td class="num up">+0.26%</td></tr>
+              <tr><td><i class="r-no">6</i></td><td>冷轧 1.0</td><td>浦东外高桥</td><td class="num">4150</td><td class="num up">+0.12%</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="panel">
+          <div class="panel-h"><span>📉 上海跌幅榜 TOP 6</span><a class="more">查看全部</a></div>
+          <table class="rank-table">
+            <tbody>
+              <tr><td><i class="r-no n1 d">1</i></td><td>无缝管 108×4</td><td>浦东海港</td><td class="num">4680</td><td class="num down">−0.32%</td></tr>
+              <tr><td><i class="r-no n2 d">2</i></td><td>热卷 5.75</td><td>外高桥</td><td class="num">3520</td><td class="num down">−0.28%</td></tr>
+              <tr><td><i class="r-no n3 d">3</i></td><td>盘螺 φ8</td><td>宝山·C 区</td><td class="num">3710</td><td class="num down">−0.13%</td></tr>
+              <tr><td><i class="r-no d">4</i></td><td>不锈钢 304 2B</td><td>嘉定钢市</td><td class="num">15820</td><td class="num down">−0.10%</td></tr>
+              <tr><td><i class="r-no d">5</i></td><td>方管 50×3</td><td>松江工业仓</td><td class="num">4060</td><td class="num down">−0.07%</td></tr>
+              <tr><td><i class="r-no d">6</i></td><td>圆钢 φ20</td><td>宝山·A 区</td><td class="num">3780</td><td class="num down">−0.05%</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- 右 -->
+    <aside class="wb-right">
+
+      <div class="panel me-card">
+        <div class="me-h">
+          <div class="me-avt">沪</div>
+          <div>
+            <div class="me-hi">您好，请登录上海站 →</div>
+            <div class="me-sub">解锁本地专属价格</div>
+          </div>
+        </div>
+        <div class="me-stats">
+          <div><b>12</b><span>关注</span></div>
+          <div><b>3</b><span>求购</span></div>
+          <div><b>5</b><span>订阅</span></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-h"><span>⭐ 我的关注</span><a class="more">管理</a></div>
+        <ul class="watch-list">
+          <li><span class="w-n">螺纹 φ20·沙钢·宝山</span><span class="w-p up">3680 <em>+20</em></span></li>
+          <li><span class="w-n">热卷 5.75·本钢·外高桥</span><span class="w-p down">3520 <em>−10</em></span></li>
+          <li><span class="w-n">冷轧 1.0·武钢·浦东</span><span class="w-p up">4150 <em>+5</em></span></li>
+        </ul>
+      </div>
+
+      <!-- ② 侧边广告 -->
+      <div class="sh-side-ad">
+        <div class="img" style="background:linear-gradient(135deg,#0F4C75,#3282B8)">🚛<br>上海钢运物流<br><span style="font-size:11px;font-weight:400;opacity:.9">同城 4 小时达</span></div>
+        <div class="body">
+          <div class="t">同城配送限时 8 折</div>
+          <div class="d">覆盖宝山/浦东/嘉定/青浦/松江，30+ 车队定时直达。</div>
+          <a class="b">立即下单 →</a>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-h"><span>📢 我的求购</span><a class="more">+ 发布</a></div>
+        <ul class="buy-list">
+          <li><div class="b-t">螺纹 HRB400E φ16  <b>200 吨</b></div><div class="b-m">宝山交货 · 报价 <em class="up">12</em></div></li>
+          <li><div class="b-t">热卷 Q235B 4.0  <b>500 吨</b></div><div class="b-m">外高桥仓 · 报价 <em class="up">8</em></div></li>
+          <li><div class="b-t">H 型钢 200×200  <b>80 吨</b></div><div class="b-m">嘉定工业区 · 报价 <em class="up">4</em></div></li>
+        </ul>
+      </div>
+
+      <!-- ③ 侧边广告 -->
+      <div class="sh-side-ad">
+        <div class="img" style="background:linear-gradient(135deg,#E55A00,#FF8533)">🏭<br>沙钢上海直营仓<br><span style="font-size:11px;font-weight:400;opacity:.9">厂家直供</span></div>
+        <div class="body">
+          <div class="t">价格直降 ¥30/吨</div>
+          <div class="d">宝山中心仓现货，量大优惠，全月特惠。</div>
+          <a class="b">立即询价 →</a>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-h"><span>🔔 我的预警 <i style="font-style:normal;color:#fff;background:#E63946;font-size:10px;padding:0 5px;border-radius:8px;margin-left:4px">3</i></span></div>
+        <ul class="alert-list">
+          <li><span class="al-dot up"></span><span class="al-body"><b>螺纹·沙钢</b> 达订阅价 <em class="up">¥3680</em><span class="al-tm">5 分钟前</span></span></li>
+          <li><span class="al-dot down"></span><span class="al-body"><b>热卷·本钢</b> 跌破支撑 <em class="down">¥3520</em><span class="al-tm">22 分钟前</span></span></li>
+          <li><span class="al-dot up"></span><span class="al-body"><b>镀锌·首钢</b> 突破阻力 <em class="up">¥4520</em><span class="al-tm">1 小时前</span></span></li>
+        </ul>
+      </div>
+
+      <!-- ④ 侧边广告 -->
+      <div class="sh-side-ad">
+        <div class="img" style="background:linear-gradient(135deg,#2BA471,#54C18C)">💰<br>钢贸贷<br><span style="font-size:11px;font-weight:400;opacity:.9">当天放款</span></div>
+        <div class="body">
+          <div class="t">利率 3.6% 起</div>
+          <div class="d">钢贸专属授信，最高 500 万，1 小时审批。</div>
+          <a class="b">立即申请 →</a>
+        </div>
+      </div>
+
+    </aside>
+
+  </div>
+</section>
+
+<!-- ========== 钢厂在沪代理出厂价 + 上海钢厂动态 ========== -->
+<section class="mill-area-wrap">
+  <div class="wrap mill-area">
+
+    <div class="panel mill-pn">
+      <div class="panel-h">
+        <span>🏭 钢厂在沪代理出厂价</span>
+        <span style="display:flex;gap:10px;align-items:center">
+          <span class="seg" style="display:flex;gap:0;background:#fff;border:1px solid #E5E7EB;border-radius:3px;padding:2px;font-size:12px">
+            <a style="padding:3px 12px;background:#FF6A00;color:#fff;border-radius:2px;font-weight:600">螺纹钢</a>
+            <a style="padding:3px 12px;color:#6B6B6B">热卷</a>
+            <a style="padding:3px 12px;color:#6B6B6B">冷轧</a>
+            <a style="padding:3px 12px;color:#6B6B6B">中厚板</a>
+          </span>
+          <a class="more">更多 →</a>
+        </span>
+      </div>
+      <table class="shmill-tbl">
+        <thead>
+          <tr><th>钢厂</th><th>上海代理</th><th>仓库</th><th class="num">代理价</th><th class="num">日变化</th><th>状态</th><th class="num">更新</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="nm">沙钢<small>张家港</small></td><td>上海钢之家</td><td>宝山 A 区</td><td class="num px">3,710</td><td class="num d up">+30 ↑</td><td><span class="tg up">上调</span></td><td class="num tm">09:30</td></tr>
+          <tr><td class="nm">永钢<small>张家港</small></td><td>永盛金属</td><td>宝山宝业</td><td class="num px">3,690</td><td class="num d up">+20 ↑</td><td><span class="tg up">上调</span></td><td class="num tm">09:15</td></tr>
+          <tr><td class="nm">中天<small>南通</small></td><td>中天上海代理</td><td>嘉定钢市</td><td class="num px">3,700</td><td class="num d up">+20 ↑</td><td><span class="tg up">上调</span></td><td class="num tm">09:08</td></tr>
+          <tr><td class="nm">日照<small>山东</small></td><td>沪联钢铁</td><td>宝山 B 区</td><td class="num px">3,670</td><td class="num d up">+10 ↑</td><td><span class="tg up">上调</span></td><td class="num tm">08:45</td></tr>
+          <tr><td class="nm">首钢<small>迁安</small></td><td>首钢直营</td><td>宝山 C 区</td><td class="num px">3,730</td><td class="num d up">+20 ↑</td><td><span class="tg up">上调</span></td><td class="num tm">昨日</td></tr>
+          <tr><td class="nm">武钢<small>武汉</small></td><td>华钢上海</td><td>浦东外高桥</td><td class="num px">3,720</td><td class="num d flat">持平</td><td><span class="tg flat">持平</span></td><td class="num tm">昨日</td></tr>
+          <tr><td class="nm">马钢<small>马鞍山</small></td><td>恒泰贸易</td><td>松江工业园</td><td class="num px">3,740</td><td class="num d up">+10 ↑</td><td><span class="tg up">上调</span></td><td class="num tm">昨日</td></tr>
+        </tbody>
+      </table>
+      <div class="mill-foot">
+        <div class="it"><b class="up">6</b><span>钢厂上调</span></div>
+        <div class="it"><b class="flat">1</b><span>钢厂持平</span></div>
+        <div class="it"><b class="down">0</b><span>钢厂下调</span></div>
+        <div class="it"><b class="info">+18</b><span>平均涨幅 元/吨</span></div>
+      </div>
+    </div>
+
+    <div class="panel mill-dyn">
+      <div class="panel-h">
+        <span>📢 上海/华东钢市动态</span>
+        <a class="more">更多 →</a>
+      </div>
+      <div class="dyn-list">
+        <div class="dyn-it">
+          <div class="dyn-tm">09:30</div>
+          <div class="dyn-body">
+            <div class="dyn-h"><span class="dyn-nm">沙钢上海仓</span><span class="dyn-tg up">代理价上调 +30</span></div>
+            <div class="dyn-c">宝山 A 区代理仓螺纹 HRB400E 上调 <em class="up">¥30/吨</em>，调整后 <em class="up">¥3,710</em>。</div>
+          </div>
+        </div>
+        <div class="dyn-it">
+          <div class="dyn-tm">09:20</div>
+          <div class="dyn-body">
+            <div class="dyn-h"><span class="dyn-nm">宝山钢市</span><span class="dyn-tg info">市场动态</span></div>
+            <div class="dyn-c">华东工地集中开工，宝山钢市螺纹日成交量环比 <em class="up">+18%</em>，库存连续 3 周下降。</div>
+          </div>
+        </div>
+        <div class="dyn-it">
+          <div class="dyn-tm">09:15</div>
+          <div class="dyn-body">
+            <div class="dyn-h"><span class="dyn-nm">永钢上海仓</span><span class="dyn-tg up">代理价上调 +20</span></div>
+            <div class="dyn-c">宝山宝业仓螺纹钢上调 <em class="up">¥20/吨</em>，跟随出厂价同步调整。</div>
+          </div>
+        </div>
+        <div class="dyn-it">
+          <div class="dyn-tm">昨日</div>
+          <div class="dyn-body">
+            <div class="dyn-h"><span class="dyn-nm">外高桥保税</span><span class="dyn-tg info">仓单更新</span></div>
+            <div class="dyn-c">外高桥保税港区铁矿石到港量周环比 <em class="up">+8.6%</em>，预计支撑钢价。</div>
+          </div>
+        </div>
+        <div class="dyn-it">
+          <div class="dyn-tm">昨日</div>
+          <div class="dyn-body">
+            <div class="dyn-h"><span class="dyn-nm">嘉定钢市</span><span class="dyn-tg gold">商家入驻</span></div>
+            <div class="dyn-c">嘉定钢市新增 12 家品牌钢贸商家入驻货袋子，本地资源池扩容。</div>
+          </div>
+        </div>
+        <div class="dyn-it">
+          <div class="dyn-tm">2 日前</div>
+          <div class="dyn-body">
+            <div class="dyn-h"><span class="dyn-nm">华东限产</span><span class="dyn-tg info">政策快讯</span></div>
+            <div class="dyn-c">华东多地启动 5 月环保限产计划，预计影响产量约 <em>8 万吨/日</em>。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ========== ⑤ 中部广告通栏 ========== -->
+<div class="wrap">
+  <div class="sh-ad-thin">
+    <div class="ic">🎉</div>
+    <div class="body">
+      <div class="t">华东钢材数字交易峰会 · 6 月 18 日上海</div>
+      <div class="d">300+ 钢厂与钢贸商现场撮合 · 报名即送行业白皮书</div>
+    </div>
+    <a class="b">立即报名 →</a>
+  </div>
+</div>
+
+<!-- ========== 长三角周边热力图 ========== -->
+<section class="heatmap-wrap">
+  <div class="wrap">
+    <div class="panel">
+      <div class="panel-h">
+        <span>🗺️ 长三角钢市热力图（12 个周边城市 · 颜色越深越活跃）</span>
+        <span class="legend">
+          <i class="lg lg1"></i>低
+          <i class="lg lg2"></i><i class="lg lg3"></i><i class="lg lg4"></i><i class="lg lg5"></i>高
+          <a class="more" style="margin-left:14px">查看全国分站 →</a>
+        </span>
+      </div>
+      <div class="sh-heat">
+        <a class="sh-hm l5"><div class="sh-hm-t">上海<span class="sh-hm-b">华东中心</span></div><div class="sh-hm-p up">3,712 ↑</div><div class="sh-hm-r">活跃 96 · 5.2 万</div></a>
+        <a class="sh-hm l5"><div class="sh-hm-t">苏州</div><div class="sh-hm-p up">3,706 ↑</div><div class="sh-hm-r">活跃 92 · 3.8 万</div></a>
+        <a class="sh-hm l4"><div class="sh-hm-t">无锡<span class="sh-hm-b">东方钢市</span></div><div class="sh-hm-p up">3,710 ↑</div><div class="sh-hm-r">活跃 88 · 3.6 万</div></a>
+        <a class="sh-hm l4"><div class="sh-hm-t">张家港<span class="sh-hm-b">沙钢</span></div><div class="sh-hm-p up">3,700 ↑</div><div class="sh-hm-r">活跃 86 · 3.1 万</div></a>
+        <a class="sh-hm l4"><div class="sh-hm-t">南通</div><div class="sh-hm-p up">3,698 ↑</div><div class="sh-hm-r">活跃 78 · 2.4 万</div></a>
+        <a class="sh-hm l4"><div class="sh-hm-t">常州</div><div class="sh-hm-p up">3,694 ↑</div><div class="sh-hm-r">活跃 72 · 2.0 万</div></a>
+
+        <a class="sh-hm l3"><div class="sh-hm-t">南京</div><div class="sh-hm-p up">3,710 ↑</div><div class="sh-hm-r">活跃 70 · 1.8 万</div></a>
+        <a class="sh-hm l3"><div class="sh-hm-t">杭州<span class="sh-hm-b">杭钢</span></div><div class="sh-hm-p up">3,718 ↑</div><div class="sh-hm-r">活跃 68 · 2.0 万</div></a>
+        <a class="sh-hm l2"><div class="sh-hm-t">嘉兴</div><div class="sh-hm-p up">3,720 ↑</div><div class="sh-hm-r">活跃 56 · 1.2 万</div></a>
+        <a class="sh-hm l2"><div class="sh-hm-t">宁波</div><div class="sh-hm-p flat">3,730 →</div><div class="sh-hm-r">活跃 52 · 1.4 万</div></a>
+        <a class="sh-hm l1"><div class="sh-hm-t">绍兴</div><div class="sh-hm-p down">3,712 ↓</div><div class="sh-hm-r">活跃 38 · 0.8 万</div></a>
+        <a class="sh-hm l1"><div class="sh-hm-t">合肥</div><div class="sh-hm-p up">3,706 ↑</div><div class="sh-hm-r">活跃 32 · 0.7 万</div></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 上海资讯 + 工具入口 ========== -->
+<section>
+  <div class="wrap" style="display:grid;grid-template-columns:1.6fr 1fr;gap:16px;margin-top:14px">
+
+    <div class="panel">
+      <div class="panel-h"><span>📰 上海钢材资讯</span>
+        <span class="seg"><a class="active">行情解读</a><a>政策法规</a><a>行业动态</a><a>钢材知识</a></span>
+        <a class="more">更多 →</a>
+      </div>
+      <ul class="news-flat">
+        <li class="hot"><a>上海宝山钢市本周成交价格汇总（5 月 19 日 - 5 月 25 日）</a><span class="date">09:12</span></li>
+        <li class="hot"><a>上海螺纹钢库存周环比下降 3.2%，节后需求回暖</a><span class="date">08:30</span></li>
+        <li class="hot"><a>沙钢上海代理上调出厂价 ¥30/吨</a><span class="date">昨日</span></li>
+        <li><a>上海周边工地集中开工 中厚板成交转好</a><span class="date">05-25</span></li>
+        <li><a>外高桥保税港区铁矿石到港量周报</a><span class="date">05-25</span></li>
+        <li><a>上海钢贸协会发布 5 月行业景气指数</a><span class="date">05-24</span></li>
+        <li><a>嘉定钢市新增 12 家品牌商家入驻货袋子</a><span class="date">05-24</span></li>
+      </ul>
+    </div>
+
+    <div class="panel">
+      <div class="panel-h"><span>🛠️ 上海站工具</span></div>
+      <div class="tools-big tools-big-5" style="grid-template-columns:repeat(2,1fr)">
+        <a class="tb"><span class="tb-badge hot">HOT</span><div class="tb-i">🎯</div><div class="tb-n">智能找钢</div><div class="tb-d">本地资源 AI 匹配</div></a>
+        <a class="tb"><span class="tb-badge new">NEW</span><div class="tb-i">🔔</div><div class="tb-n">价格订阅</div><div class="tb-d">本地行情推送</div></a>
+        <a class="tb"><div class="tb-i">📡</div><div class="tb-n">报价雷达</div><div class="tb-d">上海求购撮合</div></a>
+        <a class="tb"><div class="tb-i">📊</div><div class="tb-n">行情对比</div><div class="tb-d">长三角价格联动</div></a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ========== ⑥ 商家入驻广告通栏 ========== -->
+<div class="wrap">
+  <div class="sh-ad-thin">
+    <div class="ic">🎁</div>
+    <div class="body">
+      <div class="t">货袋子上海站 · 商家入驻限时免佣金</div>
+      <div class="d">前 100 名商家享 6 个月平台服务费全免 · 专属客服 · 上海/华东曝光</div>
+    </div>
+    <a class="b">立即入驻 →</a>
+  </div>
+</div>
+
+<!-- ========== SEO 文字区（保留） ========== -->
+<div class="wrap">
+  <div class="sh-seo">
+    <h2>上海钢材现货交易平台 - 货袋子上海站</h2>
+    <p>
+      货袋子上海分站是华东地区领先的钢材现货交易服务平台，整合上海及周边长三角地区优质钢材现货资源，
+      提供 <a>上海螺纹钢</a>、<a>上海热轧卷板</a>、<a>上海冷轧板</a>、<a>上海中厚板</a>、<a>上海镀锌板</a>、<a>上海线材</a>、<a>上海型钢</a>、<a>上海无缝管</a>
+      等钢材品类的实时报价、智能找钢、价格订阅、报价雷达、行情对比 全流程服务。覆盖
+      <strong>上海宝山钢材市场</strong>、<strong>浦东外高桥保税港区</strong>、<strong>嘉定钢市</strong>、<strong>青浦钢材城</strong>、<strong>松江工业仓储区</strong>
+      等核心钢材集散地，对接沙钢、本钢、武钢、首钢、鞍钢、马钢、永钢、日照钢铁、中天钢铁 等主流钢厂在沪代理资源，
+      助力上海钢贸商家数字化经营、采购商精准找钢、工程项目高效采购，一站式解决上海钢材现货交易需求。
+    </p>
+    <div class="links">
+      <strong>周边城市分站：</strong>
+      <a>南京</a>｜<a>杭州</a>｜<a>苏州</a>｜<a>宁波</a>｜<a>无锡</a>｜<a>常州</a>｜<a>合肥</a>｜<a>嘉兴</a>｜<a>南通</a>｜<a>湖州</a>｜<a>绍兴</a>｜<a>金华</a>｜<a>张家港</a>
+    </div>
+    <div class="links" style="margin-top:6px;border-top:0;padding-top:0">
+      <strong>热门长尾词：</strong>
+      <a>上海螺纹钢价格今日报价</a>｜<a>上海热轧卷板价格</a>｜<a>上海冷轧板现货</a>｜<a>宝山钢市价格</a>｜<a>外高桥钢材现货</a>｜<a>沙钢上海代理价</a>｜<a>永钢上海仓</a>｜<a>上海钢贸贷</a>
+    </div>
+  </div>
+</div>
+
+<!-- ========== KPI + 友情链接 + 页脚 ========== -->
+<div class="wrap">
+  <div class="kpi">
+    <div><div class="n">152.6 万吨</div><div class="l">上海累计成交</div></div>
+    <div><div class="n">312 家</div><div class="l">本地入驻商家</div></div>
+    <div><div class="n">5.2 万条</div><div class="l">本地在售资源</div></div>
+    <div><div class="n">12 家</div><div class="l">钢厂在沪代理</div></div>
+  </div>
+
+  <div class="friend">
+    <strong style="color:var(--c-text)">友情链接：</strong>
+    <a>上海钢贸商会</a><a>上海钢材市场</a><a>宝山钢市</a><a>外高桥保税港区</a><a>沙钢集团</a><a>宝武集团</a><a>本钢集团</a><a>永钢集团</a><a>日照钢铁</a><a>上海钢联</a>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="brand">
+      <div class="name">货袋子 · 上海站</div>
+      <div style="font-size:12px;color:#888;margin-top:4px">上海钢材现货交易平台</div>
+      <div class="tel">400-888-xxxx</div>
+      <div class="time">服务时间 周一至周日 8:00 - 20:00</div>
+      <div class="qr">
+        <div class="item"><div class="b">货袋子APP</div><div class="l">下载App</div></div>
+        <div class="item"><div class="b">微信公众号</div><div class="l">关注</div></div>
+      </div>
+    </div>
+    <div><h5>关于我们</h5><a>公司介绍</a><a>发展历程</a><a>新闻动态</a><a>加入我们</a><a>联系方式</a></div>
+    <div><h5>帮助中心</h5><a>新手指南</a><a>交易流程</a><a>支付方式</a><a>物流配送</a><a>常见问题</a></div>
+    <div><h5>商家服务</h5><a>商家入驻</a><a>广告投放</a><a>会员服务</a><a>API 接入</a><a>开放平台</a></div>
+    <div><h5>法律条款</h5><a>用户协议</a><a>隐私政策</a><a>知识产权</a><a>免责声明</a><a>投诉建议</a></div>
+  </div>
+  <div class="copy">© 2026 货袋子 · 普讯网络科技 ｜ 沪 ICP 备 XXXXXXXX 号 - 1 ｜ 沪公网安 31010XXXXXXXXXX 号</div>
+</footer>
+
+</body>
+</html>

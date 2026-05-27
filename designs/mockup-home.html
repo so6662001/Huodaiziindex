@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="zh-cmn-Hans">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280">
+<title>货袋子-钢材现货交易平台 | 找钢材找供应商就上货袋子 | 钢贸宝 | 普讯</title>
+<meta name="keywords" content="货袋子,货袋子平台,全国钢材现货交易平台,钢材现货,钢材交易,找钢材,钢贸,钢贸宝,普讯">
+<meta name="description" content="货袋子是专业全国钢材现货交易平台，整合全国优质钢材现货资源，提供钢材实时报价、在线下单、库存查询、物流配送全流程服务。">
+<link rel="stylesheet" href="./assets/common.css">
+<style>
+/* === 首页专属 === */
+.hero{display:grid;grid-template-columns:1fr 380px;gap:16px;margin-top:16px}
+.banner{position:relative;height:380px;background:linear-gradient(135deg,#FFB47A 0%,#FF8533 45%,#FF6A00 100%);border-radius:6px;overflow:hidden;color:#fff;padding:48px 56px;display:flex;flex-direction:column;justify-content:center}
+.banner h1{font-size:38px;font-weight:800;line-height:1.25;letter-spacing:1px}
+.banner h1 em{font-style:normal;background:#fff;color:var(--c-primary);padding:0 10px;margin:0 4px;border-radius:3px}
+.banner p{font-size:16px;opacity:.95;margin-top:14px}
+.banner .features{margin-top:22px;display:flex;gap:24px}
+.banner .features span{display:inline-flex;align-items:center;gap:6px;font-size:14px;background:rgba(255,255,255,.18);padding:5px 12px;border-radius:20px}
+.banner .cta{margin-top:30px}
+.banner .cta a{display:inline-block;background:#fff;color:var(--c-primary);padding:12px 26px;border-radius:var(--radius);font-weight:700;font-size:15px;margin-right:12px}
+.banner .cta a.line{background:transparent;color:#fff;border:1.5px solid #fff}
+.banner .illu{position:absolute;right:-20px;bottom:-10px;width:440px;height:340px;opacity:.95}
+.banner .dots{position:absolute;left:56px;bottom:24px;display:flex;gap:6px}
+.banner .dots i{width:24px;height:4px;background:rgba(255,255,255,.4);border-radius:2px}
+.banner .dots i.on{background:#fff;width:32px}
+
+.quote-side{background:#fff;border-radius:6px;overflow:hidden;display:flex;flex-direction:column}
+.quote-side .qh{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid var(--c-line)}
+.quote-side .qh .t{font-size:15px;font-weight:700;color:var(--c-primary);display:flex;align-items:center;gap:6px}
+.quote-side .qh .t:before{content:"📈"}
+.quote-side .qh .m{font-size:12px;color:var(--c-text-3)}
+.quote-side .qb{flex:1;overflow:hidden}
+
+/* 列表行表头 */
+.row-head{display:grid;grid-template-columns:1.7fr .9fr .9fr 1.3fr .7fr .7fr 1fr 90px;gap:12px;padding:12px 20px;background:var(--c-bg-soft);color:var(--c-text-2);font-size:13px;border-bottom:1px solid var(--c-line)}
+</style>
+</head>
+<body>
+
+<!-- 顶部条 -->
+<div class="topbar">
+  <div class="wrap">
+    <div class="left">
+      <a class="city">📍 上海 切换城市</a>
+      <span>欢迎来到货袋子全国钢材现货交易平台</span>
+    </div>
+    <div class="right">
+      <a>登录</a><span>|</span>
+      <a>注册</a><span>|</span>
+      <a>下载APP</a><span>|</span>
+      <a>商家入驻</a><span>|</span>
+      <a>帮助中心</a><span>|</span>
+      <a>客服 400-888-xxxx</a>
+    </div>
+  </div>
+</div>
+
+<!-- Logo + 搜索 -->
+<header class="header">
+  <div class="wrap">
+    <div class="logo">
+      <div class="mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><ellipse cx="12" cy="6" rx="8" ry="2.5"/><path d="M4 6v12c0 1.4 3.6 2.5 8 2.5s8-1.1 8-2.5V6"/><path d="M4 12c0 1.4 3.6 2.5 8 2.5s8-1.1 8-2.5"/></svg>
+      </div>
+      <div>
+        <div class="name">货袋子</div>
+      </div>
+      <div class="sub">HUODAIZI<br>全国钢材现货交易平台</div>
+    </div>
+    <div class="search">
+      <select><option>找钢材</option><option>找求购</option><option>找商家</option><option>找资讯</option></select>
+      <input placeholder="请输入品名 / 规格 / 产地，如：螺纹钢 HRB400E φ20 上海">
+      <button>🔍 搜 索</button>
+    </div>
+    <div class="actions">
+      <button class="btn-outline">我要发布</button>
+      <button class="btn-outline">我要求购</button>
+    </div>
+  </div>
+</header>
+
+<!-- 主导航 -->
+<nav class="nav">
+  <div class="wrap">
+    <a class="active">首页</a>
+    <a>找钢材</a>
+    <a>找求购</a>
+    <a>行情中心</a>
+    <a>商家黄页</a>
+    <a>钢材资讯</a>
+    <a>全国分站</a>
+    <a>关于我们</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <!-- 品类九宫格 -->
+  <div class="cats mt16" style="border-radius:6px;overflow:hidden">
+    <a><svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="14"/><circle cx="18" cy="18" r="8"/><circle cx="18" cy="18" r="3"/></svg>螺纹钢</a>
+    <a><svg viewBox="0 0 36 36"><path d="M6 18c0-3 2-6 6-6s6 3 12 3 6-3 6-3M6 24c0-3 2-6 6-6s6 3 12 3 6-3 6-3"/></svg>线材</a>
+    <a><svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="13"/><path d="M11 11l14 14M25 11L11 25"/></svg>盘螺</a>
+    <a><svg viewBox="0 0 36 36"><rect x="5" y="10" width="26" height="16" rx="1"/><path d="M5 18h26"/></svg>热轧卷板</a>
+    <a><svg viewBox="0 0 36 36"><rect x="5" y="14" width="26" height="8" rx="1"/><path d="M5 18h26"/></svg>冷轧板</a>
+    <a><svg viewBox="0 0 36 36"><rect x="6" y="8" width="24" height="20" rx="1"/><path d="M6 14h24M6 22h24"/></svg>中厚板</a>
+    <a><svg viewBox="0 0 36 36"><rect x="5" y="13" width="26" height="10"/><path d="M9 13v10M15 13v10M21 13v10M27 13v10"/></svg>镀锌板</a>
+    <a><svg viewBox="0 0 36 36"><path d="M18 4l12 6v16l-12 6L6 26V10z"/><path d="M18 4v28M6 10l24 16M30 10L6 26"/></svg>型钢</a>
+    <a><svg viewBox="0 0 36 36"><circle cx="10" cy="18" r="6"/><circle cx="10" cy="18" r="2"/><circle cx="26" cy="18" r="6"/><circle cx="26" cy="18" r="2"/><path d="M10 12h16M10 24h16"/></svg>管材</a>
+  </div>
+
+  <!-- Hero Banner + 实时行情 -->
+  <div class="hero">
+    <div class="banner">
+      <h1>专业<em>全国</em>钢材现货交易平台</h1>
+      <p>实时报价 · 在线下单 · 库存查询 · 全程物流</p>
+      <div class="features">
+        <span>✓ 12000+ 入驻商家</span>
+        <span>✓ 1280万吨 累计交易</span>
+        <span>✓ 280+ 城市覆盖</span>
+      </div>
+      <div class="cta">
+        <a>立即找钢 →</a>
+        <a class="line">商家入驻</a>
+      </div>
+      <div class="dots"><i class="on"></i><i></i><i></i></div>
+
+      <!-- 扁平插画：几何钢卷 -->
+      <svg class="illu" viewBox="0 0 440 340" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="g1" x1="0" x2="1" y1="0" y2="1">
+            <stop offset="0" stop-color="#FFE0C8"/><stop offset="1" stop-color="#FFB47A"/>
+          </linearGradient>
+          <linearGradient id="g2" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0" stop-color="#FFD2A6"/><stop offset="1" stop-color="#E55A00"/>
+          </linearGradient>
+          <linearGradient id="g3" x1="0" x2="1" y1="0" y2="0">
+            <stop offset="0" stop-color="#FFFFFF" stop-opacity=".3"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+
+        <!-- 地面 -->
+        <ellipse cx="220" cy="305" rx="200" ry="14" fill="#000" opacity=".08"/>
+
+        <!-- 大钢卷（左） -->
+        <g transform="translate(60,150)">
+          <ellipse cx="60" cy="80" rx="60" ry="60" fill="url(#g2)"/>
+          <ellipse cx="60" cy="80" rx="44" ry="44" fill="#FFE0C8"/>
+          <ellipse cx="60" cy="80" rx="28" ry="28" fill="#FFB47A"/>
+          <ellipse cx="60" cy="80" rx="14" ry="14" fill="#E55A00"/>
+          <ellipse cx="60" cy="80" rx="6" ry="6" fill="#fff"/>
+          <path d="M120 80c0 20 -27 36 -60 36s-60 -16 -60 -36" stroke="rgba(0,0,0,.1)" fill="none"/>
+        </g>
+
+        <!-- 中钢卷（中） -->
+        <g transform="translate(170,90)">
+          <ellipse cx="50" cy="50" rx="50" ry="50" fill="url(#g2)"/>
+          <ellipse cx="50" cy="50" rx="36" ry="36" fill="#FFE0C8"/>
+          <ellipse cx="50" cy="50" rx="22" ry="22" fill="#FFB47A"/>
+          <ellipse cx="50" cy="50" rx="10" ry="10" fill="#fff"/>
+        </g>
+
+        <!-- 小钢卷（右） -->
+        <g transform="translate(280,175)">
+          <ellipse cx="45" cy="45" rx="45" ry="45" fill="url(#g2)"/>
+          <ellipse cx="45" cy="45" rx="32" ry="32" fill="#FFE0C8"/>
+          <ellipse cx="45" cy="45" rx="20" ry="20" fill="#FFB47A"/>
+          <ellipse cx="45" cy="45" rx="8" ry="8" fill="#fff"/>
+        </g>
+
+        <!-- 钢板堆叠（右后） -->
+        <g transform="translate(310,90)">
+          <rect x="0" y="40" width="120" height="10" fill="#E55A00"/>
+          <rect x="0" y="40" width="120" height="10" fill="url(#g3)"/>
+          <rect x="6" y="30" width="108" height="10" fill="#FF8533"/>
+          <rect x="6" y="30" width="108" height="10" fill="url(#g3)"/>
+          <rect x="12" y="20" width="96" height="10" fill="#FFB47A"/>
+          <rect x="12" y="20" width="96" height="10" fill="url(#g3)"/>
+          <rect x="18" y="10" width="84" height="10" fill="#FFE0C8"/>
+        </g>
+
+        <!-- 螺纹钢条（前） -->
+        <g transform="translate(40,255)">
+          <rect x="0" y="0" width="220" height="8" rx="4" fill="#E55A00"/>
+          <rect x="10" y="12" width="220" height="8" rx="4" fill="#FF8533"/>
+          <rect x="20" y="24" width="220" height="8" rx="4" fill="#FFB47A"/>
+          <!-- 螺纹纹路 -->
+          <g stroke="rgba(0,0,0,.15)" stroke-width="1">
+            <line x1="20" y1="0" x2="14" y2="8"/><line x1="50" y1="0" x2="44" y2="8"/>
+            <line x1="80" y1="0" x2="74" y2="8"/><line x1="110" y1="0" x2="104" y2="8"/>
+            <line x1="140" y1="0" x2="134" y2="8"/><line x1="170" y1="0" x2="164" y2="8"/>
+            <line x1="200" y1="0" x2="194" y2="8"/>
+          </g>
+        </g>
+
+        <!-- 装饰齿轮（背景） -->
+        <g transform="translate(360,30)" opacity=".25">
+          <circle cx="30" cy="30" r="24" fill="none" stroke="#fff" stroke-width="3" stroke-dasharray="6 4"/>
+          <circle cx="30" cy="30" r="10" fill="#fff"/>
+        </g>
+        <!-- 折线（上涨示意） -->
+        <g transform="translate(20,20)" opacity=".4">
+          <polyline points="0,60 30,40 60,50 90,20 120,30 150,5" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="150" cy="5" r="4" fill="#fff"/>
+        </g>
+      </svg>
+    </div>
+
+    <!-- 右侧实时行情 -->
+    <div class="quote-side">
+      <div class="qh">
+        <span class="t">实时行情 TOP 10</span>
+        <span class="m">更新于 14:25</span>
+      </div>
+      <div class="qb">
+        <table class="quote-table">
+          <thead><tr><th>品名</th><th>规格</th><th class="num">均价</th><th class="num">涨跌</th></tr></thead>
+          <tbody>
+            <tr><td>螺纹钢</td><td>HRB400E φ20</td><td class="num">3680</td><td class="num up">+20 ↑</td></tr>
+            <tr><td>热轧卷板</td><td>Q235B 5.75</td><td class="num">3520</td><td class="num down">−10 ↓</td></tr>
+            <tr><td>线材</td><td>HPB300 φ8</td><td class="num">3720</td><td class="num up">+15 ↑</td></tr>
+            <tr><td>冷轧板</td><td>SPCC 1.0</td><td class="num">4150</td><td class="num up">+5 ↑</td></tr>
+            <tr><td>中厚板</td><td>Q235B 20</td><td class="num">3780</td><td class="num">持平</td></tr>
+            <tr><td>镀锌板</td><td>DX51D 1.0</td><td class="num">4520</td><td class="num up">+30 ↑</td></tr>
+            <tr><td>盘螺</td><td>HRB400E φ8</td><td class="num">3710</td><td class="num down">−5 ↓</td></tr>
+            <tr><td>角钢</td><td>50×50×5</td><td class="num">3850</td><td class="num up">+10 ↑</td></tr>
+            <tr><td>工字钢</td><td>20#</td><td class="num">3920</td><td class="num up">+8 ↑</td></tr>
+            <tr><td>无缝管</td><td>20# 108×4</td><td class="num">4680</td><td class="num down">−15 ↓</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 今日热门资源（列表行） -->
+  <div class="section">
+    <div class="section-head">
+      <span class="section-title">今日热门资源</span>
+      <a class="section-more">查看全部资源 →</a>
+    </div>
+    <div class="tabs">
+      <a class="active">全部</a><a>螺纹钢</a><a>热轧卷板</a><a>线材</a><a>冷轧板</a><a>中厚板</a><a>镀锌板</a><a>型钢</a><a>管材</a>
+    </div>
+    <div class="row-head">
+      <span>品名 / 规格</span>
+      <span>材质</span>
+      <span>产地</span>
+      <span>仓库</span>
+      <span>库存</span>
+      <span>发布</span>
+      <span style="text-align:right">价格</span>
+      <span style="text-align:center">操作</span>
+    </div>
+    <div class="row-list">
+      <div class="row"><span class="name">螺纹钢 φ20×9000<small>HRB400E 国标</small></span><span>HRB400E</span><span><span class="tag">沙钢</span></span><span>上海宝山钢材市场</span><span>286 吨</span><span class="time">10分钟前</span><span class="price" style="text-align:right">¥3680<small>/吨</small></span><a class="btn-solid">询价</a></div>
+      <div class="row"><span class="name">热轧卷板 5.75×1500×C<small>开平可定尺</small></span><span>Q235B</span><span><span class="tag">本钢</span></span><span>天津港保税仓</span><span>1240 吨</span><span class="time">28分钟前</span><span class="price" style="text-align:right">¥3520<small>/吨</small></span><a class="btn-solid">询价</a></div>
+      <div class="row"><span class="name">线材 φ8×盘卷<small>10吨/卷</small></span><span>HPB300</span><span><span class="tag">永钢</span></span><span>无锡东方钢材城</span><span>520 吨</span><span class="time">1小时前</span><span class="price" style="text-align:right">¥3720<small>/吨</small></span><a class="btn-solid">询价</a></div>
+      <div class="row"><span class="name">中厚板 20×2200×C<small>切割可定尺</small></span><span>Q345B</span><span><span class="tag">鞍钢</span></span><span>唐山陡河钢市</span><span>860 吨</span><span class="time">1小时前</span><span class="price" style="text-align:right">¥4180<small>/吨</small></span><a class="btn-solid">询价</a></div>
+      <div class="row"><span class="name">冷轧板 1.0×1250×C<small>原厂塑封</small></span><span>SPCC</span><span><span class="tag">武钢</span></span><span>武汉青山仓库</span><span>340 吨</span><span class="time">2小时前</span><span class="price" style="text-align:right">¥4150<small>/吨</small></span><a class="btn-solid">询价</a></div>
+      <div class="row"><span class="name">镀锌板 DX51D+Z 1.0×1250<small>锌层 80g</small></span><span>DX51D</span><span><span class="tag">首钢</span></span><span>邯郸丛台钢市</span><span>180 吨</span><span class="time">2小时前</span><span class="price" style="text-align:right">¥4520<small>/吨</small></span><a class="btn-solid">询价</a></div>
+      <div class="row"><span class="name">角钢 50×50×5<small>定尺 6 米</small></span><span>Q235B</span><span><span class="tag">马钢</span></span><span>马鞍山港口仓</span><span>420 吨</span><span class="time">3小时前</span><span class="price" style="text-align:right">¥3850<small>/吨</small></span><a class="btn-solid">询价</a></div>
+      <div class="row"><span class="name">工字钢 20#<small>定尺 12 米</small></span><span>Q235B</span><span><span class="tag">莱钢</span></span><span>莱芜本部仓</span><span>260 吨</span><span class="time">4小时前</span><span class="price" style="text-align:right">¥3920<small>/吨</small></span><a class="btn-solid">询价</a></div>
+      <div class="row"><span class="name">无缝管 108×4<small>定尺 9 米</small></span><span>20#</span><span><span class="tag">包钢</span></span><span>包头白云仓</span><span>96 吨</span><span class="time">4小时前</span><span class="price" style="text-align:right">¥4680<small>/吨</small></span><a class="btn-solid">询价</a></div>
+      <div class="row"><span class="name">盘螺 φ8<small>HRB400E</small></span><span>HRB400E</span><span><span class="tag">日照</span></span><span>日照岚山钢市</span><span>720 吨</span><span class="time">5小时前</span><span class="price" style="text-align:right">¥3710<small>/吨</small></span><a class="btn-solid">询价</a></div>
+    </div>
+  </div>
+
+  <!-- 钢材资讯 三列 -->
+  <div class="section">
+    <div class="section-head">
+      <span class="section-title">钢材资讯</span>
+      <a class="section-more">查看更多资讯 →</a>
+    </div>
+    <div class="news-cols">
+      <div class="news-col">
+        <h4>行情解读</h4>
+        <ul>
+          <li class="hot"><a>今日螺纹钢现货价格小幅上涨 沙钢出厂上调20元</a><span class="date">05-26</span></li>
+          <li class="hot"><a>热卷震荡偏强 后市关注唐山限产执行情况</a><span class="date">05-26</span></li>
+          <li><a>冷轧板价格企稳 下游汽车板需求逐步释放</a><span class="date">05-25</span></li>
+          <li><a>中厚板成交转好 工程项目集中开工带动</a><span class="date">05-25</span></li>
+          <li><a>钢市周评：现货价格震荡偏强 库存继续去化</a><span class="date">05-24</span></li>
+        </ul>
+      </div>
+      <div class="news-col">
+        <h4>政策法规</h4>
+        <ul>
+          <li class="hot"><a>多部委发文支持钢铁行业绿色低碳转型</a><span class="date">05-26</span></li>
+          <li><a>2026 年钢铁产能置换实施办法解读</a><span class="date">05-25</span></li>
+          <li><a>河北：发布钢铁行业超低排放改造新要求</a><span class="date">05-24</span></li>
+          <li><a>钢材出口退税政策调整最新动态</a><span class="date">05-23</span></li>
+          <li><a>京津冀地区秋冬季限产方案征求意见</a><span class="date">05-22</span></li>
+        </ul>
+      </div>
+      <div class="news-col">
+        <h4>行业动态</h4>
+        <ul>
+          <li class="hot"><a>沙钢集团一季度营收同比增长 12.5%</a><span class="date">05-26</span></li>
+          <li><a>宝钢股份发布新一代高强汽车板</a><span class="date">05-25</span></li>
+          <li><a>唐山主流钢厂检修计划汇总</a><span class="date">05-25</span></li>
+          <li><a>港口铁矿石库存连续四周下降</a><span class="date">05-24</span></li>
+          <li><a>钢贸商家数字化转型趋势调研报告发布</a><span class="date">05-23</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 全国分站 -->
+  <div class="section">
+    <div class="section-head">
+      <span class="section-title">全国分站（20 个重点钢贸城市）</span>
+      <a class="section-more">查看全部分站 →</a>
+    </div>
+    <div class="cities">
+      <a class="city-tile"><div class="cn">唐山<span class="badge">钢都</span></div><div class="meta">现货资源 4.8 万条 · 286 家商家</div></a>
+      <a class="city-tile"><div class="cn">邯郸</div><div class="meta">现货资源 2.6 万条 · 168 家商家</div></a>
+      <a class="city-tile"><div class="cn">张家港<span class="badge">沙钢</span></div><div class="meta">现货资源 3.1 万条 · 192 家商家</div></a>
+      <a class="city-tile"><div class="cn">无锡<span class="badge">东方钢市</span></div><div class="meta">现货资源 3.6 万条 · 215 家商家</div></a>
+      <a class="city-tile"><div class="cn">莱芜<span class="badge">莱钢</span></div><div class="meta">现货资源 1.4 万条 · 96 家商家</div></a>
+
+      <a class="city-tile"><div class="cn">日照</div><div class="meta">现货资源 1.7 万条 · 108 家商家</div></a>
+      <a class="city-tile"><div class="cn">鞍山<span class="badge">鞍钢</span></div><div class="meta">现货资源 1.8 万条 · 112 家商家</div></a>
+      <a class="city-tile"><div class="cn">本溪<span class="badge">本钢</span></div><div class="meta">现货资源 0.9 万条 · 64 家商家</div></a>
+      <a class="city-tile"><div class="cn">包头<span class="badge">包钢</span></div><div class="meta">现货资源 1.2 万条 · 78 家商家</div></a>
+      <a class="city-tile"><div class="cn">太原<span class="badge">太钢</span></div><div class="meta">现货资源 1.3 万条 · 86 家商家</div></a>
+
+      <a class="city-tile"><div class="cn">马鞍山<span class="badge">马钢</span></div><div class="meta">现货资源 1.6 万条 · 104 家商家</div></a>
+      <a class="city-tile"><div class="cn">武汉<span class="badge">武钢</span></div><div class="meta">现货资源 2.2 万条 · 142 家商家</div></a>
+      <a class="city-tile"><div class="cn">重庆<span class="badge">重钢</span></div><div class="meta">现货资源 1.5 万条 · 96 家商家</div></a>
+      <a class="city-tile"><div class="cn">攀枝花<span class="badge">攀钢</span></div><div class="meta">现货资源 0.8 万条 · 52 家商家</div></a>
+      <a class="city-tile"><div class="cn">长沙<span class="badge">华菱</span></div><div class="meta">现货资源 1.4 万条 · 88 家商家</div></a>
+
+      <a class="city-tile"><div class="cn">上海<span class="badge">华东中心</span></div><div class="meta">现货资源 5.2 万条 · 312 家商家</div></a>
+      <a class="city-tile"><div class="cn">天津</div><div class="meta">现货资源 2.8 万条 · 178 家商家</div></a>
+      <a class="city-tile"><div class="cn">北京</div><div class="meta">现货资源 1.9 万条 · 124 家商家</div></a>
+      <a class="city-tile"><div class="cn">广州<span class="badge">华南</span></div><div class="meta">现货资源 2.4 万条 · 156 家商家</div></a>
+      <a class="city-tile"><div class="cn">杭州<span class="badge">杭钢</span></div><div class="meta">现货资源 2.0 万条 · 132 家商家</div></a>
+    </div>
+  </div>
+
+  <!-- 优质商家 -->
+  <div class="section">
+    <div class="section-head">
+      <span class="section-title">优质商家</span>
+      <a class="section-more">进入商家黄页 →</a>
+    </div>
+    <div class="shops">
+      <a class="shop"><div class="avatar">钢之家</div><div class="info"><div class="name">上海钢之家贸易有限公司</div><div class="meta">📍 上海·宝山钢市 · 经营 12 年</div><div class="tags"><span class="tag">螺纹钢</span><span class="tag tag-gray">热卷</span></div></div></a>
+      <a class="shop"><div class="avatar">永盛</div><div class="info"><div class="name">永盛金属（张家港）有限公司</div><div class="meta">📍 张家港·沙钢直营 · 经营 8 年</div><div class="tags"><span class="tag">沙钢</span><span class="tag tag-gray">盘螺</span></div></div></a>
+      <a class="shop"><div class="avatar">宏达</div><div class="info"><div class="name">唐山宏达钢材销售公司</div><div class="meta">📍 唐山·陡河 · 经营 15 年</div><div class="tags"><span class="tag">中厚板</span><span class="tag tag-gray">型钢</span></div></div></a>
+      <a class="shop"><div class="avatar">东方</div><div class="info"><div class="name">无锡东方钢材物流公司</div><div class="meta">📍 无锡·东方钢市 · 经营 10 年</div><div class="tags"><span class="tag">线材</span><span class="tag tag-gray">盘螺</span></div></div></a>
+
+      <a class="shop"><div class="avatar">汇通</div><div class="info"><div class="name">汇通钢铁（天津）有限公司</div><div class="meta">📍 天津港·保税区 · 经营 11 年</div><div class="tags"><span class="tag">冷轧板</span><span class="tag tag-gray">镀锌</span></div></div></a>
+      <a class="shop"><div class="avatar">鑫源</div><div class="info"><div class="name">邯郸鑫源金属材料公司</div><div class="meta">📍 邯郸·丛台 · 经营 9 年</div><div class="tags"><span class="tag">螺纹钢</span><span class="tag tag-gray">线材</span></div></div></a>
+      <a class="shop"><div class="avatar">华钢</div><div class="info"><div class="name">华钢（武汉）金属贸易公司</div><div class="meta">📍 武汉·青山 · 经营 13 年</div><div class="tags"><span class="tag">武钢</span><span class="tag tag-gray">中厚板</span></div></div></a>
+      <a class="shop"><div class="avatar">恒昌</div><div class="info"><div class="name">恒昌钢铁（广州）有限公司</div><div class="meta">📍 广州·黄埔港 · 经营 7 年</div><div class="tags"><span class="tag">冷轧</span><span class="tag tag-gray">不锈钢</span></div></div></a>
+    </div>
+  </div>
+
+  <!-- 平台数据 -->
+  <div class="kpi">
+    <div><div class="n">1,280 万吨</div><div class="l">累计成交</div></div>
+    <div><div class="n">12,000+</div><div class="l">入驻商家</div></div>
+    <div><div class="n">280+</div><div class="l">覆盖城市</div></div>
+    <div><div class="n">80 万+</div><div class="l">注册用户</div></div>
+  </div>
+
+  <!-- 友情链接 -->
+  <div class="friend">
+    <strong style="color:var(--c-text)">友情链接：</strong>
+    <a>中国钢铁工业协会</a><a>中国冶金报</a><a>沙钢集团</a><a>宝武集团</a><a>河钢集团</a><a>鞍钢集团</a><a>首钢集团</a><a>包钢集团</a><a>太钢集团</a><a>马钢集团</a><a>武钢集团</a><a>华菱钢铁</a><a>本钢集团</a><a>钢之家</a><a>找钢网</a>
+  </div>
+</div>
+
+<!-- 页脚 -->
+<footer class="footer">
+  <div class="wrap">
+    <div class="brand">
+      <div class="name">货袋子 HUODAIZI</div>
+      <div style="font-size:12px;color:#888;margin-top:4px">全国钢材现货交易平台</div>
+      <div class="tel">400-888-xxxx</div>
+      <div class="time">服务时间 周一至周日 8:00 - 20:00</div>
+      <div class="qr">
+        <div class="item"><div class="b">货袋子APP</div><div class="l">下载App</div></div>
+        <div class="item"><div class="b">微信公众号</div><div class="l">关注公众号</div></div>
+      </div>
+    </div>
+    <div><h5>关于我们</h5><a>公司介绍</a><a>发展历程</a><a>新闻动态</a><a>加入我们</a><a>联系方式</a></div>
+    <div><h5>帮助中心</h5><a>新手指南</a><a>交易流程</a><a>支付方式</a><a>物流配送</a><a>常见问题</a></div>
+    <div><h5>商家服务</h5><a>商家入驻</a><a>广告投放</a><a>会员服务</a><a>API 接入</a><a>开放平台</a></div>
+    <div><h5>法律条款</h5><a>用户协议</a><a>隐私政策</a><a>知识产权</a><a>免责声明</a><a>投诉建议</a></div>
+  </div>
+  <div class="copy">
+    © 2026 货袋子 · 普讯网络科技 ｜ 沪 ICP 备 XXXXXXXX 号 - 1 ｜ 沪公网安 31010XXXXXXXXXX 号
+  </div>
+</footer>
+
+</body>
+</html>

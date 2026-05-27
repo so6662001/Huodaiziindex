@@ -1,0 +1,61 @@
+---
+description: Java 后端编码规范
+globs: ["**/*.java", "**/pom.xml", "**/application*.yml"]
+---
+
+# Java 后端编码规范
+
+## 包结构
+- `com.huodaizi.<module>.<layer>`
+- module：resource / mill / news / index / subscription / radar / ad / news / seo / common
+- layer：controller / service / repository / domain / dto / mapper / config / task
+
+## 分层架构（强约束）
+- `controller` 仅做参数校验 + 调 service + 返回 VO；**不允许**业务逻辑
+- `service` 业务编排 + `@Transactional`；分接口 `XxxService` 与实现 `XxxServiceImpl`
+- `repository`/`mapper` 仅 SQL
+- `domain` 实体 + 业务方法（充血模型）
+- DTO 三套对象：`XxxRequestDTO` / `XxxResponseVO` / `XxxEntity`，用 MapStruct 转换
+
+## 命名
+- 类：`PascalCase`（`UserService`、`ResourceController`、`MillPriceCrawlTask`）
+- 方法：动宾（`findById`、`createOrder`、`pushAlert`）
+- 常量：`UPPER_SNAKE_CASE`
+- 变量：`camelCase`
+
+## 必须做
+- 所有 Controller 方法加 `@Operation(summary = "...")` 与 `@Parameter`
+- 所有 Entity 用 Lombok `@Data` `@Builder` + 审计字段（`@CreatedDate` `@LastModifiedDate`）
+- 业务异常：`throw new BusinessException(ErrorCode.XXX, "...")`
+- 单元测试：每个 Service 方法 ≥ 1 个测试，覆盖率 ≥ 70%
+- 集成测试：每个 Controller 至少 1 个 MockMvc 测试
+- 日志用 SLF4J 占位符：`log.info("user {} login from {}", userId, ip)`
+
+## 禁止做
+- ❌ `e.printStackTrace()`
+- ❌ `System.out.println` / `System.err.println`
+- ❌ `throws Exception` 一把抓
+- ❌ `catch (Exception e) {}` 吞异常
+- ❌ MyBatis `${}` 字符串拼接
+- ❌ 在 Controller 直接调 Repository（必须经 Service）
+- ❌ Service 之间循环依赖
+- ❌ 大事务 + 远程调用混用（远程调用必须放事务外）
+- ❌ 在循环中执行 SQL（用 batch / IN 一次性查）
+
+## 缓存
+- 用 `@Cacheable` 或手写 RedisTemplate
+- Key 规范：`huodaizi:<module>:<entity>:<id>`，例 `huodaizi:resource:detail:12345`
+- TTL 按 `docs/development-prompt.md` 第 5.3 节
+
+## 定时任务
+- 用 `@Scheduled` 或 XXL-Job
+- 必须加分布式锁（Redisson）避免重复执行
+- 必须记录开始/结束日志 + 异常告警（钉钉）
+
+## SQL
+- DDL 写在 `docs/db/schema.sql` 与 Flyway migrations
+- 表名 `t_` 前缀，字段小写下划线
+- 主键 `id BIGINT AUTO_INCREMENT`
+- 逻辑删除 `deleted TINYINT DEFAULT 0`
+- 审计 `created_at` `updated_at` `created_by` `updated_by`
+- 索引按查询模式建（参考文档第 4.3 节）
