@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=1280">
-<title>货袋子 · 5 大工具详细设计 | 智能找钢 / 批量比价 / 价格订阅 / 报价雷达 / 行情对比</title>
+<title>货袋子 · 4 大工具详细设计 | 智能找钢 / 价格订阅 / 报价雷达 / 行情对比</title>
 <link rel="stylesheet" href="./assets/common.css">
 <link rel="stylesheet" href="./assets/workbench.css">
 <link rel="stylesheet" href="./assets/tools.css">
@@ -13,9 +13,8 @@
 <!-- 顶部锚点导航 -->
 <nav class="tools-nav">
   <div class="wrap">
-    <div class="lb"><i>⚙️</i>5 大工具设计</div>
+    <div class="lb"><i>⚙️</i>4 大工具设计</div>
     <a href="#tool-1" class="on"><span class="ic">🎯</span>智能找钢</a>
-    <a href="#tool-2"><span class="ic">⚖️</span>批量比价</a>
     <a href="#tool-3"><span class="ic">🔔</span>价格订阅</a>
     <a href="#tool-4"><span class="ic">📡</span>报价雷达</a>
     <a href="#tool-5"><span class="ic">📊</span>行情对比</a>
@@ -111,7 +110,7 @@
         </div>
         <div class="actions">
           <a class="pri">立即询价</a>
-          <a class="out">+ 加入对比</a>
+          <a class="out">🔔 订阅价格</a>
         </div>
       </div>
 
@@ -133,7 +132,7 @@
         </div>
         <div class="actions">
           <a class="pri">立即询价</a>
-          <a class="out">+ 加入对比</a>
+          <a class="out">🔔 订阅价格</a>
         </div>
       </div>
 
@@ -155,7 +154,7 @@
         </div>
         <div class="actions">
           <a class="pri">立即询价</a>
-          <a class="out">+ 加入对比</a>
+          <a class="out">🔔 订阅价格</a>
         </div>
       </div>
 
@@ -176,7 +175,7 @@
         </div>
         <div class="actions">
           <a class="pri">立即询价</a>
-          <a class="out">+ 加入对比</a>
+          <a class="out">🔔 订阅价格</a>
         </div>
       </div>
 
@@ -197,16 +196,16 @@
         </div>
         <div class="actions">
           <a class="pri">立即询价</a>
-          <a class="out">+ 加入对比</a>
+          <a class="out">🔔 订阅价格</a>
         </div>
       </div>
 
       <div class="ai-action-bar">
-        <div class="info">已选 <b>2</b> 家加入对比 · 平均匹配度 <b>87%</b></div>
+        <div class="info">共匹配 <b>28</b> 条 · 价格区间 <b>¥3,680 ~ ¥3,720</b> · 平均匹配度 <b>87%</b></div>
         <a class="out">💾 保存为找钢方案</a>
-        <a class="out">📤 一键发起求购</a>
-        <a class="out">📊 进入批量比价</a>
-        <a class="pri">⚡ 批量询价 (5 家)</a>
+        <a class="out">🔔 价格订阅</a>
+        <a class="out">📡 一键发求购</a>
+        <a class="pri">📞 联系平台找货</a>
       </div>
     </div>
 
@@ -215,195 +214,7 @@
 
 <div class="tool-sep"></div>
 
-<!-- ========== 2. 批量比价 ========== -->
-<span class="anchor" id="tool-2"></span>
-<section class="tool-page">
-  <div class="wrap">
-
-    <div class="tool-intro">
-      <div class="ic-big">⚖️</div>
-      <div class="info">
-        <h2>批量比价<small>BATCH PRICE COMPARE</small></h2>
-        <p>同规格 N 家供应商横向对比 12 项指标（出厂价/含税/物流/账期/信用/总成本），自动高亮最优，支持 Excel 批量上传与一键群发询价。</p>
-        <div class="badges"><span>📋 12 项指标</span><span>🏆 最优自动高亮</span><span>📥 Excel 批量</span><span>📤 群发询价</span></div>
-      </div>
-      <div class="stats">
-        <div class="it"><b>8 家</b><span>同台对比</span></div>
-        <div class="it"><b>4.2%</b><span>平均价差</span></div>
-        <div class="it"><b>1 次</b><span>询价完成</span></div>
-      </div>
-    </div>
-
-    <!-- 查询条件 -->
-    <div class="bc-query">
-      <span class="grp"><label>品类</label><select><option>螺纹钢</option></select></span>
-      <span class="grp"><label>材质</label><select><option>HRB400E</option></select></span>
-      <span class="grp"><label>规格</label><select><option>φ20</option></select></span>
-      <span class="grp"><label>长度</label><select><option>9000mm</option></select></span>
-      <span class="grp"><label>采购量</label><input style="width:80px" value="200"><span style="font-size:12px;color:#6B6B6B">吨</span></span>
-      <span class="grp"><label>交付城市</label><select><option>上海</option></select></span>
-      <span class="grp"><label>交付方式</label><select><option>送货上门</option></select></span>
-      <button class="btn-go">🔍 比价</button>
-      <button class="btn-excel">📥 Excel 批量上传</button>
-    </div>
-
-    <!-- 比价表 -->
-    <div class="bc-table-wrap">
-      <table class="bc-table">
-        <thead>
-          <tr>
-            <th class="col-key">对比指标</th>
-            <th>
-              <div class="av">钢</div>
-              <div>沙钢</div>
-              <div class="mn">钢之家贸易</div>
-            </th>
-            <th>
-              <div class="av">永</div>
-              <div>永钢</div>
-              <div class="mn">永盛金属</div>
-            </th>
-            <th>
-              <div class="av">中</div>
-              <div>中天</div>
-              <div class="mn">中天上海代理</div>
-            </th>
-            <th>
-              <div class="av">日</div>
-              <div>日照</div>
-              <div class="mn">沪联钢铁</div>
-            </th>
-            <th>
-              <div class="av">首</div>
-              <div>首钢</div>
-              <div class="mn">首钢直营</div>
-            </th>
-            <th>
-              <div class="av">鞍</div>
-              <div>鞍钢</div>
-              <div class="mn">汇通钢铁</div>
-            </th>
-            <th>
-              <div class="av">马</div>
-              <div>马钢</div>
-              <div class="mn">恒泰贸易</div>
-            </th>
-            <th>
-              <div class="av">本</div>
-              <div>本钢</div>
-              <div class="mn">浦钢销售</div>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="col-key"><b>规格</b></td>
-            <td>φ20 9m</td><td>φ20 9m</td><td>φ20 9m</td><td>φ20 9m</td><td>φ20 12m</td><td>φ20 9m</td><td>φ20 9m</td><td>φ20 9m</td>
-          </tr>
-          <tr>
-            <td class="col-key"><b>不含税价</b><small>/吨</small></td>
-            <td class="num price best">3,680</td>
-            <td class="num price">3,690</td>
-            <td class="num price">3,695</td>
-            <td class="num price">3,700</td>
-            <td class="num price">3,710</td>
-            <td class="num price">3,720</td>
-            <td class="num price">3,720</td>
-            <td class="num price worst">3,750</td>
-          </tr>
-          <tr>
-            <td class="col-key">含税价 (13%)</td>
-            <td class="num">3,724</td><td class="num">3,734</td><td class="num">3,739</td><td class="num">3,744</td><td class="num">3,755</td><td class="num">3,765</td><td class="num">3,765</td><td class="num">3,795</td>
-          </tr>
-          <tr>
-            <td class="col-key">物流费<small>/吨</small></td>
-            <td class="num">50</td><td class="num best">30</td><td class="num">45</td><td class="num">60</td><td class="num">35</td><td class="num">80</td><td class="num">55</td><td class="num">90</td>
-          </tr>
-          <tr>
-            <td class="col-key"><b>总成本</b><small>/吨</small></td>
-            <td class="num price best">3,774</td>
-            <td class="num price">3,764</td>
-            <td class="num price">3,784</td>
-            <td class="num price">3,804</td>
-            <td class="num price">3,790</td>
-            <td class="num price">3,845</td>
-            <td class="num price">3,820</td>
-            <td class="num price worst">3,885</td>
-          </tr>
-          <tr>
-            <td class="col-key">交付时间</td>
-            <td>当日</td><td>次日</td><td>当日</td><td>2 日</td><td>当日</td><td>3 日</td><td>2 日</td><td>3 日</td>
-          </tr>
-          <tr>
-            <td class="col-key">可供库存<small>吨</small></td>
-            <td class="num">286</td><td class="num">520</td><td class="num">180</td><td class="num">96</td><td class="num">420</td><td class="num">340</td><td class="num">260</td><td class="num">160</td>
-          </tr>
-          <tr>
-            <td class="col-key">账期</td>
-            <td>现款</td><td>30 天</td><td>现款</td><td>60 天</td><td>30 天</td><td>90 天</td><td>30 天</td><td>60 天</td>
-          </tr>
-          <tr>
-            <td class="col-key">信用评级</td>
-            <td class="stars">★★★★★</td>
-            <td class="stars">★★★★</td>
-            <td class="stars">★★★</td>
-            <td class="stars">★★★★★</td>
-            <td class="stars">★★★★</td>
-            <td class="stars">★★★★</td>
-            <td class="stars">★★★★</td>
-            <td class="stars">★★★</td>
-          </tr>
-          <tr>
-            <td class="col-key">合作年限</td>
-            <td>12 年</td><td>8 年</td><td>5 年</td><td>11 年</td><td>15 年</td><td>9 年</td><td>10 年</td><td>3 年</td>
-          </tr>
-          <tr>
-            <td class="col-key">质保期</td>
-            <td>180 天</td><td>180 天</td><td>180 天</td><td>180 天</td><td>365 天</td><td>180 天</td><td>180 天</td><td>180 天</td>
-          </tr>
-          <tr class="row-check">
-            <td class="col-key" style="background:#FFF4EC"><b>加入对比 → 询价</b></td>
-            <td><input type="checkbox" checked></td>
-            <td><input type="checkbox" checked></td>
-            <td><input type="checkbox" checked></td>
-            <td><input type="checkbox"></td>
-            <td><input type="checkbox" checked></td>
-            <td><input type="checkbox"></td>
-            <td><input type="checkbox"></td>
-            <td><input type="checkbox"></td>
-          </tr>
-        </tbody>
-      </table>
-
-      <div class="bc-foot">
-        <div class="l">已选 <b>4</b> 家 · 最低含税 <b>¥3,724</b> · 最高 <b>¥3,795</b> · 价差 <b>¥71 / 1.9%</b> · 按 200 吨计算可节省 <b>¥14,200</b></div>
-        <div class="r">
-          <a class="out">📥 导出对比表</a>
-          <a class="out">🔔 价格订阅</a>
-          <a class="pri">⚡ 群发询价 (4 家)</a>
-        </div>
-      </div>
-    </div>
-
-    <!-- 总成本分布柱状 -->
-    <div class="bc-dist">
-      <div class="h">📊 总成本分布（含税 + 物流，按 200 吨采购计算）</div>
-      <div class="bc-dist-row"><span class="nm">永钢·永盛</span><div class="bar"><div class="fl best" style="width:65%">3,764</div></div><span class="px best">¥3,764</span><span class="tt">总额 ¥752,800 🏆</span></div>
-      <div class="bc-dist-row"><span class="nm">沙钢·钢之家</span><div class="bar"><div class="fl" style="width:68%">3,774</div></div><span class="px">¥3,774</span><span class="tt">总额 ¥754,800</span></div>
-      <div class="bc-dist-row"><span class="nm">中天·上海代理</span><div class="bar"><div class="fl" style="width:72%">3,784</div></div><span class="px">¥3,784</span><span class="tt">总额 ¥756,800</span></div>
-      <div class="bc-dist-row"><span class="nm">首钢·直营</span><div class="bar"><div class="fl" style="width:76%">3,790</div></div><span class="px">¥3,790</span><span class="tt">总额 ¥758,000</span></div>
-      <div class="bc-dist-row"><span class="nm">日照·沪联</span><div class="bar"><div class="fl" style="width:80%">3,804</div></div><span class="px">¥3,804</span><span class="tt">总额 ¥760,800</span></div>
-      <div class="bc-dist-row"><span class="nm">马钢·恒泰</span><div class="bar"><div class="fl" style="width:86%">3,820</div></div><span class="px">¥3,820</span><span class="tt">总额 ¥764,000</span></div>
-      <div class="bc-dist-row"><span class="nm">鞍钢·汇通</span><div class="bar"><div class="fl" style="width:92%">3,845</div></div><span class="px">¥3,845</span><span class="tt">总额 ¥769,000</span></div>
-      <div class="bc-dist-row"><span class="nm">本钢·浦钢</span><div class="bar"><div class="fl" style="width:100%">3,885</div></div><span class="px">¥3,885</span><span class="tt">总额 ¥777,000</span></div>
-    </div>
-
-  </div>
-</section>
-
-<div class="tool-sep"></div>
-
-<!-- ========== 3. 价格订阅 ========== -->
+<!-- ========== 2. 价格订阅 ========== -->
 <span class="anchor" id="tool-3"></span>
 <section class="tool-page">
   <div class="wrap">
@@ -638,7 +449,7 @@
 
 <div class="tool-sep"></div>
 
-<!-- ========== 4. 报价雷达 ========== -->
+<!-- ========== 3. 报价雷达 ========== -->
 <span class="anchor" id="tool-4"></span>
 <section class="tool-page">
   <div class="wrap">
@@ -863,7 +674,7 @@
 
 <div class="tool-sep"></div>
 
-<!-- ========== 5. 行情对比 ========== -->
+<!-- ========== 4. 行情对比 ========== -->
 <span class="anchor" id="tool-5"></span>
 <section class="tool-page">
   <div class="wrap">
