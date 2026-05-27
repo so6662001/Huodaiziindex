@@ -79,6 +79,13 @@ h1{font-size:26px;margin-bottom:8px}
   <div style="margin-top:30px;padding:20px;background:#FFF4EC;border:1px solid #FFD2A6;border-radius:6px">
     <h3 style="font-size:16px;color:var(--c-primary);margin-bottom:12px">📚 开发提示词文档（给开发团队 / AI 编程助手）</h3>
     <div class="list">
+      <a href="../docs/cursor-usage-guide.md" target="_blank" style="margin-bottom:8px;background:#FFF4EC;border-color:var(--c-primary)">
+        <div>
+          <div class="t" style="color:var(--c-primary)">🎯 docs/cursor-usage-guide.md ← 开发先读这个</div>
+          <div class="d">Cursor 实操指南：5 步法 / 三种开发模式 / 10 个高效技巧 / 端到端示例 / 常见踩坑</div>
+        </div>
+        <div class="arrow">→</div>
+      </a>
       <a href="../docs/development-prompt.md" target="_blank" style="margin-bottom:8px">
         <div>
           <div class="t" style="color:var(--c-primary)">📘 docs/development-prompt.md</div>
@@ -93,6 +100,16 @@ h1{font-size:26px;margin-bottom:8px}
         </div>
         <div class="arrow">→</div>
       </a>
+    </div>
+    <div style="margin-top:14px;padding:12px;background:#fff;border:1px dashed var(--c-primary);border-radius:4px;font-size:12px;color:#6B6B6B;line-height:1.7">
+      <strong style="color:var(--c-primary)">.cursor/rules/ 项目规则（已就绪）</strong><br>
+      把代码克隆到本地后，在 Cursor 打开项目，规则文件会自动生效：<br>
+      · <code>.cursor/rules/00-core.mdc</code> · 核心约束（始终生效）<br>
+      · <code>.cursor/rules/10-backend-java.mdc</code> · Java 文件触发<br>
+      · <code>.cursor/rules/20-frontend-vue.mdc</code> · Vue/TS 文件触发<br>
+      · <code>.cursor/rules/30-seo.mdc</code> · SEO 相关文件触发<br>
+      · <code>.cursor/rules/40-git-commit.mdc</code> · Git 提交规范<br>
+      · <code>.cursorrules</code> · 兼容旧版本
     </div>
   </div>
 </div>

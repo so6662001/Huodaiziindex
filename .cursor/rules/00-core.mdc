@@ -1,0 +1,66 @@
+---
+description: 货袋子 V2 平台核心约束 - 所有任务必读
+alwaysApply: true
+---
+
+# 货袋子 V2 平台 · 核心约束（所有任务必读）
+
+## 你的角色
+你是货袋子（钢材现货交易平台）V2 改造项目的全栈工程师。
+完整开发指引在 `docs/development-prompt.md`，分模块 prompt 在 `docs/ai-prompts-per-module.md`，设计稿在 `designs/` 目录。
+
+## 工作流（每次任务必须遵守）
+1. **先读再写**：动手前必须读完 `docs/development-prompt.md` 对应章节 + 对应设计稿
+2. **先计划再执行**：列出将创建/修改的文件清单，等用户确认后再写代码
+3. **小步快跑**：单次任务只实现 1 个模块，跨模块拆分多轮对话
+4. **收尾输出**：每次完成必须输出 — 变更文件清单 / 新增依赖（白名单检查）/ SQL DDL（如有，提醒 DBA Review）/ 单元测试 / 本地运行方式 / 关键决策注释
+
+## 技术栈（严格遵守）
+- 后端：Java 17 + Spring Boot 3.2 + MyBatis-Plus + MySQL 8 + Redis 7 + Thymeleaf 3.1（仅 SEO 着陆页）+ Elasticsearch 8
+- 前端：Vue 3.4 + TypeScript 5 + Pinia 2 + vue-router 4 + Vite 5 + ECharts 5 + Element Plus + Naive UI（沿用现状）
+- 测试：JUnit 5 + Mockito + Testcontainers（后端）/ Vitest + Playwright（前端）
+
+## 全平台配色（中国行业惯例：红涨绿跌）
+- 主橙 `#FF6A00` / 主橙-深 `#E55A00` / 主橙-浅背景 `#FFF4EC`
+- 涨红 `#E63946` / 跌绿 `#10B981` / 持平灰 `#9CA3AF`
+- 文字主 `#1F1F1F` / 文字次 `#6B6B6B` / 线 `#E5E7EB`
+- 深色（仅指数大屏）：`#0F1A2A` / `#142236`
+
+## 禁用清单（NEVER）
+- ❌ 引入未在 `docs/development-prompt.md` 第 2 章列出的依赖
+- ❌ 在公开页（首页/分站/资源/资讯/工具）加载 `wujie` / `ag-grid` / `vxe-table`
+- ❌ 使用 `jQuery` / `moment` 写新代码（用 `dayjs` 代替 moment）
+- ❌ TypeScript 使用 `any`、`@ts-ignore`、`@ts-nocheck`
+- ❌ Java 中 `e.printStackTrace()` / `System.out.println` / `throws Exception` 一把抓
+- ❌ 在公开页面（SEO 着陆页）使用空 `<div id="app">` 等待 JS 渲染
+- ❌ 在前端代码或 Git 中硬编码密钥、Token、内部 IP
+- ❌ SQL 使用 `${}` 拼接（必须 `#{}` 参数化）
+- ❌ 富文本 `v-html` 不做 DOMPurify 过滤
+- ❌ 设计稿之外的视觉自创（必须对照 designs/ 实现，有疑问问用户）
+- ❌ 出现"批量比价 / 加入对比 / 批量询价 / 撮合大厅 / AI 价格预测 / 心电图脉搏"等已确认移除的功能
+
+## 强制约束（ALWAYS）
+- ✅ 所有金额按"分"用 `BIGINT` 存储（如 `price_cent`），前端展示"元/吨"
+- ✅ 所有时间用 UTC `TIMESTAMP WITH TIME ZONE` 存储，前端按浏览器时区展示
+- ✅ 所有对外 API 加 OpenAPI 注解（springdoc-openapi），前端必须从生成的 TS 类型调用
+- ✅ 所有 `<img>` 必填 `alt` + `width` + `height`
+- ✅ 所有 SEO 着陆页 HTML 必须直出（含 title/description/keywords/canonical/og:*/JSON-LD/正文/≥30 个 `<a>`）
+- ✅ 提交前必须本地跑通：`mvn test`（后端）/ `pnpm test` + `pnpm typecheck`（前端）
+- ✅ 命名遵守 docs/development-prompt.md 第 10 章
+
+## 设计稿映射
+- 首页：`designs/mockup-home-v2.html` + `designs/preview/home-v2.png`
+- 上海分站：`designs/mockup-shanghai.html` + `designs/preview/shanghai.png`
+- 4 大工具：`designs/mockup-tools.html` + `designs/preview/tools.png`
+- 公共样式：`designs/assets/workbench.css` + `designs/assets/common.css` + `designs/assets/tools.css`
+
+## 错误时的处理
+- 不确定的地方：写 `// @TODO @产品 xxx问题` 注释并在收尾时列出，不要脑补
+- 设计稿与文档冲突：以**设计稿**为视觉真源，以**文档**为功能/数据/接口真源
+- 引入新依赖：必须先停下来询问用户
+
+## 4 个最终确认的工具（其他工具按文档优先级）
+1. 🎯 智能找钢
+2. 🔔 价格订阅
+3. 📡 报价雷达
+4. 📊 行情对比

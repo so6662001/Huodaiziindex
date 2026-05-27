@@ -1,0 +1,84 @@
+---
+description: Vue3 + TypeScript 前端编码规范
+globs: ["**/*.vue", "**/*.ts", "**/*.tsx", "**/vite.config.*", "**/package.json"]
+---
+
+# Vue3 + TypeScript 前端编码规范
+
+## 项目目录
+```
+frontend/src/
+├── api/           axios 实例 + 接口模块（按 OpenAPI 生成 + 业务封装）
+├── assets/        静态资源
+├── components/    通用组件
+├── views/         页面组件
+├── router/        路由
+├── stores/        Pinia stores
+├── styles/        全局样式 + 主题变量
+├── utils/         工具函数
+├── composables/   组合式函数
+└── types/         全局 TS 类型
+```
+
+## 组件
+- 单文件组件 `<script setup lang="ts">` + 组合式 API
+- 组件文件 `PascalCase.vue`（`ResourceStream.vue`、`IndexDashboard.vue`）
+- 模板中引用 kebab-case（`<resource-stream>`）
+- Props/Emits 必须显式 TypeScript 类型化
+
+## 命名
+- 变量 `camelCase`
+- 常量 `UPPER_SNAKE_CASE`
+- 类型/接口 `PascalCase`（`ResourceListVO`、`SubscriptionForm`）
+- composables 用 `useXxx`（`useIndexDashboard`、`useUserStore`）
+
+## 状态（Pinia）
+- 一个 view 一个 store（`useHomeStore`、`useFindStore`）
+- 全局 store：`useUserStore` / `useCityStore` / `useThemeStore`
+- 异步用 `async/await`
+- 不在 setup 顶层 `await` 阻塞渲染（用 `Suspense` 或 loading 状态）
+
+## API 调用
+- 接口类型由 OpenAPI Generator 生成到 `src/api/__generated__/`
+- 业务封装在 `src/api/<module>.ts`
+- 统一拦截：response 失败用 reject，组件用 try/catch + ElMessage
+
+## 路由
+- 路由级代码分割：`() => import('./HomeView.vue')`
+- 公开页（首页/资源/分站/资讯/工具）走 vue-router 渲染
+- 工作台/订单/账户 等私有页通过 wujie 加载子应用（路径 `/workspace/*`）
+- **禁止**：公开页加载 wujie / ag-grid / vxe-table
+
+## ECharts
+- 统一在 `components/charts/` 封装：`KLine` / `MultiLine` / `HeatGrid` / `MiniSparkline` / `RadarSweep`
+- 红涨 `#E63946` / 绿跌 `#10B981` / 主橙 `#FF6A00`
+- 字体 `DIN, Helvetica Neue, Arial`
+- 按需引入：`import { LineChart } from 'echarts/charts'`，禁止 `import * as echarts`
+
+## 必须做
+- TS 严格模式 `strict: true` `noImplicitAny: true`
+- 单测覆盖 utils + composables ≥ 70%
+- 关键组件加 `<style scoped>`
+- 所有 `<img>` 加 `alt`、`width`、`height`
+- 富文本 `v-html` 必须先 DOMPurify 过滤
+
+## 禁止做
+- ❌ `any` 类型
+- ❌ `@ts-ignore` `@ts-nocheck`
+- ❌ `console.log` 提交（dev 环境 OK，正式代码用 logger）
+- ❌ jQuery / moment.js（用 dayjs）
+- ❌ 内联 `style="..."`（迁移到 SCSS）
+- ❌ 在公开页 import wujie / ag-grid / vxe-table
+- ❌ 用 fetch / xhr 直接调接口（统一走 `src/api/`）
+
+## 性能预算
+- 首页 JS gzip < 200 KB
+- 首屏 CSS < 50 KB
+- LCP < 2.5s（4G）
+- 单 chunk < 300 KB（gzip 前）
+
+## CSS
+- 使用 SCSS + 变量（`src/styles/_vars.scss`）
+- 禁用 `!important`（特殊情况注释说明）
+- 优先 Flex/Grid 布局
+- 主题色全部从变量读取，禁止硬编码 `#FF6A00` 之外的颜色码
