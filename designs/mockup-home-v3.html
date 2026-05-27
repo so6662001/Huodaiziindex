@@ -1,0 +1,1062 @@
+<!doctype html>
+<html lang="zh-cmn-Hans">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280">
+<title>货袋子 · 钢市作战大厅 | 全国钢材现货交易终端</title>
+<meta name="keywords" content="货袋子,钢材现货交易终端,钢市作战大厅,钢材指数,钢市地图,撮合大厅,智能找钢,AI 价格预测">
+<meta name="description" content="货袋子钢市作战大厅：实时钢材指数 K 线、全国钢市地图、撮合大厅、智能找钢漏斗、AI 价格预测、钢市脉搏，专业钢贸操盘终端。">
+<link rel="stylesheet" href="./assets/terminal.css">
+</head>
+<body>
+
+<!-- 顶部条 -->
+<div class="tm-topbar">
+  <div class="wrap">
+    <div>
+      <a class="city">📍 上海 切换</a>
+      <span style="margin:0 12px">|</span>
+      <span>钢市作战大厅</span>
+      <span style="margin:0 12px">|</span>
+      <span class="clock">2026-05-27 09:32:18 周三 · 开市中</span>
+    </div>
+    <div>
+      <a>登录</a><span>|</span><a>注册</a><span>|</span><a>APP</a><span>|</span><a>商家入驻</a><span>|</span><a>API</a><span>|</span><a>客服 400-888-xxxx</a>
+    </div>
+  </div>
+</div>
+
+<!-- Header -->
+<header class="tm-header">
+  <div class="wrap">
+    <div class="tm-logo">
+      <div class="mk">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><ellipse cx="12" cy="6" rx="8" ry="2.5"/><path d="M4 6v12c0 1.4 3.6 2.5 8 2.5s8-1.1 8-2.5V6"/><path d="M4 12c0 1.4 3.6 2.5 8 2.5s8-1.1 8-2.5"/></svg>
+      </div>
+      <div>
+        <div class="nm">货袋子</div>
+        <div style="font-size:10px;color:var(--text-3);letter-spacing:2px;margin-top:2px">STEEL TRADING TERMINAL</div>
+      </div>
+      <div class="sb">钢市作战大厅<br>v3.0 · 终端版</div>
+    </div>
+
+    <div class="tm-search">
+      <span class="hint">AI · 智能搜索</span>
+      <span class="ai">AI</span>
+      <input placeholder="自然语言：上海宝山螺纹钢 HRB400E φ20 价格 ≤ 3700 库存 ≥ 100 吨">
+      <button class="btn">🔍 搜索</button>
+    </div>
+
+    <div class="tm-qt">
+      <a><span class="i">🎯</span>智能找钢</a>
+      <a><span class="i">⚡</span>实时撮合</a>
+      <a><span class="i">🔔</span>价格雷达</a>
+      <a><span class="i">📊</span>K线分析</a>
+    </div>
+  </div>
+</header>
+
+<!-- Nav -->
+<nav class="tm-nav">
+  <div class="wrap">
+    <a class="on">⬢ 作战大厅</a>
+    <a>找钢材</a>
+    <a>找求购</a>
+    <a>行情终端</a>
+    <a>商家黄页</a>
+    <a>钢材资讯</a>
+    <a>全国分站</a>
+    <a>API 开放平台</a>
+    <span class="right">
+      <span class="live"><i></i>实时数据 · 8 路在线</span>
+      <span>今日撮合 <b style="color:var(--primary-bright);font-family:DIN">368</b> 单</span>
+    </span>
+  </div>
+</nav>
+
+<!-- ========== HERO：综合指数 K 线 + 雷达 ========== -->
+<section class="tm-hero">
+  <div class="wrap">
+    <div class="hero-grid">
+
+      <!-- K线大图 -->
+      <div class="hero-chart">
+        <div class="hc-head">
+          <div class="hc-name">
+            <span class="lb">货袋子钢材综合指数</span>
+            <span class="cd">HDZSI · 000001</span>
+          </div>
+          <div class="hc-tabs">
+            <a>分时</a><a class="on">日K</a><a>周K</a><a>月K</a><a>年K</a><a>对比</a>
+          </div>
+        </div>
+
+        <div class="hc-meta">
+          <div class="px up">3,712.48</div>
+          <div class="dt up">+28.65  +0.78%</div>
+          <div class="kvs">
+            <div>开盘<b>3683.83</b></div>
+            <div>最高<b class="up">3718.20</b></div>
+            <div>最低<b class="down">3680.10</b></div>
+            <div>成交<b>286.5万吨</b></div>
+            <div>振幅<b>1.03%</b></div>
+            <div>52周高<b class="up">4128</b></div>
+            <div>52周低<b class="down">3214</b></div>
+          </div>
+        </div>
+
+        <div class="hc-chart-wrap">
+          <svg class="hc-chart" viewBox="0 0 800 260" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="kgrad" x1="0" x2="0" y1="0" y2="1">
+                <stop offset="0" stop-color="#FF6A00" stop-opacity=".25"/>
+                <stop offset="1" stop-color="#FF6A00" stop-opacity="0"/>
+              </linearGradient>
+              <linearGradient id="malin" x1="0" x2="1" y1="0" y2="0">
+                <stop offset="0" stop-color="#00D4FF"/><stop offset="1" stop-color="#FFC847"/>
+              </linearGradient>
+            </defs>
+            <!-- 网格 -->
+            <g stroke="#1F3450" stroke-dasharray="2 4" stroke-width=".6">
+              <line x1="50" y1="30" x2="800" y2="30"/>
+              <line x1="50" y1="80" x2="800" y2="80"/>
+              <line x1="50" y1="130" x2="800" y2="130"/>
+              <line x1="50" y1="180" x2="800" y2="180"/>
+              <line x1="50" y1="230" x2="800" y2="230"/>
+            </g>
+            <!-- 蜡烛图 (40 根) - 红涨绿跌, 钢铁市场红涨 -->
+            <g>
+              <!-- 数据格式: x, 开, 收, 高, 低 -->
+              <!-- 第一段下跌 -->
+              <g><line x1="68" y1="160" x2="68" y2="180" stroke="#2BE0A0" stroke-width="1"/><rect x="64" y="165" width="8" height="12" fill="#2BE0A0"/></g>
+              <g><line x1="86" y1="155" x2="86" y2="178" stroke="#2BE0A0" stroke-width="1"/><rect x="82" y="158" width="8" height="15" fill="#2BE0A0"/></g>
+              <g><line x1="104" y1="145" x2="104" y2="170" stroke="#FF5A4D" stroke-width="1"/><rect x="100" y="150" width="8" height="18" fill="#FF5A4D"/></g>
+              <g><line x1="122" y1="138" x2="122" y2="165" stroke="#FF5A4D" stroke-width="1"/><rect x="118" y="142" width="8" height="20" fill="#FF5A4D"/></g>
+              <g><line x1="140" y1="135" x2="140" y2="158" stroke="#2BE0A0" stroke-width="1"/><rect x="136" y="145" width="8" height="11" fill="#2BE0A0"/></g>
+              <g><line x1="158" y1="148" x2="158" y2="172" stroke="#FF5A4D" stroke-width="1"/><rect x="154" y="152" width="8" height="16" fill="#FF5A4D"/></g>
+              <g><line x1="176" y1="140" x2="176" y2="160" stroke="#FF5A4D" stroke-width="1"/><rect x="172" y="142" width="8" height="14" fill="#FF5A4D"/></g>
+              <g><line x1="194" y1="130" x2="194" y2="155" stroke="#FF5A4D" stroke-width="1"/><rect x="190" y="134" width="8" height="18" fill="#FF5A4D"/></g>
+              <g><line x1="212" y1="125" x2="212" y2="148" stroke="#2BE0A0" stroke-width="1"/><rect x="208" y="128" width="8" height="14" fill="#2BE0A0"/></g>
+              <g><line x1="230" y1="130" x2="230" y2="158" stroke="#2BE0A0" stroke-width="1"/><rect x="226" y="135" width="8" height="20" fill="#2BE0A0"/></g>
+              <g><line x1="248" y1="140" x2="248" y2="170" stroke="#2BE0A0" stroke-width="1"/><rect x="244" y="145" width="8" height="22" fill="#2BE0A0"/></g>
+              <g><line x1="266" y1="158" x2="266" y2="186" stroke="#2BE0A0" stroke-width="1"/><rect x="262" y="163" width="8" height="20" fill="#2BE0A0"/></g>
+              <g><line x1="284" y1="148" x2="284" y2="178" stroke="#FF5A4D" stroke-width="1"/><rect x="280" y="152" width="8" height="22" fill="#FF5A4D"/></g>
+              <g><line x1="302" y1="135" x2="302" y2="165" stroke="#FF5A4D" stroke-width="1"/><rect x="298" y="140" width="8" height="22" fill="#FF5A4D"/></g>
+              <g><line x1="320" y1="128" x2="320" y2="155" stroke="#FF5A4D" stroke-width="1"/><rect x="316" y="132" width="8" height="20" fill="#FF5A4D"/></g>
+              <g><line x1="338" y1="118" x2="338" y2="148" stroke="#FF5A4D" stroke-width="1"/><rect x="334" y="124" width="8" height="22" fill="#FF5A4D"/></g>
+              <g><line x1="356" y1="125" x2="356" y2="148" stroke="#2BE0A0" stroke-width="1"/><rect x="352" y="128" width="8" height="14" fill="#2BE0A0"/></g>
+              <g><line x1="374" y1="135" x2="374" y2="158" stroke="#2BE0A0" stroke-width="1"/><rect x="370" y="138" width="8" height="16" fill="#2BE0A0"/></g>
+              <g><line x1="392" y1="130" x2="392" y2="155" stroke="#FF5A4D" stroke-width="1"/><rect x="388" y="135" width="8" height="16" fill="#FF5A4D"/></g>
+              <g><line x1="410" y1="115" x2="410" y2="142" stroke="#FF5A4D" stroke-width="1"/><rect x="406" y="120" width="8" height="20" fill="#FF5A4D"/></g>
+              <g><line x1="428" y1="108" x2="428" y2="135" stroke="#FF5A4D" stroke-width="1"/><rect x="424" y="112" width="8" height="20" fill="#FF5A4D"/></g>
+              <g><line x1="446" y1="118" x2="446" y2="140" stroke="#2BE0A0" stroke-width="1"/><rect x="442" y="120" width="8" height="16" fill="#2BE0A0"/></g>
+              <g><line x1="464" y1="128" x2="464" y2="152" stroke="#2BE0A0" stroke-width="1"/><rect x="460" y="132" width="8" height="16" fill="#2BE0A0"/></g>
+              <g><line x1="482" y1="120" x2="482" y2="148" stroke="#FF5A4D" stroke-width="1"/><rect x="478" y="125" width="8" height="18" fill="#FF5A4D"/></g>
+              <g><line x1="500" y1="105" x2="500" y2="132" stroke="#FF5A4D" stroke-width="1"/><rect x="496" y="110" width="8" height="18" fill="#FF5A4D"/></g>
+              <g><line x1="518" y1="95" x2="518" y2="125" stroke="#FF5A4D" stroke-width="1"/><rect x="514" y="98" width="8" height="22" fill="#FF5A4D"/></g>
+              <g><line x1="536" y1="100" x2="536" y2="122" stroke="#2BE0A0" stroke-width="1"/><rect x="532" y="105" width="8" height="14" fill="#2BE0A0"/></g>
+              <g><line x1="554" y1="108" x2="554" y2="135" stroke="#2BE0A0" stroke-width="1"/><rect x="550" y="115" width="8" height="16" fill="#2BE0A0"/></g>
+              <g><line x1="572" y1="118" x2="572" y2="145" stroke="#2BE0A0" stroke-width="1"/><rect x="568" y="122" width="8" height="20" fill="#2BE0A0"/></g>
+              <g><line x1="590" y1="110" x2="590" y2="138" stroke="#FF5A4D" stroke-width="1"/><rect x="586" y="115" width="8" height="18" fill="#FF5A4D"/></g>
+              <g><line x1="608" y1="95" x2="608" y2="122" stroke="#FF5A4D" stroke-width="1"/><rect x="604" y="100" width="8" height="18" fill="#FF5A4D"/></g>
+              <g><line x1="626" y1="85" x2="626" y2="112" stroke="#FF5A4D" stroke-width="1"/><rect x="622" y="90" width="8" height="20" fill="#FF5A4D"/></g>
+              <g><line x1="644" y1="90" x2="644" y2="115" stroke="#2BE0A0" stroke-width="1"/><rect x="640" y="95" width="8" height="14" fill="#2BE0A0"/></g>
+              <g><line x1="662" y1="98" x2="662" y2="120" stroke="#2BE0A0" stroke-width="1"/><rect x="658" y="100" width="8" height="14" fill="#2BE0A0"/></g>
+              <g><line x1="680" y1="92" x2="680" y2="118" stroke="#FF5A4D" stroke-width="1"/><rect x="676" y="98" width="8" height="16" fill="#FF5A4D"/></g>
+              <g><line x1="698" y1="82" x2="698" y2="108" stroke="#FF5A4D" stroke-width="1"/><rect x="694" y="85" width="8" height="18" fill="#FF5A4D"/></g>
+              <g><line x1="716" y1="75" x2="716" y2="100" stroke="#FF5A4D" stroke-width="1"/><rect x="712" y="78" width="8" height="18" fill="#FF5A4D"/></g>
+              <g><line x1="734" y1="72" x2="734" y2="95" stroke="#FF5A4D" stroke-width="1"/><rect x="730" y="76" width="8" height="16" fill="#FF5A4D"/></g>
+              <g><line x1="752" y1="65" x2="752" y2="88" stroke="#FF5A4D" stroke-width="1"/><rect x="748" y="68" width="8" height="16" fill="#FF5A4D"/></g>
+              <g><line x1="770" y1="60" x2="770" y2="85" stroke="#FF5A4D" stroke-width="1"/><rect x="766" y="62" width="8" height="20" fill="#FF5A4D"/></g>
+            </g>
+            <!-- MA5 / MA20 均线 -->
+            <polyline fill="none" stroke="#FFC847" stroke-width="1.4" stroke-dasharray="0" points="68,170 86,167 104,160 122,154 140,148 158,155 176,150 194,144 212,140 230,144 248,154 266,165 284,168 302,158 320,150 338,140 356,138 374,142 392,144 410,138 428,128 446,125 464,130 482,135 500,128 518,118 536,118 554,120 572,128 590,128 608,118 626,108 644,105 662,108 680,110 698,103 716,95 734,90 752,82 770,76"/>
+            <polyline fill="none" stroke="#00D4FF" stroke-width="1.4" points="68,162 86,160 104,157 122,154 140,152 158,154 176,152 194,150 212,148 230,148 248,150 266,154 284,156 302,154 320,150 338,146 356,144 374,144 392,144 410,142 428,138 446,136 464,136 482,136 500,134 518,130 536,128 554,128 572,130 590,130 608,126 626,122 644,118 662,116 680,116 698,114 716,110 734,106 752,102 770,98"/>
+            <!-- 当前价格线 -->
+            <line x1="50" y1="62" x2="800" y2="62" stroke="#FF6A00" stroke-width="1" stroke-dasharray="4 4" opacity=".7"/>
+            <rect x="755" y="54" width="45" height="16" fill="#FF6A00"/>
+            <text x="777" y="65" font-size="10" fill="#fff" text-anchor="middle" font-family="DIN" font-weight="700">3712.48</text>
+          </svg>
+
+          <div class="hc-y-axis">
+            <span>3800</span><span>3700</span><span>3600</span><span>3500</span><span>3400</span><span>3300</span>
+          </div>
+
+          <div class="hc-x-axis" style="padding-left:50px">
+            <span>03-01</span><span>03-15</span><span>04-01</span><span>04-15</span><span>05-01</span><span>05-15</span><span>05-27</span>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:14px;font-size:11px;color:var(--text-3);padding-top:6px;border-top:1px dashed var(--line);margin-top:6px">
+          <span><i style="display:inline-block;width:12px;height:2px;background:#FFC847;vertical-align:3px;margin-right:4px"></i>MA5 <b style="color:var(--gold);font-family:DIN;margin-left:4px">3702</b></span>
+          <span><i style="display:inline-block;width:12px;height:2px;background:#00D4FF;vertical-align:3px;margin-right:4px"></i>MA20 <b style="color:var(--cyan);font-family:DIN;margin-left:4px">3658</b></span>
+          <span><i style="display:inline-block;width:8px;height:8px;background:#FF5A4D;vertical-align:0;margin-right:4px"></i>涨 <b style="color:var(--up);font-family:DIN">22</b></span>
+          <span><i style="display:inline-block;width:8px;height:8px;background:#2BE0A0;vertical-align:0;margin-right:4px"></i>跌 <b style="color:var(--down);font-family:DIN">18</b></span>
+          <span style="margin-left:auto;color:var(--primary-bright)">↗ 突破 60 日均线 · 短期看多</span>
+        </div>
+      </div>
+
+      <!-- 右侧雷达 + 品类卡 -->
+      <div class="hero-side">
+        <div class="side-radar">
+          <div class="ttl">品类强弱雷达 · 6 维度</div>
+          <svg viewBox="0 0 280 200" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <radialGradient id="rdg" cx="50%" cy="50%" r="50%">
+                <stop offset="0" stop-color="#FF6A00" stop-opacity=".4"/>
+                <stop offset="1" stop-color="#FF6A00" stop-opacity=".05"/>
+              </radialGradient>
+            </defs>
+            <g transform="translate(140,100)">
+              <!-- 网格 6 边形 -->
+              <g fill="none" stroke="#1F3450" stroke-width=".8">
+                <polygon points="0,-80 69.3,-40 69.3,40 0,80 -69.3,40 -69.3,-40"/>
+                <polygon points="0,-60 51.96,-30 51.96,30 0,60 -51.96,30 -51.96,-30"/>
+                <polygon points="0,-40 34.64,-20 34.64,20 0,40 -34.64,20 -34.64,-20"/>
+                <polygon points="0,-20 17.32,-10 17.32,10 0,20 -17.32,10 -17.32,-10"/>
+              </g>
+              <!-- 轴线 -->
+              <g stroke="#1F3450" stroke-width=".8">
+                <line x1="0" y1="0" x2="0" y2="-80"/>
+                <line x1="0" y1="0" x2="69.3" y2="-40"/>
+                <line x1="0" y1="0" x2="69.3" y2="40"/>
+                <line x1="0" y1="0" x2="0" y2="80"/>
+                <line x1="0" y1="0" x2="-69.3" y2="40"/>
+                <line x1="0" y1="0" x2="-69.3" y2="-40"/>
+              </g>
+              <!-- 数据 -->
+              <polygon points="0,-72 62.4,-36 51.96,30 0,52 -45,26 -62.4,-36"
+                fill="url(#rdg)" stroke="#FF6A00" stroke-width="1.8"/>
+              <!-- 数据点 -->
+              <g fill="#FF6A00" stroke="#fff" stroke-width="1.5">
+                <circle cx="0" cy="-72" r="3"/>
+                <circle cx="62.4" cy="-36" r="3"/>
+                <circle cx="51.96" cy="30" r="3"/>
+                <circle cx="0" cy="52" r="3"/>
+                <circle cx="-45" cy="26" r="3"/>
+                <circle cx="-62.4" cy="-36" r="3"/>
+              </g>
+              <!-- 标签 -->
+              <g fill="#8AA3BD" font-size="10" text-anchor="middle">
+                <text x="0" y="-90">螺纹</text>
+                <text x="80" y="-44">热卷</text>
+                <text x="80" y="48">冷轧</text>
+                <text x="0" y="94">中厚板</text>
+                <text x="-80" y="48">镀锌</text>
+                <text x="-80" y="-44">型钢</text>
+              </g>
+              <g fill="#FF8533" font-size="9" font-family="DIN" text-anchor="middle" font-weight="700">
+                <text x="0" y="-78">90</text>
+                <text x="68" y="-32">82</text>
+                <text x="58" y="35">75</text>
+                <text x="0" y="58">65</text>
+                <text x="-50" y="32">68</text>
+                <text x="-68" y="-32">82</text>
+              </g>
+            </g>
+          </svg>
+          <div class="info"><span>综合强度</span><span><b>76.8</b> / 100</span></div>
+        </div>
+
+        <div class="side-cats">
+          <div class="side-cat">
+            <div class="n">螺纹钢 HRB400E</div>
+            <div class="p up">3,680</div>
+            <div class="d up">+20 ↑ +0.55%</div>
+          </div>
+          <div class="side-cat">
+            <div class="n">热轧 Q235B 5.75</div>
+            <div class="p down">3,520</div>
+            <div class="d down">−10 ↓ −0.28%</div>
+          </div>
+          <div class="side-cat">
+            <div class="n">冷轧 SPCC 1.0</div>
+            <div class="p up">4,150</div>
+            <div class="d up">+5 ↑ +0.12%</div>
+          </div>
+          <div class="side-cat">
+            <div class="n">中厚板 Q235B 20</div>
+            <div class="p flat">3,780</div>
+            <div class="d flat">持平 →</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 全宽 Ticker -->
+    <div class="tm-ticker">
+      <span class="lb">⚡ LIVE TICKER</span>
+      <div class="tk">
+        <span><b>HDZSI</b> <em class="up">3712.48 +0.78%</em></span>
+        <span><b>螺纹·沪</b> <em class="up">3680 +20</em></span>
+        <span><b>热卷·津</b> <em class="down">3520 −10</em></span>
+        <span><b>线材·锡</b> <em class="up">3720 +15</em></span>
+        <span><b>冷轧·汉</b> <em class="up">4150 +5</em></span>
+        <span><b>中厚板·唐</b> <em class="flat">3780 平</em></span>
+        <span><b>镀锌·邯</b> <em class="up">4520 +30</em></span>
+        <span><b>盘螺·日</b> <em class="down">3710 −5</em></span>
+        <span><b>角钢·马</b> <em class="up">3850 +10</em></span>
+        <span><b>工字钢·莱</b> <em class="up">3920 +8</em></span>
+        <span><b>无缝管·包</b> <em class="down">4680 −15</em></span>
+        <span><b>H型钢·沪</b> <em class="up">3950 +12</em></span>
+        <span><b>不锈304·永</b> <em class="down">15820 −20</em></span>
+        <span><b>方管·津</b> <em class="down">4060 −8</em></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 3D 等距钢材品类导航 ========== -->
+<section>
+  <div class="wrap">
+    <div class="tm-cats3d">
+      <div class="cats3d-head">
+        <div class="ttl">品类直达 <b>STEEL CATEGORIES</b> <span style="color:var(--text-3);font-size:11px;margin-left:8px">· 6 大主品类 · 实时价格</span></div>
+        <div class="hint">点击进入对应品类资源池</div>
+      </div>
+      <div class="cats3d-grid">
+
+        <!-- 螺纹钢 (3D 等距钢筋束) -->
+        <a class="cat3d">
+          <svg class="cat3d-svg" viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
+            <defs><linearGradient id="b1" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#FFB060"/><stop offset="1" stop-color="#FF3D00"/></linearGradient></defs>
+            <g transform="translate(10,30)">
+              <!-- 6 根螺纹钢平行排列 -->
+              <g>
+                <ellipse cx="8" cy="8" rx="6" ry="3" fill="url(#b1)"/><rect x="2" y="8" width="78" height="8" fill="url(#b1)"/><ellipse cx="80" cy="8" rx="6" ry="3" fill="#FF3D00"/>
+                <ellipse cx="8" cy="14" rx="6" ry="3" fill="url(#b1)"/><rect x="2" y="14" width="78" height="0" fill="url(#b1)"/>
+                <!-- 螺纹纹路 -->
+                <g stroke="#0A1320" stroke-width="1.2" opacity=".5"><line x1="10" y1="6" x2="14" y2="14"/><line x1="20" y1="6" x2="24" y2="14"/><line x1="30" y1="6" x2="34" y2="14"/><line x1="40" y1="6" x2="44" y2="14"/><line x1="50" y1="6" x2="54" y2="14"/><line x1="60" y1="6" x2="64" y2="14"/><line x1="70" y1="6" x2="74" y2="14"/></g>
+              </g>
+              <g transform="translate(0,18)">
+                <ellipse cx="8" cy="8" rx="6" ry="3" fill="url(#b1)"/><rect x="2" y="8" width="78" height="8" fill="url(#b1)"/><ellipse cx="80" cy="8" rx="6" ry="3" fill="#FF3D00"/>
+                <g stroke="#0A1320" stroke-width="1.2" opacity=".5"><line x1="10" y1="6" x2="14" y2="14"/><line x1="20" y1="6" x2="24" y2="14"/><line x1="30" y1="6" x2="34" y2="14"/><line x1="40" y1="6" x2="44" y2="14"/><line x1="50" y1="6" x2="54" y2="14"/><line x1="60" y1="6" x2="64" y2="14"/><line x1="70" y1="6" x2="74" y2="14"/></g>
+              </g>
+            </g>
+          </svg>
+          <div class="nm">螺纹钢</div>
+          <div class="cn">REBAR · 12,486 资源</div>
+          <div class="px">¥3680 <span class="dt up">+0.55%</span></div>
+        </a>
+
+        <!-- 热轧卷板 (3D 等距钢卷) -->
+        <a class="cat3d">
+          <svg class="cat3d-svg" viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
+            <defs><linearGradient id="b2" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#FFB060"/><stop offset="1" stop-color="#E55A00"/></linearGradient></defs>
+            <!-- 三个钢卷叠放 -->
+            <g transform="translate(20,12)">
+              <!-- 后排卷 -->
+              <ellipse cx="30" cy="14" rx="22" ry="10" fill="#FF6A00" opacity=".5"/>
+              <!-- 中卷 -->
+              <ellipse cx="20" cy="36" rx="18" ry="9" fill="url(#b2)"/>
+              <ellipse cx="20" cy="36" rx="12" ry="6" fill="#FFE0C8"/>
+              <ellipse cx="20" cy="36" rx="6" ry="3" fill="#FF3D00"/>
+              <!-- 右卷 -->
+              <ellipse cx="44" cy="40" rx="18" ry="9" fill="url(#b2)"/>
+              <ellipse cx="44" cy="40" rx="12" ry="6" fill="#FFE0C8"/>
+              <ellipse cx="44" cy="40" rx="6" ry="3" fill="#FF3D00"/>
+            </g>
+          </svg>
+          <div class="nm">热轧卷板</div>
+          <div class="cn">HRC · 24,180 资源</div>
+          <div class="px">¥3520 <span class="dt down">−0.28%</span></div>
+        </a>
+
+        <!-- 冷轧板 (等距板材) -->
+        <a class="cat3d">
+          <svg class="cat3d-svg" viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
+            <defs><linearGradient id="b3" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#FFD2A6"/><stop offset="1" stop-color="#FF6A00"/></linearGradient></defs>
+            <g transform="translate(15,18)">
+              <!-- 4 张板等距堆叠 -->
+              <g>
+                <polygon points="0,42 30,52 70,42 40,32" fill="url(#b3)" stroke="#FF3D00" stroke-width=".8"/>
+                <polygon points="0,42 0,46 30,56 30,52" fill="#E55A00"/>
+                <polygon points="30,52 30,56 70,46 70,42" fill="#C44A00"/>
+              </g>
+              <g transform="translate(0,-8)">
+                <polygon points="0,42 30,52 70,42 40,32" fill="#FFB060" stroke="#FF3D00" stroke-width=".8"/>
+                <polygon points="0,42 0,46 30,56 30,52" fill="#E55A00"/>
+                <polygon points="30,52 30,56 70,46 70,42" fill="#C44A00"/>
+              </g>
+              <g transform="translate(0,-16)">
+                <polygon points="0,42 30,52 70,42 40,32" fill="#FFC684" stroke="#FF3D00" stroke-width=".8"/>
+              </g>
+            </g>
+          </svg>
+          <div class="nm">冷轧板</div>
+          <div class="cn">CRC · 9,360 资源</div>
+          <div class="px">¥4150 <span class="dt up">+0.12%</span></div>
+        </a>
+
+        <!-- 中厚板 (等距厚板) -->
+        <a class="cat3d">
+          <svg class="cat3d-svg" viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
+            <defs><linearGradient id="b4" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#FFB060"/><stop offset="1" stop-color="#E55A00"/></linearGradient></defs>
+            <g transform="translate(15,15)">
+              <g transform="translate(0,15)">
+                <polygon points="0,30 30,42 70,30 40,18" fill="url(#b4)" stroke="#FF3D00" stroke-width="1"/>
+                <polygon points="0,30 0,38 30,50 30,42" fill="#C44A00"/>
+                <polygon points="30,42 30,50 70,38 70,30" fill="#A03900"/>
+              </g>
+              <g>
+                <polygon points="0,30 30,42 70,30 40,18" fill="#FFD2A6" stroke="#FF3D00" stroke-width="1"/>
+                <polygon points="0,30 0,38 30,50 30,42" fill="#E55A00"/>
+                <polygon points="30,42 30,50 70,38 70,30" fill="#C44A00"/>
+              </g>
+            </g>
+          </svg>
+          <div class="nm">中厚板</div>
+          <div class="cn">PLATE · 7,840 资源</div>
+          <div class="px">¥3780 <span class="dt" style="color:var(--flat)">持平</span></div>
+        </a>
+
+        <!-- 型钢 (H 型钢等距) -->
+        <a class="cat3d">
+          <svg class="cat3d-svg" viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
+            <defs><linearGradient id="b5" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#FFB060"/><stop offset="1" stop-color="#FF6A00"/></linearGradient></defs>
+            <g transform="translate(15,8)">
+              <!-- 等距 H 型钢 -->
+              <g>
+                <!-- 顶面 H 形 -->
+                <polygon points="0,28 24,40 48,28 24,16" fill="url(#b5)"/>
+                <!-- 顶面挖空(腹板) -->
+                <polygon points="6,28 24,37 42,28 24,19" fill="#0F1A2A"/>
+                <polygon points="18,28 24,31 30,28 24,25" fill="url(#b5)"/>
+                <!-- 侧面立柱 -->
+                <polygon points="0,28 24,40 24,56 0,44" fill="#C44A00"/>
+                <polygon points="24,40 48,28 48,44 24,56" fill="#A03900"/>
+              </g>
+              <g transform="translate(28,-3)">
+                <polygon points="0,28 24,40 48,28 24,16" fill="#FFD2A6"/>
+                <polygon points="6,28 24,37 42,28 24,19" fill="#0F1A2A"/>
+                <polygon points="18,28 24,31 30,28 24,25" fill="#FFD2A6"/>
+                <polygon points="0,28 24,40 24,56 0,44" fill="#FF6A00"/>
+                <polygon points="24,40 48,28 48,44 24,56" fill="#E55A00"/>
+              </g>
+            </g>
+          </svg>
+          <div class="nm">型钢</div>
+          <div class="cn">SECTION · 4,680 资源</div>
+          <div class="px">¥3920 <span class="dt up">+0.20%</span></div>
+        </a>
+
+        <!-- 管材 (等距钢管) -->
+        <a class="cat3d">
+          <svg class="cat3d-svg" viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
+            <defs><linearGradient id="b6" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#FFB060"/><stop offset="1" stop-color="#E55A00"/></linearGradient></defs>
+            <g transform="translate(10,10)">
+              <!-- 多根钢管堆叠 -->
+              <g>
+                <ellipse cx="14" cy="20" rx="10" ry="5" fill="url(#b6)"/>
+                <rect x="14" y="15" width="60" height="10" fill="url(#b6)"/>
+                <ellipse cx="74" cy="20" rx="10" ry="5" fill="#E55A00"/>
+                <ellipse cx="14" cy="20" rx="6" ry="3" fill="#0F1A2A"/>
+              </g>
+              <g transform="translate(8,12)">
+                <ellipse cx="14" cy="20" rx="10" ry="5" fill="url(#b6)"/>
+                <rect x="14" y="15" width="60" height="10" fill="url(#b6)"/>
+                <ellipse cx="74" cy="20" rx="10" ry="5" fill="#E55A00"/>
+                <ellipse cx="14" cy="20" rx="6" ry="3" fill="#0F1A2A"/>
+              </g>
+              <g transform="translate(-4,24)">
+                <ellipse cx="14" cy="20" rx="10" ry="5" fill="#FFD2A6"/>
+                <rect x="14" y="15" width="60" height="10" fill="#FFD2A6"/>
+                <ellipse cx="74" cy="20" rx="10" ry="5" fill="#FF6A00"/>
+                <ellipse cx="14" cy="20" rx="6" ry="3" fill="#0F1A2A"/>
+              </g>
+            </g>
+          </svg>
+          <div class="nm">管材</div>
+          <div class="cn">TUBE · 3,920 资源</div>
+          <div class="px">¥4680 <span class="dt down">−0.32%</span></div>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 中国钢市地图 + 撮合大厅 ========== -->
+<section>
+  <div class="wrap">
+    <div class="tm-warroom">
+
+      <!-- 中国地图 -->
+      <div class="tm-map">
+        <div class="map-head">
+          <div class="ttl">全国钢市作战地图 <b>WAR MAP</b> <span style="color:var(--text-3);font-size:11px;margin-left:8px">· 20 个钢贸城市 · 实时活跃度</span></div>
+          <div class="legend">
+            <span><i class="a"></i>涨</span>
+            <span><i class="c"></i>持平</span>
+            <span class="down-c"><i style="background:#2BE0A0;box-shadow:0 0 6px #2BE0A0"></i>跌</span>
+          </div>
+        </div>
+
+        <svg class="china-map" viewBox="0 0 800 460" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="dotg" cx="50%" cy="50%" r="50%">
+              <stop offset="0" stop-color="#FF6A00" stop-opacity="1"/>
+              <stop offset="1" stop-color="#FF6A00" stop-opacity="0"/>
+            </radialGradient>
+            <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="3" result="b"/>
+              <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+          </defs>
+
+          <!-- 中国地图简化轮廓 -->
+          <g fill="rgba(255,106,0,.06)" stroke="rgba(0,212,255,.35)" stroke-width="1.2" stroke-linejoin="round">
+            <!-- 主体大陆轮廓 -->
+            <path d="M180,140 L210,90 L240,75 L290,72 L340,80 L390,85 L420,100 L460,95 L510,105 L560,110 L595,135 L630,145 L660,160 L678,180 L685,210 L680,240 L662,260 L640,275 L620,290 L595,310 L555,330 L520,348 L485,360 L455,375 L425,378 L390,372 L360,360 L335,345 L312,348 L285,360 L255,355 L230,335 L210,310 L195,280 L185,250 L182,220 L180,190 Z"/>
+            <!-- 海南岛 -->
+            <ellipse cx="440" cy="395" rx="14" ry="8"/>
+            <!-- 台湾岛 -->
+            <ellipse cx="588" cy="320" rx="6" ry="14"/>
+          </g>
+
+          <!-- 网格线（经纬度暗示）-->
+          <g stroke="rgba(0,212,255,.08)" stroke-width=".5">
+            <line x1="100" y1="100" x2="700" y2="100"/>
+            <line x1="100" y1="200" x2="700" y2="200"/>
+            <line x1="100" y1="300" x2="700" y2="300"/>
+            <line x1="200" y1="60" x2="200" y2="400"/>
+            <line x1="350" y1="60" x2="350" y2="400"/>
+            <line x1="500" y1="60" x2="500" y2="400"/>
+            <line x1="650" y1="60" x2="650" y2="400"/>
+          </g>
+
+          <!-- 城市间连线 (主物流走廊) -->
+          <g stroke="rgba(255,106,0,.25)" stroke-width="1" stroke-dasharray="3 3" fill="none">
+            <line x1="488" y1="155" x2="528" y2="240"/><!-- 唐山-上海 -->
+            <line x1="488" y1="155" x2="456" y2="185"/><!-- 唐山-邯郸 -->
+            <line x1="528" y1="240" x2="448" y2="245"/><!-- 上海-武汉 -->
+            <line x1="528" y1="240" x2="432" y2="320"/><!-- 上海-广州 -->
+            <line x1="448" y1="245" x2="352" y2="265"/><!-- 武汉-重庆 -->
+            <line x1="448" y1="245" x2="432" y2="275"/><!-- 武汉-长沙 -->
+            <line x1="528" y1="240" x2="496" y2="240"/><!-- 上海-马鞍山 -->
+            <line x1="552" y1="130" x2="488" y2="155"/><!-- 本溪-唐山 -->
+          </g>
+
+          <!-- 20 城市热点 -->
+          <!-- 大档 (lg5) -->
+          <g filter="url(#glow)">
+            <!-- 上海 -->
+            <circle cx="528" cy="240" r="14" fill="url(#dotg)"/>
+            <circle cx="528" cy="240" r="6" fill="#FF6A00"/>
+            <circle cx="528" cy="240" r="6" fill="none" stroke="#FF6A00" stroke-width="1" opacity=".6"><animate attributeName="r" from="6" to="22" dur="2s" repeatCount="indefinite"/><animate attributeName="opacity" from=".6" to="0" dur="2s" repeatCount="indefinite"/></circle>
+            <!-- 唐山 -->
+            <circle cx="488" cy="155" r="14" fill="url(#dotg)"/>
+            <circle cx="488" cy="155" r="6" fill="#FF6A00"/>
+            <circle cx="488" cy="155" r="6" fill="none" stroke="#FF6A00" stroke-width="1" opacity=".6"><animate attributeName="r" from="6" to="22" dur="2.4s" repeatCount="indefinite"/><animate attributeName="opacity" from=".6" to="0" dur="2.4s" repeatCount="indefinite"/></circle>
+          </g>
+
+          <!-- 中档 -->
+          <g>
+            <!-- 张家港 -->
+            <circle cx="520" cy="235" r="5" fill="#FF8533"/><circle cx="520" cy="235" r="10" fill="none" stroke="#FF8533" stroke-width="1" opacity=".4"/>
+            <!-- 无锡 -->
+            <circle cx="512" cy="240" r="5" fill="#FF8533"/><circle cx="512" cy="240" r="10" fill="none" stroke="#FF8533" stroke-width="1" opacity=".4"/>
+            <!-- 天津 -->
+            <circle cx="472" cy="160" r="5" fill="#2BE0A0"/><circle cx="472" cy="160" r="10" fill="none" stroke="#2BE0A0" stroke-width="1" opacity=".4"/>
+            <!-- 邯郸 -->
+            <circle cx="456" cy="185" r="5" fill="#FF8533"/>
+            <!-- 武汉 -->
+            <circle cx="448" cy="245" r="5" fill="#FF8533"/><circle cx="448" cy="245" r="10" fill="none" stroke="#FF8533" stroke-width="1" opacity=".4"/>
+            <!-- 广州 -->
+            <circle cx="432" cy="320" r="5" fill="#FF8533"/>
+            <!-- 杭州 -->
+            <circle cx="512" cy="250" r="5" fill="#FF8533"/>
+            <!-- 北京 -->
+            <circle cx="464" cy="150" r="5" fill="#FFC847"/>
+          </g>
+
+          <!-- 小档 -->
+          <g>
+            <circle cx="544" cy="135" r="4" fill="#2BE0A0"/><!--鞍山 跌-->
+            <circle cx="552" cy="130" r="4" fill="#FFC847"/><!--本溪 平-->
+            <circle cx="392" cy="135" r="4" fill="#2BE0A0"/><!--包头 跌-->
+            <circle cx="424" cy="175" r="4" fill="#2BE0A0"/><!--太原 跌-->
+            <circle cx="480" cy="190" r="4" fill="#FF8533"/><!--莱芜 涨-->
+            <circle cx="504" cy="200" r="4" fill="#2BE0A0"/><!--日照 跌-->
+            <circle cx="496" cy="240" r="4" fill="#FF8533"/><!--马鞍山 涨-->
+            <circle cx="352" cy="265" r="4" fill="#FFC847"/><!--重庆 平-->
+            <circle cx="432" cy="275" r="4" fill="#FF8533"/><!--长沙 涨-->
+            <circle cx="296" cy="290" r="4" fill="#FF8533"/><!--攀枝花 涨-->
+          </g>
+
+          <!-- 城市标签 -->
+          <g font-size="10" font-family="PingFang SC" fill="#E6EBF1">
+            <text x="528" y="262" text-anchor="middle">上海</text>
+            <text x="528" y="274" text-anchor="middle" font-size="9" fill="#FF8533" font-family="DIN" font-weight="700">3712 ↑</text>
+
+            <text x="488" y="177" text-anchor="middle">唐山·钢都</text>
+            <text x="488" y="189" text-anchor="middle" font-size="9" fill="#FF8533" font-family="DIN" font-weight="700">3690 ↑</text>
+
+            <text x="520" y="225" text-anchor="end" font-size="9">张家港</text>
+            <text x="512" y="240" text-anchor="end" font-size="9" dx="-12">无锡</text>
+            <text x="472" y="174" text-anchor="middle" font-size="9">天津</text>
+            <text x="456" y="200" text-anchor="middle" font-size="9">邯郸</text>
+            <text x="448" y="260" text-anchor="middle" font-size="9">武汉</text>
+            <text x="432" y="335" text-anchor="middle" font-size="9">广州</text>
+            <text x="512" y="265" text-anchor="middle" font-size="9">杭州</text>
+            <text x="464" y="142" text-anchor="middle" font-size="9">北京</text>
+            <text x="544" y="125" text-anchor="middle" font-size="9">鞍山</text>
+            <text x="552" y="118" text-anchor="middle" font-size="9" dx="14">本溪</text>
+            <text x="392" y="125" text-anchor="middle" font-size="9">包头</text>
+            <text x="424" y="165" text-anchor="middle" font-size="9">太原</text>
+            <text x="480" y="208" text-anchor="middle" font-size="9">莱芜</text>
+            <text x="504" y="218" text-anchor="middle" font-size="9">日照</text>
+            <text x="496" y="255" text-anchor="middle" font-size="9" dx="20">马鞍山</text>
+            <text x="352" y="280" text-anchor="middle" font-size="9">重庆</text>
+            <text x="432" y="290" text-anchor="middle" font-size="9">长沙</text>
+            <text x="296" y="305" text-anchor="middle" font-size="9">攀枝花</text>
+          </g>
+
+          <!-- 罗盘 -->
+          <g transform="translate(720,80)" fill="#5E7894" font-size="9" font-family="DIN">
+            <circle cx="0" cy="0" r="22" fill="none" stroke="#1F3450" stroke-width="1"/>
+            <text x="0" y="-26" text-anchor="middle">N</text>
+            <text x="0" y="33" text-anchor="middle">S</text>
+            <text x="-28" y="3" text-anchor="middle">W</text>
+            <text x="28" y="3" text-anchor="middle">E</text>
+            <polygon points="0,-18 4,0 0,18 -4,0" fill="#FF6A00"/>
+          </g>
+        </svg>
+
+        <!-- 地图左上：今日 TOP 5 活跃城市 -->
+        <div class="map-list">
+          <div class="h">⚡ 今日 TOP 5 活跃</div>
+          <div class="it"><span><i></i>上海</span><em>96 单</em></div>
+          <div class="it"><span><i></i>唐山</span><em>92 单</em></div>
+          <div class="it"><span><i></i>无锡</span><em>88 单</em></div>
+          <div class="it"><span><i></i>张家港</span><em>84 单</em></div>
+          <div class="it"><span><i></i>天津</span><em>78 单</em></div>
+        </div>
+
+        <!-- 地图右下：实时全国数据 -->
+        <div class="map-stats">
+          <div class="row"><span>全国总成交</span><b class="up">286.5 万吨</b></div>
+          <div class="row"><span>活跃城市</span><b class="cyan">20 / 280</b></div>
+          <div class="row"><span>在售商家</span><b>12,486</b></div>
+          <div class="row"><span>今日 IP 访问</span><b class="cyan">48.6 万</b></div>
+        </div>
+      </div>
+
+      <!-- 撮合大厅 -->
+      <div class="tm-match">
+        <div class="match-head">
+          <div class="ttl">撮合大厅 <b>ORDER BOOK</b></div>
+          <div class="live"><i></i>实时撮合中</div>
+        </div>
+
+        <div class="depth">
+          <div class="depth-tabs">
+            <a class="on">螺纹 HRB400E φ20</a><a>热卷 5.75</a><a>冷轧 1.0</a><a>+</a>
+          </div>
+          <div class="depth-head"><span>挂单 / 商家</span><span>价(¥)</span><span>量(吨)</span></div>
+
+          <!-- 卖盘 (5 档) -->
+          <div class="depth-row"><div class="bg" style="width:46%"></div><span class="nm">沙钢 上海宝山</span><span class="px">3700</span><span>420</span></div>
+          <div class="depth-row"><div class="bg" style="width:32%"></div><span class="nm">中天 张家港</span><span class="px">3695</span><span>286</span></div>
+          <div class="depth-row"><div class="bg" style="width:60%"></div><span class="nm">永钢 无锡</span><span class="px">3690</span><span>540</span></div>
+          <div class="depth-row"><div class="bg" style="width:85%"></div><span class="nm">沙钢 上海宝山</span><span class="px">3685</span><span>768</span></div>
+          <div class="depth-row"><div class="bg" style="width:40%"></div><span class="nm">本钢 天津港</span><span class="px">3682</span><span>360</span></div>
+
+          <!-- 中间撮合价 -->
+          <div class="depth-mid">
+            <div>
+              <div class="mp">¥3,680</div>
+              <div class="mt">最新成交 · 09:32:08</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-size:14px;font-weight:800;color:var(--up);font-family:DIN">+20 ↑ 0.55%</div>
+              <div class="mt">较昨收</div>
+            </div>
+          </div>
+
+          <!-- 买盘 (5 档) -->
+          <div class="depth-row buy"><div class="bg" style="width:55%"></div><span class="nm">华润 上海</span><span class="px">3678</span><span>495</span></div>
+          <div class="depth-row buy"><div class="bg" style="width:70%"></div><span class="nm">中铁建 长三角</span><span class="px">3675</span><span>630</span></div>
+          <div class="depth-row buy"><div class="bg" style="width:90%"></div><span class="nm">中建八局 上海项目部</span><span class="px">3670</span><span>810</span></div>
+          <div class="depth-row buy"><div class="bg" style="width:50%"></div><span class="nm">某地产集团 嘉定</span><span class="px">3665</span><span>450</span></div>
+          <div class="depth-row buy"><div class="bg" style="width:36%"></div><span class="nm">沪建集团 浦东</span><span class="px">3660</span><span>320</span></div>
+        </div>
+
+        <!-- 撮合流 -->
+        <div class="match-stream">
+          <div class="h"><span>📋 近 10 笔成交</span><span>累计今日 <b>368 单 · 286.5 万吨</b></span></div>
+          <div class="ms-row"><span class="tg b">买</span><span class="nm">螺纹 φ20 沪</span><span class="px">3680</span><span class="qt">×120t</span><span class="tm">09:32:08</span></div>
+          <div class="ms-row"><span class="tg s">卖</span><span class="nm">热卷 5.75 津</span><span class="px">3520</span><span class="qt">×240t</span><span class="tm">09:31:55</span></div>
+          <div class="ms-row"><span class="tg b">买</span><span class="nm">冷轧 1.0 汉</span><span class="px">4150</span><span class="qt">×80t</span><span class="tm">09:31:42</span></div>
+          <div class="ms-row"><span class="tg b">买</span><span class="nm">中厚板 20 唐</span><span class="px">4180</span><span class="qt">×180t</span><span class="tm">09:31:30</span></div>
+          <div class="ms-row"><span class="tg s">卖</span><span class="nm">镀锌 1.0 邯</span><span class="px">4520</span><span class="qt">×60t</span><span class="tm">09:31:18</span></div>
+          <div class="ms-row"><span class="tg b">买</span><span class="nm">线材 φ8 锡</span><span class="px">3720</span><span class="qt">×150t</span><span class="tm">09:31:05</span></div>
+          <div class="ms-row"><span class="tg b">买</span><span class="nm">H 型钢 200 沪</span><span class="px">3950</span><span class="qt">×96t</span><span class="tm">09:30:52</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 智能找钢漏斗 ========== -->
+<section>
+  <div class="wrap">
+    <div class="tm-funnel">
+      <div class="fn-head">
+        <div>
+          <div class="ttl"><span class="ic">🎯</span><b>智能找钢漏斗</b> · 4 步精准定位资源</div>
+          <span class="sub">支持自然语言搜索 · 价格订阅 · 一键比价</span>
+        </div>
+        <a class="fn-result" style="margin-top:0;padding:10px 18px">
+          <div class="l"><b style="font-size:14px">↗</b> 已支持 <b>286</b> 项规格组合</div>
+        </a>
+      </div>
+
+      <div class="fn-steps">
+
+        <div class="fn-step">
+          <div class="no"><b>1</b> 选品类</div>
+          <div class="lb">钢材品类</div>
+          <div class="chips">
+            <span class="chip on">螺纹钢</span>
+            <span class="chip">热轧卷板</span>
+            <span class="chip">冷轧板</span>
+            <span class="chip">中厚板</span>
+            <span class="chip">线材</span>
+            <span class="chip">型钢</span>
+            <span class="chip">管材</span>
+          </div>
+        </div>
+
+        <div class="fn-arrow">▶</div>
+
+        <div class="fn-step">
+          <div class="no"><b>2</b> 选规格</div>
+          <div class="lb">材质 / 规格</div>
+          <div class="chips">
+            <span class="chip on">HRB400E</span>
+            <span class="chip">HRB500E</span>
+            <span class="chip">HPB300</span>
+            <span class="chip on">φ20</span>
+            <span class="chip">φ16</span>
+            <span class="chip">φ22</span>
+            <span class="chip">φ25</span>
+            <span class="chip">9000mm</span>
+          </div>
+        </div>
+
+        <div class="fn-arrow">▶</div>
+
+        <div class="fn-step">
+          <div class="no"><b>3</b> 选产地</div>
+          <div class="lb">主流钢厂</div>
+          <div class="chips">
+            <span class="chip on">沙钢</span>
+            <span class="chip on">永钢</span>
+            <span class="chip">中天</span>
+            <span class="chip">本钢</span>
+            <span class="chip">首钢</span>
+            <span class="chip">鞍钢</span>
+            <span class="chip">日照</span>
+            <span class="chip">+12</span>
+          </div>
+        </div>
+
+        <div class="fn-arrow">▶</div>
+
+        <div class="fn-step">
+          <div class="no"><b>4</b> 选交付</div>
+          <div class="lb">交付仓 / 城市</div>
+          <div class="chips">
+            <span class="chip on">上海·宝山</span>
+            <span class="chip">上海·浦东</span>
+            <span class="chip">无锡</span>
+            <span class="chip">张家港</span>
+            <span class="chip">天津港</span>
+            <span class="chip">同城配</span>
+            <span class="chip">送货上门</span>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="fn-result">
+        <div class="l">
+          已匹配 <b>286</b> 条资源 · 价格区间 <b style="color:var(--up)">¥3680 ~ ¥3720</b> /吨 · 总库存 <b>12,486 吨</b> · <em>30 家供应商可询</em>
+        </div>
+        <a class="btn">⚡ 查看 / 一键询价 →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 龙虎榜 + 脉搏 + AI 预测 ========== -->
+<section>
+  <div class="wrap">
+    <div class="tm-trio">
+
+      <!-- 大单龙虎榜 -->
+      <div class="t-panel">
+        <div class="h">
+          <span class="ttl">大单龙虎榜 <b>BIG DEALS</b></span>
+          <a class="more">全部 →</a>
+        </div>
+        <div class="bigdeal">
+          <div class="bd-row"><span class="no n1">1</span><span class="nm">螺纹 φ20 沙钢<small>上海·宝山钢市</small></span><span class="qt">2,860<em>吨</em></span><span class="px">3680</span></div>
+          <div class="bd-row"><span class="no n2">2</span><span class="nm">热卷 5.75 本钢<small>天津港保税仓</small></span><span class="qt">1,540<em>吨</em></span><span class="px">3520</span></div>
+          <div class="bd-row"><span class="no n3">3</span><span class="nm">中厚板 20 鞍钢<small>唐山·陡河钢市</small></span><span class="qt">1,280<em>吨</em></span><span class="px">4180</span></div>
+          <div class="bd-row"><span class="no">4</span><span class="nm">冷轧 1.0 武钢<small>武汉·青山仓</small></span><span class="qt">960<em>吨</em></span><span class="px">4150</span></div>
+          <div class="bd-row"><span class="no">5</span><span class="nm">镀锌 1.0 首钢<small>邯郸·丛台</small></span><span class="qt">680<em>吨</em></span><span class="px">4520</span></div>
+          <div class="bd-row"><span class="no">6</span><span class="nm">H 型钢 200 马钢<small>马鞍山·港仓</small></span><span class="qt">420<em>吨</em></span><span class="px">3950</span></div>
+          <div class="bd-row"><span class="no">7</span><span class="nm">线材 φ8 永钢<small>无锡·东方钢市</small></span><span class="qt">360<em>吨</em></span><span class="px">3720</span></div>
+        </div>
+      </div>
+
+      <!-- 钢市脉搏 -->
+      <div class="t-panel">
+        <div class="h">
+          <span class="ttl">钢市脉搏 <b>MARKET PULSE</b></span>
+          <a class="more">详情 →</a>
+        </div>
+        <div class="pulse">
+          <div class="pulse-score">
+            <div class="sc">78.6</div>
+            <div class="lb">M A R K E T   S E N T I M E N T</div>
+            <div class="st">▲ 多头情绪</div>
+          </div>
+          <div class="pulse-wave">
+            <svg viewBox="0 0 400 140" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="pls" x1="0" x2="0" y1="0" y2="1">
+                  <stop offset="0" stop-color="#FF6A00" stop-opacity=".6"/>
+                  <stop offset="1" stop-color="#FF6A00" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <!-- 网格 -->
+              <g stroke="#1F3450" stroke-width=".5" stroke-dasharray="2 3">
+                <line x1="0" y1="35" x2="400" y2="35"/>
+                <line x1="0" y1="70" x2="400" y2="70"/>
+                <line x1="0" y1="105" x2="400" y2="105"/>
+              </g>
+              <!-- 心电图样式 -->
+              <path d="M0,70 L30,70 L40,70 L42,30 L45,110 L48,50 L52,70 L80,70 L100,70 L110,68 L130,72 L150,65 L170,72 L185,68 L200,55 L210,40 L215,90 L218,30 L222,100 L226,70 L260,70 L280,68 L300,60 L320,55 L340,62 L355,40 L360,85 L365,25 L368,95 L372,70 L400,70"
+                fill="none" stroke="#FF5A4D" stroke-width="1.8" stroke-linejoin="round" filter="url(#glow)"/>
+              <path d="M0,70 L30,70 L40,70 L42,30 L45,110 L48,50 L52,70 L80,70 L100,70 L110,68 L130,72 L150,65 L170,72 L185,68 L200,55 L210,40 L215,90 L218,30 L222,100 L226,70 L260,70 L280,68 L300,60 L320,55 L340,62 L355,40 L360,85 L365,25 L368,95 L372,70 L400,70 L400,140 L0,140 Z"
+                fill="url(#pls)" opacity=".5"/>
+              <!-- 心跳点 -->
+              <circle cx="372" cy="70" r="3" fill="#FF6A00"/>
+              <circle cx="372" cy="70" r="3" fill="none" stroke="#FF6A00"><animate attributeName="r" from="3" to="12" dur="1.2s" repeatCount="indefinite"/><animate attributeName="opacity" from=".8" to="0" dur="1.2s" repeatCount="indefinite"/></circle>
+            </svg>
+          </div>
+          <div class="pulse-foot">
+            <div class="it"><b class="up">62%</b>看多比例</div>
+            <div class="it"><b class="down">22%</b>看空比例</div>
+            <div class="it"><b class="cyan">16%</b>中性</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI 价格预测 -->
+      <div class="t-panel">
+        <div class="h">
+          <span class="ttl">AI 价格预测 <b>FORECAST</b></span>
+          <a class="more">模型说明 →</a>
+        </div>
+        <div class="aipred">
+          <div class="aip-head">
+            <span class="ic">🤖</span>
+            <div class="lb">
+              <b>HDZ-Forecast v2.6</b>
+              <small>基于 80 万笔历史成交训练</small>
+            </div>
+            <span class="ac">准确率 87.2%</span>
+          </div>
+
+          <div class="aip-chart">
+            <svg viewBox="0 0 380 130" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="aig" x1="0" x2="0" y1="0" y2="1">
+                  <stop offset="0" stop-color="#00D4FF" stop-opacity=".3"/>
+                  <stop offset="1" stop-color="#00D4FF" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <g stroke="#1F3450" stroke-width=".5" stroke-dasharray="2 3">
+                <line x1="0" y1="32" x2="380" y2="32"/>
+                <line x1="0" y1="65" x2="380" y2="65"/>
+                <line x1="0" y1="98" x2="380" y2="98"/>
+              </g>
+              <!-- 历史实线 -->
+              <polyline fill="none" stroke="#FF6A00" stroke-width="2" points="0,90 30,88 60,82 90,78 120,72 150,75 180,68 210,60 220,58"/>
+              <!-- 历史区域 -->
+              <path d="M0,90 30,88 60,82 90,78 120,72 150,75 180,68 210,60 220,58 L220,130 L0,130 Z" fill="url(#aig)" opacity=".3"/>
+              <!-- 预测虚线 -->
+              <polyline fill="none" stroke="#00D4FF" stroke-width="2" stroke-dasharray="5 4" points="220,58 250,55 280,48 310,42 340,38 370,32"/>
+              <!-- 预测区间带 (置信区间) -->
+              <path d="M220,58 250,50 280,40 310,30 340,22 370,12 L370,52 340,54 310,54 280,56 250,60 220,58 Z" fill="rgba(0,212,255,.10)" stroke="none"/>
+              <path d="M220,58 250,60 280,56 310,54 340,54 370,52 L370,92 340,82 310,72 280,62 250,68 220,58 Z" fill="rgba(0,212,255,.10)" stroke="none"/>
+              <!-- 分界线 -->
+              <line x1="220" y1="0" x2="220" y2="130" stroke="#FF6A00" stroke-width="1" stroke-dasharray="2 3" opacity=".5"/>
+              <text x="222" y="14" font-size="9" fill="#FF8533" font-family="DIN">↑ 今</text>
+              <!-- 预测点 -->
+              <circle cx="370" cy="32" r="3" fill="#00D4FF"/>
+              <text x="362" y="22" font-size="9" fill="#00D4FF" font-family="DIN" font-weight="700" text-anchor="end">3780</text>
+            </svg>
+          </div>
+
+          <div class="aip-list">
+            <div class="it"><span class="nm">7 日预测 <small>螺纹综合</small></span><span class="pd up">¥3,720 <span class="arr">↗</span></span></div>
+            <div class="it"><span class="nm">15 日预测 <small>螺纹综合</small></span><span class="pd up">¥3,750 <span class="arr">↗</span></span></div>
+            <div class="it"><span class="nm">30 日预测 <small>螺纹综合</small></span><span class="pd up">¥3,780 <span class="arr">↗</span></span></div>
+            <div class="it"><span class="nm">趋势判断</span><span class="pd up" style="color:var(--up)">温和上行 ↑</span></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ========== 工具圆盘 + 个人作战桌 ========== -->
+<section>
+  <div class="wrap">
+    <div class="tm-tools-area">
+
+      <!-- 工具 -->
+      <div class="tm-tools">
+        <div class="tools-head">
+          <div class="ttl">操盘工具 <b>POWER TOOLS</b></div>
+          <div class="sub">为钢贸商家、采购方、工程项目方深度定制的 8 大效率工具</div>
+        </div>
+        <div class="tools-grid">
+          <a class="tl"><span class="tag hot">HOT</span><div class="ic">🎯</div><div class="nm">智能找钢</div><div class="ds">自然语言匹配</div></a>
+          <a class="tl"><span class="tag hot">HOT</span><div class="ic">⚖️</div><div class="nm">批量比价</div><div class="ds">多商家同台 PK</div></a>
+          <a class="tl"><span class="tag">NEW</span><div class="ic">🔔</div><div class="nm">价格订阅</div><div class="ds">微信钉钉推送</div></a>
+          <a class="tl"><div class="ic">📡</div><div class="nm">报价雷达</div><div class="ds">求购实时撮合</div></a>
+          <a class="tl"><div class="ic">📊</div><div class="nm">K线分析</div><div class="ds">技术指标 / 历史</div></a>
+          <a class="tl"><div class="ic">📦</div><div class="nm">库存核仓</div><div class="ds">在线验仓提单</div></a>
+          <a class="tl"><span class="tag">NEW</span><div class="ic">🚚</div><div class="nm">物流追踪</div><div class="ds">车辆位置实时</div></a>
+          <a class="tl"><div class="ic">💰</div><div class="nm">钢贸贷</div><div class="ds">1 小时审批</div></a>
+        </div>
+      </div>
+
+      <!-- 个人作战桌 -->
+      <div class="tm-me">
+        <div class="me-head">
+          <div class="av">钢</div>
+          <div class="info">
+            <b>欢迎登录作战大厅</b>
+            <small>登录后解锁专属操盘面板</small>
+          </div>
+          <span class="lv">VIP</span>
+        </div>
+
+        <div class="me-quick">
+          <div class="me-q"><b>12</b><span>关注</span></div>
+          <div class="me-q"><b>3</b><span>求购</span></div>
+          <div class="me-q alert"><b>5</b><span>价格预警</span></div>
+        </div>
+
+        <div class="me-watch">
+          <div class="h"><span>⭐ 我的关注</span><a class="more">管理 →</a></div>
+          <ul>
+            <li><span class="nm">螺纹 HRB400E φ20·沙钢</span><span class="pp up">3680 <em>+20</em></span></li>
+            <li><span class="nm">热卷 5.75 Q235B·本钢</span><span class="pp down">3520 <em>−10</em></span></li>
+            <li><span class="nm">冷轧 1.0 SPCC·武钢</span><span class="pp up">4150 <em>+5</em></span></li>
+            <li><span class="nm">中厚板 20 Q345B·鞍钢</span><span class="pp" style="color:var(--flat)">3780 <em>持平</em></span></li>
+            <li><span class="nm">镀锌 DX51D 1.0·首钢</span><span class="pp up">4520 <em>+30</em></span></li>
+          </ul>
+        </div>
+
+        <div class="me-alert">
+          <div class="h">🔔 价格预警 (5)</div>
+          <div class="it">📌 <b>螺纹·沙钢</b> 已涨至订阅价 <em>¥3680</em></div>
+          <div class="it">📌 <b>热卷·本钢</b> 跌破支撑位 <em>¥3520</em></div>
+          <div class="it">📌 <b>镀锌·首钢</b> 突破阻力 <em>¥4520</em></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ========== 资讯（dark）========== -->
+<section>
+  <div class="wrap">
+    <div class="tm-news">
+      <div class="h">
+        <span class="ttl">钢材资讯 <b style="color:var(--primary-bright)">NEWS</b></span>
+        <span class="seg"><a class="on">行情解读</a><a>政策法规</a><a>行业动态</a><a>钢材知识</a></span>
+        <a class="more">更多 →</a>
+      </div>
+      <div class="news-grid">
+        <div class="col">
+          <div class="ch">▸ 行情解读</div>
+          <ul>
+            <li class="hot"><a>今日螺纹钢现货价格小幅上涨 沙钢出厂上调 20 元</a><span class="dt">09:12</span></li>
+            <li class="hot"><a>热卷震荡偏强 后市关注唐山限产执行情况</a><span class="dt">08:30</span></li>
+            <li><a>冷轧板价格企稳 下游汽车板需求逐步释放</a><span class="dt">05-25</span></li>
+            <li><a>钢市周评：现货价格震荡偏强 库存继续去化</a><span class="dt">05-24</span></li>
+            <li><a>中厚板成交转好 工程项目集中开工带动</a><span class="dt">05-25</span></li>
+          </ul>
+        </div>
+        <div class="col">
+          <div class="ch">▸ 政策法规</div>
+          <ul>
+            <li class="hot"><a>多部委发文支持钢铁行业绿色低碳转型</a><span class="dt">05-26</span></li>
+            <li><a>2026 年钢铁产能置换实施办法解读</a><span class="dt">05-25</span></li>
+            <li><a>河北：发布钢铁行业超低排放改造新要求</a><span class="dt">05-24</span></li>
+            <li><a>钢材出口退税政策调整最新动态</a><span class="dt">05-23</span></li>
+            <li><a>京津冀地区秋冬季限产方案征求意见</a><span class="dt">05-22</span></li>
+          </ul>
+        </div>
+        <div class="col">
+          <div class="ch">▸ 行业动态</div>
+          <ul>
+            <li class="hot"><a>沙钢集团一季度营收同比增长 12.5%</a><span class="dt">05-26</span></li>
+            <li><a>宝钢股份发布新一代高强汽车板</a><span class="dt">05-25</span></li>
+            <li><a>唐山主流钢厂检修计划汇总</a><span class="dt">05-25</span></li>
+            <li><a>港口铁矿石库存连续四周下降</a><span class="dt">05-24</span></li>
+            <li><a>钢贸商家数字化转型趋势调研报告发布</a><span class="dt">05-23</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- KPI -->
+    <div class="tm-kpi">
+      <div><div class="n">1,280 万吨</div><div class="l">累计成交</div></div>
+      <div><div class="n">12,000+</div><div class="l">入驻商家</div></div>
+      <div><div class="n">280+</div><div class="l">覆盖城市</div></div>
+      <div><div class="n">80 万+</div><div class="l">注册用户</div></div>
+    </div>
+
+    <!-- 友情链接 -->
+    <div class="tm-friend">
+      <strong>友情链接：</strong>
+      <a>中国钢铁工业协会</a><a>中国冶金报</a><a>沙钢集团</a><a>宝武集团</a><a>河钢集团</a><a>鞍钢集团</a><a>首钢集团</a><a>包钢集团</a><a>太钢集团</a><a>马钢集团</a><a>武钢集团</a><a>华菱钢铁</a><a>本钢集团</a><a>钢之家</a><a>找钢网</a>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="tm-footer">
+  <div class="wrap">
+    <div class="brand">
+      <div class="nm">货袋子 HUODAIZI</div>
+      <div style="font-size:11px;color:var(--text-3);margin-top:4px;letter-spacing:2px">STEEL TRADING TERMINAL v3.0</div>
+      <div class="tel">400-888-xxxx</div>
+      <div class="tm">服务时间 周一至周日 8:00 - 20:00</div>
+      <div class="qr">
+        <div class="it"><div class="b">APP</div><div class="l">下载App</div></div>
+        <div class="it"><div class="b">公众号</div><div class="l">关注</div></div>
+      </div>
+    </div>
+    <div><h5>关于我们</h5><a>公司介绍</a><a>发展历程</a><a>新闻动态</a><a>加入我们</a><a>联系方式</a></div>
+    <div><h5>帮助中心</h5><a>新手指南</a><a>交易流程</a><a>支付方式</a><a>物流配送</a><a>常见问题</a></div>
+    <div><h5>商家服务</h5><a>商家入驻</a><a>广告投放</a><a>会员服务</a><a>API 接入</a><a>开放平台</a></div>
+    <div><h5>法律条款</h5><a>用户协议</a><a>隐私政策</a><a>知识产权</a><a>免责声明</a><a>投诉建议</a></div>
+  </div>
+  <div class="tm-cop">© 2026 货袋子 · 普讯网络科技 ｜ 沪 ICP 备 XXXXXXXX 号 - 1 ｜ 沪公网安 31010XXXXXXXXXX 号</div>
+</footer>
+
+</body>
+</html>

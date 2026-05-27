@@ -5,7 +5,7 @@
 <title>货袋子 - 设计稿索引</title>
 <link rel="stylesheet" href="./assets/common.css">
 <style>
-.box{max-width:880px;margin:60px auto;background:#fff;padding:40px;border-radius:8px;box-shadow:0 4px 24px rgba(0,0,0,.06)}
+.box{max-width:920px;margin:60px auto;background:#fff;padding:40px;border-radius:8px;box-shadow:0 4px 24px rgba(0,0,0,.06)}
 h1{font-size:26px;margin-bottom:8px}
 .sub{color:var(--c-text-2);margin-bottom:30px}
 .list a{display:flex;justify-content:space-between;align-items:center;padding:18px 20px;border:1px solid var(--c-line);border-radius:6px;margin-bottom:12px;text-decoration:none;color:var(--c-text)}
@@ -14,41 +14,50 @@ h1{font-size:26px;margin-bottom:8px}
 .list a .d{color:var(--c-text-2);font-size:13px;margin-top:4px}
 .list a .arrow{color:var(--c-primary);font-size:20px}
 .tip{background:#FFF4EC;border-left:4px solid var(--c-primary);padding:12px 16px;font-size:13px;color:var(--c-text-2);border-radius:4px;margin-top:24px}
-.recommend{border-color:var(--c-primary) !important;background:var(--c-primary-bg) !important}
-.recommend .t{color:var(--c-primary) !important}
+.hero{background:linear-gradient(135deg,#0F1A2A,#0A1320);color:#fff;border-color:#FF6A00 !important}
+.hero .t{color:#FF8533 !important;font-size:18px !important}
+.hero .d{color:#8AA3BD !important}
+.hero .arrow{color:#FF8533 !important;font-size:24px !important}
 </style>
 </head>
 <body>
 <div class="box">
   <h1>货袋子 · 视觉稿（HTML 高保真版）</h1>
-  <div class="sub">橙 #FF6A00 · 工具型平台 · 列表行 · 20 钢贸城市 · 钢市指数大屏 · 三栏作战台</div>
+  <div class="sub">从「门户营销」→「找钢工作台」→「钢市作战大厅」三版迭代</div>
 
   <div class="list">
-    <a href="./mockup-home-v2.html" target="_blank" class="recommend">
+    <a href="./mockup-home-v3.html" target="_blank" class="hero">
       <div>
-        <div class="t">⭐ 首页 v2（工作台 / 操盘台风格）mockup-home-v2.html ← 推荐</div>
-        <div class="d">钢材指数大屏（深色控制台） · 三栏作战台（左工具 / 中数据流 / 右个人面板） · 涨跌双榜 · 钢市热力图（20 城）· 快捷工具入口</div>
+        <div class="t">⚡ 首页 v3「钢市作战大厅 / 交易终端」← 最新推荐</div>
+        <div class="d">全暗模式 + 霓虹橙 · K线大图 + 雷达 · 3D 等距钢材品类 · 中国地图+撮合大厅 · 智能找钢漏斗 · AI 价格预测 · 脉搏波 · 龙虎榜</div>
+      </div>
+      <div class="arrow">→</div>
+    </a>
+    <a href="./mockup-home-v2.html" target="_blank">
+      <div>
+        <div class="t">v2 工作台风格（参考）mockup-home-v2.html</div>
+        <div class="d">钢材指数大屏 · 三栏作战台 · 涨跌双榜 · 钢市热力图</div>
       </div>
       <div class="arrow">→</div>
     </a>
     <a href="./mockup-home.html" target="_blank">
       <div>
-        <div class="t">① 首页 v1（门户风格 · 仅作对比保留）mockup-home.html</div>
-        <div class="d">扁平插画 Banner · 实时行情 TOP10 · 列表行资源 · 20 城市瓷砖 · 资讯三列</div>
+        <div class="t">v1 门户风格（对比保留）mockup-home.html</div>
+        <div class="d">扁平插画 Banner · 列表行资源 · 20 城市瓷砖 · 资讯三列</div>
       </div>
       <div class="arrow">→</div>
     </a>
     <a href="./mockup-shanghai.html" target="_blank">
       <div>
-        <div class="t">② 上海分站 mockup-shanghai.html</div>
-        <div class="d">6 个广告位（①顶部通栏 / ②③④右侧 / ⑤中部通栏 / ⑥商家下方通栏） · 列表行资源 · 12 家本地商家 · SEO 文字区</div>
+        <div class="t">上海分站 mockup-shanghai.html</div>
+        <div class="d">6 个广告位 · 列表行资源 · 12 家本地商家 · SEO 文字区</div>
       </div>
       <div class="arrow">→</div>
     </a>
   </div>
 
   <div class="tip">
-    📌 建议先看 <strong>v2 工作台版</strong>。它把首页从"门户营销页"重构为"找钢操盘台"：顶部钢材指数大屏 + 三栏作战台 + 涨跌双榜 + 热力图。如对 v2 仍有调整意见，请反馈，确认后再进入 Java + Vue3 编码。
+    📌 v3 是按"钢铁交易终端"思路完全重做的，融入了 K 线、雷达、中国地图脉冲热点、撮合深度、3D 等距钢材模型、AI 预测、心电图脉搏波 等高识别度元素，与传统 B2B 站显著区分。
   </div>
 </div>
 </body>
