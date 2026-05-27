@@ -5,7 +5,7 @@
 <title>货袋子 - 设计稿索引</title>
 <link rel="stylesheet" href="./assets/common.css">
 <style>
-.box{max-width:920px;margin:60px auto;background:#fff;padding:40px;border-radius:8px;box-shadow:0 4px 24px rgba(0,0,0,.06)}
+.box{max-width:920px;margin:50px auto;background:#fff;padding:40px;border-radius:8px;box-shadow:0 4px 24px rgba(0,0,0,.06)}
 h1{font-size:26px;margin-bottom:8px}
 .sub{color:var(--c-text-2);margin-bottom:30px}
 .list a{display:flex;justify-content:space-between;align-items:center;padding:18px 20px;border:1px solid var(--c-line);border-radius:6px;margin-bottom:12px;text-decoration:none;color:var(--c-text)}
@@ -14,50 +14,59 @@ h1{font-size:26px;margin-bottom:8px}
 .list a .d{color:var(--c-text-2);font-size:13px;margin-top:4px}
 .list a .arrow{color:var(--c-primary);font-size:20px}
 .tip{background:#FFF4EC;border-left:4px solid var(--c-primary);padding:12px 16px;font-size:13px;color:var(--c-text-2);border-radius:4px;margin-top:24px}
-.hero{background:linear-gradient(135deg,#0F1A2A,#0A1320);color:#fff;border-color:#FF6A00 !important}
-.hero .t{color:#FF8533 !important;font-size:18px !important}
-.hero .d{color:#8AA3BD !important}
-.hero .arrow{color:#FF8533 !important;font-size:24px !important}
+.reco{border-color:var(--c-primary) !important;background:var(--c-primary-bg) !important}
+.reco .t{color:var(--c-primary) !important;font-size:17px !important}
+.dark{background:linear-gradient(135deg,#0F1A2A,#0A1320);color:#fff;border-color:#FF6A00 !important}
+.dark .t{color:#FF8533 !important}
+.dark .d{color:#8AA3BD !important}
+.dark .arrow{color:#FF8533 !important}
 </style>
 </head>
 <body>
 <div class="box">
   <h1>货袋子 · 视觉稿（HTML 高保真版）</h1>
-  <div class="sub">从「门户营销」→「找钢工作台」→「钢市作战大厅」三版迭代</div>
+  <div class="sub">v1 门户 → v2 工作台 → v3 终端 → v4 行情中心（专业版）四版迭代对比</div>
 
   <div class="list">
-    <a href="./mockup-home-v3.html" target="_blank" class="hero">
+    <a href="./mockup-home-v4.html" target="_blank" class="reco">
       <div>
-        <div class="t">⚡ 首页 v3「钢市作战大厅 / 交易终端」← 最新推荐</div>
-        <div class="d">全暗模式 + 霓虹橙 · K线大图 + 雷达 · 3D 等距钢材品类 · 中国地图+撮合大厅 · 智能找钢漏斗 · AI 价格预测 · 脉搏波 · 龙虎榜</div>
+        <div class="t">⭐ 首页 v4「行情中心 · 专业版」mockup-home-v4.html ← 最新推荐</div>
+        <div class="d">浅色专业版 · 顶部深色指数大屏 · K线+雷达 · 3D 钢材品类 · 中国价格地图 · 钢厂出厂价/调价快报（代替撮合）· 20 城价差监控 · 智能找钢漏斗 · 多空对比 · 钢厂动态</div>
+      </div>
+      <div class="arrow">→</div>
+    </a>
+    <a href="./mockup-home-v3.html" target="_blank" class="dark">
+      <div>
+        <div class="t">v3 钢市作战大厅（暗色终端版，参考）</div>
+        <div class="d">全暗模式 · K线 · 雷达 · 中国地图脉冲 · 撮合大厅 · AI 预测 · 心电图脉搏（钢贸用户可能偏年轻人风）</div>
       </div>
       <div class="arrow">→</div>
     </a>
     <a href="./mockup-home-v2.html" target="_blank">
       <div>
-        <div class="t">v2 工作台风格（参考）mockup-home-v2.html</div>
-        <div class="d">钢材指数大屏 · 三栏作战台 · 涨跌双榜 · 钢市热力图</div>
+        <div class="t">v2 工作台风格（参考）</div>
+        <div class="d">钢材指数大屏 · 三栏作战台 · 涨跌双榜 · 热力图</div>
       </div>
       <div class="arrow">→</div>
     </a>
     <a href="./mockup-home.html" target="_blank">
       <div>
-        <div class="t">v1 门户风格（对比保留）mockup-home.html</div>
-        <div class="d">扁平插画 Banner · 列表行资源 · 20 城市瓷砖 · 资讯三列</div>
+        <div class="t">v1 门户风格（参考）</div>
+        <div class="d">扁平 Banner · 列表行资源 · 20 城市瓷砖</div>
       </div>
       <div class="arrow">→</div>
     </a>
     <a href="./mockup-shanghai.html" target="_blank">
       <div>
-        <div class="t">上海分站 mockup-shanghai.html</div>
-        <div class="d">6 个广告位 · 列表行资源 · 12 家本地商家 · SEO 文字区</div>
+        <div class="t">上海分站（v1 风格，待按 v4 风格改版）</div>
+        <div class="d">6 个广告位 · 列表行资源 · SEO 文字区</div>
       </div>
       <div class="arrow">→</div>
     </a>
   </div>
 
   <div class="tip">
-    📌 v3 是按"钢铁交易终端"思路完全重做的，融入了 K 线、雷达、中国地图脉冲热点、撮合深度、3D 等距钢材模型、AI 预测、心电图脉搏波 等高识别度元素，与传统 B2B 站显著区分。
+    📌 v4 重要变化：① 全部浅色专业风（钢贸用户友好）② 仅顶部指数大屏一处深色作为专业感锚点 ③ <strong>撮合大厅已移除</strong>，替换为「钢厂出厂价 + 调价快报」+「全国 20 城价差监控」—— 这两个模块的数据完全可以从平台已有挂货价、报价均价、钢厂公开公告获得，不依赖撮合业务 ④ 去掉 AI 价格预测和心电图脉搏，改为更朴素的「多空力量对比」和「钢厂动态」⑤ 红涨绿跌（中国行业习惯）。
   </div>
 </div>
 </body>
