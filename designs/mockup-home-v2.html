@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=1280">
 <title>货袋子-钢材现货交易工作台 | 找钢材找供应商就上货袋子 | 钢贸宝 | 普讯</title>
-<meta name="keywords" content="货袋子,钢材现货交易,找钢工作台,钢材指数,钢材实时行情,智能找钢,批量比价,价格订阅">
-<meta name="description" content="货袋子钢材现货交易工作台：实时钢材指数、智能找钢、批量比价、价格订阅、资源对比、求购雷达，专业钢贸操盘工具。">
+<meta name="keywords" content="货袋子,钢材现货交易,找钢工作台,钢材指数,钢材实时行情,智能找钢,价格订阅,报价雷达,行情对比,钢厂出厂价">
+<meta name="description" content="货袋子钢材现货交易工作台：实时钢材指数、智能找钢、价格订阅、报价雷达、行情对比、钢厂出厂价快报，专业钢贸操盘工具。">
 <link rel="stylesheet" href="./assets/common.css">
 <link rel="stylesheet" href="./assets/workbench.css">
 </head>
@@ -44,10 +44,10 @@
     </div>
 
     <div class="qtools">
-      <a class="qt"><span class="qt-i">🎯</span><span>智能找钢</span></a>
-      <a class="qt"><span class="qt-i">⚖️</span><span>批量比价</span></a>
+      <a class="qt hot"><span class="qt-i">🎯</span><span>智能找钢</span></a>
       <a class="qt"><span class="qt-i">🔔</span><span>价格订阅</span></a>
       <a class="qt"><span class="qt-i">📡</span><span>报价雷达</span></a>
+      <a class="qt"><span class="qt-i">📊</span><span>行情对比</span></a>
     </div>
   </div>
 </header>
@@ -109,14 +109,14 @@
         <div class="t-d-leg"><span><i class="up"></i>上涨</span><span><i class="flat"></i>持平</span><span><i class="down"></i>下跌</span></div>
       </div>
 
-      <!-- 涨跌停统计 -->
+      <!-- 市场速报（去掉撮合相关） -->
       <div class="t-cell t-stats">
         <div class="t-tag">市场速报</div>
         <ul class="t-stats-list">
           <li><span>今日新发资源</span><b class="up">2,486 条</b></li>
           <li><span>活跃在售资源</span><b>48.2 万条</b></li>
-          <li><span>今日撮合订单</span><b class="up">368 单</b></li>
-          <li><span>成交总吨数</span><b>286.5 万吨</b></li>
+          <li><span>主流钢厂调价</span><b class="up">8 上调</b></li>
+          <li><span>今日询价订单</span><b>368 单</b></li>
         </ul>
       </div>
 
@@ -149,14 +149,14 @@
     <aside class="wb-left">
 
       <div class="panel">
-        <div class="panel-h"><span>找钢工具</span></div>
+        <div class="panel-h"><span>找钢工具</span><a class="more">全部 →</a></div>
         <div class="tools-grid">
-          <a class="tool"><span class="ic">🎯</span><div><div class="n">智能找钢</div><div class="d">输入需求自动匹配</div></div></a>
-          <a class="tool"><span class="ic">⚖️</span><div><div class="n">批量比价</div><div class="d">多家供应商对比</div></div></a>
-          <a class="tool"><span class="ic">🔔</span><div><div class="n">价格订阅</div><div class="d">价格波动微信推送</div></div></a>
-          <a class="tool"><span class="ic">📡</span><div><div class="n">报价雷达</div><div class="d">求购实时撮合</div></div></a>
-          <a class="tool"><span class="ic">📊</span><div><div class="n">行情对比</div><div class="d">区域价格联动</div></div></a>
-          <a class="tool"><span class="ic">📦</span><div><div class="n">库存查询</div><div class="d">在线核对仓库</div></div></a>
+          <a class="tool hot"><span class="ic">🎯</span><div><div class="n">智能找钢</div><div class="d">AI 自然语言匹配</div></div></a>
+          <a class="tool"><span class="ic">🔔</span><div><div class="n">价格订阅</div><div class="d">微信钉钉推送</div></div></a>
+          <a class="tool"><span class="ic">📡</span><div><div class="n">报价雷达</div><div class="d">求购双向撮合</div></div></a>
+          <a class="tool"><span class="ic">📊</span><div><div class="n">行情对比</div><div class="d">多城多品类联动</div></div></a>
+          <a class="tool new"><span class="ic">📦</span><div><div class="n">库存核仓</div><div class="d">在线验仓提单</div></div></a>
+          <a class="tool"><span class="ic">🚚</span><div><div class="n">物流追踪</div><div class="d">车辆位置实时</div></div></a>
         </div>
       </div>
 
@@ -218,7 +218,7 @@
           <select><option>仓库 全部</option></select>
           <input class="range" placeholder="价格区间 ¥3000 ~ ¥5000">
           <button class="btn-solid sm">应用</button>
-          <a class="link">保存为我的方案</a>
+          <a class="link">💾 保存方案 + 订阅</a>
         </div>
 
         <!-- 资源流表 -->
@@ -320,13 +320,21 @@
       </div>
 
       <div class="panel">
+        <div class="panel-h"><span>🔔 我的预警 <i style="font-style:normal;color:#fff;background:#E63946;font-size:10px;padding:0 5px;border-radius:8px;margin-left:4px">3</i></span></div>
+        <ul class="alert-list">
+          <li><span class="al-dot up"></span><span class="al-body"><b>螺纹·沙钢</b> 已达订阅价 <em class="up">¥3680</em><span class="al-tm">5 分钟前</span></span></li>
+          <li><span class="al-dot down"></span><span class="al-body"><b>热卷·本钢</b> 跌破支撑 <em class="down">¥3520</em><span class="al-tm">22 分钟前</span></span></li>
+          <li><span class="al-dot up"></span><span class="al-body"><b>镀锌·首钢</b> 突破阻力 <em class="up">¥4520</em><span class="al-tm">1 小时前</span></span></li>
+        </ul>
+      </div>
+
+      <div class="panel">
         <div class="panel-h"><span>🕒 最近浏览</span></div>
         <ul class="recent-list">
           <li><a>螺纹钢 φ20×9000 沙钢·上海</a></li>
           <li><a>热轧卷板 5.75 本钢·天津</a></li>
           <li><a>沙钢上海直营仓 · 商家页</a></li>
           <li><a>冷轧板 1.0 武钢·武汉</a></li>
-          <li><a>钢市行情 · 上海周报</a></li>
         </ul>
       </div>
 
@@ -339,6 +347,102 @@
       </div>
 
     </aside>
+
+  </div>
+</section>
+
+<!-- ========== 钢厂出厂价快报 + 钢厂调价动态 ========== -->
+<section class="mill-area-wrap">
+  <div class="wrap mill-area">
+
+    <!-- 钢厂出厂价快报 -->
+    <div class="panel mill-pn">
+      <div class="panel-h">
+        <span>🏭 主流钢厂出厂价快报</span>
+        <span style="display:flex;gap:10px;align-items:center">
+          <span class="seg" style="display:flex;gap:0;background:#fff;border:1px solid #E5E7EB;border-radius:3px;padding:2px;font-size:12px">
+            <a class="active" style="padding:3px 12px;background:#FF6A00;color:#fff;border-radius:2px;font-weight:600">螺纹钢</a>
+            <a style="padding:3px 12px;color:#6B6B6B">热卷</a>
+            <a style="padding:3px 12px;color:#6B6B6B">冷轧</a>
+            <a style="padding:3px 12px;color:#6B6B6B">中厚板</a>
+          </span>
+          <a class="more">更多钢厂 →</a>
+        </span>
+      </div>
+      <table class="mill-tbl">
+        <thead>
+          <tr><th>钢厂</th><th>产地</th><th>规格</th><th class="num">出厂价</th><th class="num">日变化</th><th>状态</th><th class="num">更新</th><th></th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="nm">沙钢</td><td>江苏·张家港</td><td>HRB400E φ20 9m</td><td class="num px">3,700</td><td class="num d up">+30 ↑</td><td><span class="tg up">上调</span></td><td class="num tm">09:30</td><td><a class="lk">公告</a></td></tr>
+          <tr><td class="nm">永钢</td><td>江苏·张家港</td><td>HRB400E φ20 9m</td><td class="num px">3,680</td><td class="num d up">+20 ↑</td><td><span class="tg up">上调</span></td><td class="num tm">09:15</td><td><a class="lk">公告</a></td></tr>
+          <tr><td class="nm">中天</td><td>江苏·南通</td><td>HRB400E φ20 9m</td><td class="num px">3,690</td><td class="num d up">+20 ↑</td><td><span class="tg up">上调</span></td><td class="num tm">09:08</td><td><a class="lk">公告</a></td></tr>
+          <tr><td class="nm">日照</td><td>山东·日照</td><td>HRB400E φ20 9m</td><td class="num px">3,650</td><td class="num d up">+10 ↑</td><td><span class="tg up">上调</span></td><td class="num tm">08:45</td><td><a class="lk">公告</a></td></tr>
+          <tr><td class="nm">首钢</td><td>河北·迁安</td><td>HRB400E φ20 12m</td><td class="num px">3,720</td><td class="num d up">+20 ↑</td><td><span class="tg up">上调</span></td><td class="num tm">昨日</td><td><a class="lk">公告</a></td></tr>
+          <tr><td class="nm">鞍钢</td><td>辽宁·鞍山</td><td>HRB400E φ20 9m</td><td class="num px">3,640</td><td class="num d flat">持平</td><td><span class="tg flat">持平</span></td><td class="num tm">昨日</td><td><a class="lk">公告</a></td></tr>
+          <tr><td class="nm">本钢</td><td>辽宁·本溪</td><td>HRB400E φ20 9m</td><td class="num px">3,650</td><td class="num d flat">持平</td><td><span class="tg flat">持平</span></td><td class="num tm">昨日</td><td><a class="lk">公告</a></td></tr>
+          <tr><td class="nm">马钢</td><td>安徽·马鞍山</td><td>HRB400E φ20 9m</td><td class="num px">3,720</td><td class="num d up">+10 ↑</td><td><span class="tg up">上调</span></td><td class="num tm">昨日</td><td><a class="lk">公告</a></td></tr>
+        </tbody>
+      </table>
+      <div class="mill-foot">
+        <div class="it"><b class="up">8</b><span>钢厂上调</span></div>
+        <div class="it"><b class="flat">2</b><span>钢厂持平</span></div>
+        <div class="it"><b class="down">0</b><span>钢厂下调</span></div>
+        <div class="it"><b class="info">+15</b><span>平均涨幅 元/吨</span></div>
+      </div>
+    </div>
+
+    <!-- 钢厂调价动态 -->
+    <div class="panel mill-dyn">
+      <div class="panel-h">
+        <span>📢 钢厂动态</span>
+        <a class="more">更多 →</a>
+      </div>
+      <div class="dyn-list">
+        <div class="dyn-it">
+          <div class="dyn-tm">09:30</div>
+          <div class="dyn-body">
+            <div class="dyn-h"><span class="dyn-nm">沙钢</span><span class="dyn-tg up">价格上调 +30</span></div>
+            <div class="dyn-c">螺纹 HRB400E φ20 出厂价上调 <em class="up">¥30/吨</em>，调整后 <em class="up">¥3,700</em>。同时 5.5-12mm 规格全线跟涨。</div>
+          </div>
+        </div>
+        <div class="dyn-it">
+          <div class="dyn-tm">09:15</div>
+          <div class="dyn-body">
+            <div class="dyn-h"><span class="dyn-nm">永钢</span><span class="dyn-tg up">价格上调 +20</span></div>
+            <div class="dyn-c">螺纹 HRB400E 出厂价上调 <em class="up">¥20/吨</em>。</div>
+          </div>
+        </div>
+        <div class="dyn-it">
+          <div class="dyn-tm">09:08</div>
+          <div class="dyn-body">
+            <div class="dyn-h"><span class="dyn-nm">中天</span><span class="dyn-tg up">价格上调 +20</span></div>
+            <div class="dyn-c">螺纹钢全线上调 <em class="up">¥20/吨</em>，受华东工地需求集中带动。</div>
+          </div>
+        </div>
+        <div class="dyn-it">
+          <div class="dyn-tm">昨日</div>
+          <div class="dyn-body">
+            <div class="dyn-h"><span class="dyn-nm">首钢</span><span class="dyn-tg info">检修计划</span></div>
+            <div class="dyn-c">迁安基地 3 号高炉 <em class="info">5/28 - 6/5</em> 检修，预计影响产量约 <em>12 万吨</em>。</div>
+          </div>
+        </div>
+        <div class="dyn-it">
+          <div class="dyn-tm">昨日</div>
+          <div class="dyn-body">
+            <div class="dyn-h"><span class="dyn-nm">本钢</span><span class="dyn-tg gold">新品发布</span></div>
+            <div class="dyn-c">本溪基地推出 HRB500E 抗震钢筋，下月正式上市，订货已开放。</div>
+          </div>
+        </div>
+        <div class="dyn-it">
+          <div class="dyn-tm">2 日前</div>
+          <div class="dyn-body">
+            <div class="dyn-h"><span class="dyn-nm">武钢</span><span class="dyn-tg up">价格上调 +30</span></div>
+            <div class="dyn-c">冷轧板 SPCC 1.0 出厂价上调 <em class="up">¥30/吨</em>，下游汽车板需求带动。</div>
+          </div>
+        </div>
+      </div>
+    </div>
 
   </div>
 </section>
@@ -408,14 +512,13 @@
     </div>
 
     <div class="panel">
-      <div class="panel-h"><span>🛠️ 工具入口</span></div>
-      <div class="tools-big">
-        <a class="tb"><div class="tb-i">🎯</div><div class="tb-n">智能找钢</div><div class="tb-d">填需求自动匹配</div></a>
-        <a class="tb"><div class="tb-i">⚖️</div><div class="tb-n">批量比价</div><div class="tb-d">多商家一键对比</div></a>
-        <a class="tb"><div class="tb-i">🔔</div><div class="tb-n">价格订阅</div><div class="tb-d">微信钉钉推送</div></a>
-        <a class="tb"><div class="tb-i">📡</div><div class="tb-n">报价雷达</div><div class="tb-d">求购实时撮合</div></a>
-        <a class="tb"><div class="tb-i">📊</div><div class="tb-n">行情对比</div><div class="tb-d">区域品类联动</div></a>
-        <a class="tb"><div class="tb-i">📦</div><div class="tb-n">库存查询</div><div class="tb-d">在线核仓</div></a>
+      <div class="panel-h"><span>🛠️ 钢贸操盘工具 · 5 大效率神器</span></div>
+      <div class="tools-big tools-big-5">
+        <a class="tb"><span class="tb-badge hot">HOT</span><div class="tb-i">🎯</div><div class="tb-n">智能找钢</div><div class="tb-d">AI 一句话搜资源</div></a>
+        <a class="tb"><span class="tb-badge new">NEW</span><div class="tb-i">🔔</div><div class="tb-n">价格订阅</div><div class="tb-d">价格波动微信推送</div></a>
+        <a class="tb"><div class="tb-i">📡</div><div class="tb-n">报价雷达</div><div class="tb-d">求购双向撮合</div></a>
+        <a class="tb"><div class="tb-i">📊</div><div class="tb-n">行情对比</div><div class="tb-d">多城多品类联动</div></a>
+        <a class="tb"><div class="tb-i">📦</div><div class="tb-n">库存核仓</div><div class="tb-d">在线验仓提单</div></a>
       </div>
     </div>
 

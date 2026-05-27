@@ -212,6 +212,19 @@
 .recent-list li:last-child{border-bottom:0}
 .recent-list li:before{content:"·";color:var(--c-primary);margin-right:6px;font-weight:900}
 
+.alert-list{padding:6px 0}
+.alert-list li{display:flex;align-items:flex-start;gap:8px;padding:9px 14px;border-bottom:1px dashed var(--c-line);font-size:12px}
+.alert-list li:last-child{border-bottom:0}
+.alert-list .al-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.alert-list .al-dot.up{background:var(--c-up);box-shadow:0 0 0 3px rgba(230,57,70,.15)}
+.alert-list .al-dot.down{background:#10B981;box-shadow:0 0 0 3px rgba(16,185,129,.15)}
+.alert-list .al-body{flex:1;color:#6B6B6B;line-height:1.5}
+.alert-list .al-body b{color:var(--c-text);font-weight:700}
+.alert-list .al-body em{font-style:normal;font-weight:700;font-family:"DIN","Helvetica Neue",sans-serif;font-size:13px}
+.alert-list .al-body em.up{color:var(--c-up)}
+.alert-list .al-body em.down{color:#10B981}
+.alert-list .al-body .al-tm{display:block;font-size:10px;color:#9CA3AF;margin-top:2px}
+
 .ad-thin-r{padding:12px;background:linear-gradient(135deg,#FFF4EC,#FFE0C8);border:1px solid #FFD2A6;position:relative}
 .ad-thin-r .ad-tag{position:absolute;top:6px;right:6px;background:rgba(0,0,0,.35);color:#fff;font-size:10px;padding:1px 5px;border-radius:2px}
 .ad-thin-r .ad-t{font-size:14px;font-weight:700;color:var(--c-primary)}
@@ -254,8 +267,76 @@
 .news-flat li.hot a:before{content:"热";display:inline-block;background:var(--c-up);color:#fff;font-size:10px;padding:1px 4px;border-radius:2px;margin-right:6px;vertical-align:1px}
 
 .tools-big{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:#E5E7EB;padding:1px}
-.tools-big .tb{display:block;text-align:center;padding:18px 8px;background:#fff;color:var(--c-text)}
-.tools-big .tb:hover{background:var(--c-primary-bg)}
-.tools-big .tb-i{font-size:28px}
-.tools-big .tb-n{font-size:14px;font-weight:700;margin-top:6px;color:var(--c-text)}
-.tools-big .tb-d{font-size:12px;color:#999;margin-top:2px}
+.tools-big .tb{display:block;text-align:center;padding:18px 8px;background:#fff;color:var(--c-text);position:relative;transition:all .15s}
+.tools-big .tb:hover{background:var(--c-primary-bg);transform:translateY(-2px)}
+.tools-big .tb-i{font-size:28px;display:flex;align-items:center;justify-content:center;width:54px;height:54px;margin:0 auto;border-radius:12px;background:linear-gradient(135deg,#FFF4EC,#FFE0C8);border:1px solid #FFD2A6}
+.tools-big .tb:hover .tb-i{background:linear-gradient(135deg,var(--c-primary),#FF8533);color:#fff;border-color:var(--c-primary);box-shadow:0 4px 12px rgba(255,106,0,.3)}
+.tools-big .tb-n{font-size:14px;font-weight:700;margin-top:8px;color:var(--c-text)}
+.tools-big .tb-d{font-size:12px;color:#999;margin-top:3px}
+.tools-big-5{grid-template-columns:repeat(5,1fr)}
+.tb-badge{position:absolute;top:8px;right:10px;font-size:10px;padding:1px 6px;border-radius:3px;font-weight:700;letter-spacing:.5px;color:#fff}
+.tb-badge.hot{background:linear-gradient(90deg,#E63946,#FF6A00)}
+.tb-badge.new{background:linear-gradient(90deg,#10B981,#34D399)}
+
+/* === 工具卡 HOT/NEW 标签（左侧+顶部） === */
+.qtools .qt{position:relative}
+.qtools .qt.hot:after{content:"HOT";position:absolute;top:-6px;right:-6px;background:linear-gradient(90deg,#E63946,#FF6A00);color:#fff;font-size:9px;padding:1px 4px;border-radius:2px;font-weight:700;letter-spacing:.5px;line-height:1.2}
+
+.tools-grid .tool{position:relative}
+.tools-grid .tool.hot:after{content:"HOT";position:absolute;top:4px;right:4px;background:linear-gradient(90deg,#E63946,#FF6A00);color:#fff;font-size:9px;padding:0 4px;border-radius:2px;font-weight:700;letter-spacing:.5px;line-height:14px}
+.tools-grid .tool.new:after{content:"NEW";position:absolute;top:4px;right:4px;background:linear-gradient(90deg,#10B981,#34D399);color:#fff;font-size:9px;padding:0 4px;border-radius:2px;font-weight:700;letter-spacing:.5px;line-height:14px}
+
+/* ============================================================
+   主流钢厂出厂价快报 + 钢厂调价动态
+   ============================================================ */
+.mill-area-wrap{padding-top:2px}
+.mill-area{display:grid;grid-template-columns:1.4fr 1fr;gap:14px;margin-top:16px;align-items:start}
+
+.mill-pn .mill-tbl{width:100%;border-collapse:collapse;font-size:13px}
+.mill-pn .mill-tbl thead th{background:#FAFBFC;color:#6B6B6B;font-weight:500;padding:9px 12px;text-align:left;font-size:12px;border-bottom:1px solid var(--c-line)}
+.mill-pn .mill-tbl thead th.num{text-align:right}
+.mill-pn .mill-tbl tbody td{padding:10px 12px;border-bottom:1px solid #F0F0F0;vertical-align:middle}
+.mill-pn .mill-tbl tbody tr:hover{background:#FFF8F1}
+.mill-pn .mill-tbl .num{text-align:right;font-family:"DIN","Helvetica Neue",sans-serif}
+.mill-pn .mill-tbl .nm{font-weight:700;color:var(--c-text);font-size:14px}
+.mill-pn .mill-tbl .px{font-weight:800;color:var(--c-text);font-size:15px}
+.mill-pn .mill-tbl .d{font-weight:700;font-size:12px}
+.mill-pn .mill-tbl .d.up{color:var(--c-up)}
+.mill-pn .mill-tbl .d.down{color:var(--c-down)}
+.mill-pn .mill-tbl .d.flat{color:#9CA3AF}
+.mill-pn .mill-tbl .tg{display:inline-block;font-size:11px;padding:2px 7px;border-radius:2px;font-weight:600}
+.mill-pn .mill-tbl .tg.up{background:#FEE2E2;color:var(--c-up)}
+.mill-pn .mill-tbl .tg.down{background:#D1FAE5;color:var(--c-down)}
+.mill-pn .mill-tbl .tg.flat{background:#F3F4F6;color:#6B7280}
+.mill-pn .mill-tbl .tm{color:#9CA3AF;font-size:11px}
+.mill-pn .mill-tbl .lk{color:var(--c-primary);font-size:12px}
+.mill-pn .mill-tbl .lk:hover{text-decoration:underline}
+
+.mill-foot{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--c-line);border-top:1px solid var(--c-line)}
+.mill-foot .it{background:#FAFBFC;padding:12px 8px;text-align:center}
+.mill-foot .it b{display:block;font-size:20px;font-weight:800;font-family:"DIN","Helvetica Neue",sans-serif;color:var(--c-text)}
+.mill-foot .it b.up{color:var(--c-up)}
+.mill-foot .it b.down{color:var(--c-down)}
+.mill-foot .it b.flat{color:#6B7280}
+.mill-foot .it b.info{color:#2563EB}
+.mill-foot .it span{font-size:11px;color:#9CA3AF;margin-top:2px}
+
+/* 钢厂动态 */
+.mill-dyn .dyn-list{padding:4px 0}
+.dyn-it{display:grid;grid-template-columns:50px 1fr;gap:10px;padding:12px 14px;border-bottom:1px solid #F0F0F0;align-items:flex-start}
+.dyn-it:last-child{border-bottom:0}
+.dyn-it:hover{background:#FFF8F1}
+.dyn-tm{color:#9CA3AF;font-size:11px;font-family:"DIN","Helvetica Neue",sans-serif;text-align:center;padding-top:3px;border-right:1px dashed #E5E7EB;padding-right:8px}
+.dyn-body{min-width:0}
+.dyn-h{display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.dyn-nm{font-weight:700;color:var(--c-text);font-size:13px}
+.dyn-tg{font-size:10px;padding:1px 6px;border-radius:2px;font-weight:600}
+.dyn-tg.up{background:#FEE2E2;color:var(--c-up)}
+.dyn-tg.down{background:#D1FAE5;color:var(--c-down)}
+.dyn-tg.info{background:#DBEAFE;color:#2563EB}
+.dyn-tg.gold{background:#FEF3C7;color:#F59E0B}
+.dyn-c{color:#6B6B6B;font-size:12px;line-height:1.6}
+.dyn-c em{font-style:normal;font-weight:700;font-family:"DIN","Helvetica Neue",sans-serif}
+.dyn-c em.up{color:var(--c-up)}
+.dyn-c em.down{color:var(--c-down)}
+.dyn-c em.info{color:#2563EB}
