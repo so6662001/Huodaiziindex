@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="zh-cmn-Hans">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>货袋子-钢材现货交易工作台 | 找钢材找供应商就上货袋子</title>
+<style>
+  /* =====================================================================
+     货袋子 · 首页页头 · 融合方案 D（高保真 / 可交互）
+     结构：顶栏 32px（sticky top:0）→ 页头 72px → 主导航 44px（sticky top:32px）
+     LOGO 白色卡片 384×110px 从页头顶部悬挂至导航底部上方；滚动后切换为导航内迷你 LOGO
+     ===================================================================== */
+  :root{
+    --brand:#ff6a00; --brand-2:#ff8b33; --brand-deep:#f04f00; --brand-soft:#fff4ec; --brand-line:#ffd0ae;
+    --steel-900:#141c30; --steel-800:#1b2540; --steel-700:#2b3a55; --steel-500:#5a6a86; --steel-400:#7b8aa5; --steel-300:#93a1b8;
+    --line:#e9eef6; --line-2:#d6dfeb; --bg:#f1f5fa; --text:#18213a;
+    --wrap:1440px; --gutter:22px;
+    --topbar-h:32px; --header-h:72px; --nav-h:44px;
+    --card-w:384px; --card-h:110px; --card-gap:14px;
+    --font:"PingFang SC","Microsoft YaHei","Noto Sans CJK SC","Source Han Sans SC","WenQuanYi Micro Hei","Helvetica Neue",Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{font-family:var(--font);color:var(--text);background:#f5f7fa;-webkit-font-smoothing:antialiased}
+  a{text-decoration:none;color:inherit}
+  button{font:inherit}
+  .wrap{width:100%;max-width:var(--wrap);margin:0 auto;padding:0 var(--gutter)}
+
+  /* ---------- 顶栏 ---------- */
+  .wb-topbar{position:sticky;top:0;z-index:120;background:var(--bg);border-bottom:1px solid var(--line);height:var(--topbar-h);line-height:var(--topbar-h);font-size:11.5px;color:var(--steel-300)}
+  .wb-topbar .wrap{display:flex;justify-content:space-between;align-items:center;height:var(--topbar-h)}
+  .wb-topbar .left,.wb-topbar .right{display:flex;align-items:center;white-space:nowrap}
+  .wb-topbar a{color:var(--steel-500)}
+  .wb-topbar a:hover{color:var(--brand)}
+  .wb-topbar .city{color:var(--brand);font-weight:600}
+  .wb-topbar .top-sep{display:inline-block;width:1px;height:11px;margin:0 8px;background:var(--line-2);vertical-align:middle}
+  .wb-topbar .pc-login{color:var(--brand);font-weight:600}
+
+  /* ---------- 页头 ---------- */
+  .header-wb{background:#fff;height:var(--header-h);border-bottom:1px solid var(--line)}
+  .header-wb .wrap{position:relative;display:grid;grid-template-columns:var(--card-w) minmax(0,1fr) auto;align-items:center;gap:18px;height:var(--header-h)}
+
+  /* LOGO 悬挂卡片 */
+  .logo-card{position:absolute;left:var(--gutter);top:0;width:var(--card-w);height:var(--card-h);z-index:130;
+     display:flex;align-items:center;gap:14px;padding:0 20px 4px 18px;
+     background:#fff;border-radius:0 0 18px 18px;
+     box-shadow:0 10px 24px rgba(20,28,48,.16);
+     transition:opacity .16s ease,transform .16s ease}
+  .logo-card .mark{height:68px;width:auto;display:block;flex:0 0 auto;filter:drop-shadow(0 3px 4px rgba(255,106,0,.20))}
+  .logo-card .word{display:flex;flex-direction:column;justify-content:center;line-height:1;min-width:0}
+  .logo-card .en{font-size:9.5px;font-weight:800;letter-spacing:3px;color:var(--steel-300);padding-left:2px}
+  .logo-card .cn{margin-top:5px;font-size:36px;font-weight:900;letter-spacing:2.5px;line-height:1;
+     background:linear-gradient(180deg,var(--brand-2) 0%,var(--brand) 55%,var(--brand-deep) 100%);
+     -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .logo-card .pos{margin-top:8px;display:flex;align-items:center;gap:7px;white-space:nowrap}
+  .logo-card .beam{width:17px;height:17px;border-radius:4px;background:linear-gradient(135deg,var(--brand-2),var(--brand));display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;box-shadow:0 2px 5px rgba(255,106,0,.28)}
+  .logo-card .beam svg{width:10px;height:10px;display:block}
+  .logo-card .p1{font-size:13.5px;font-weight:800;letter-spacing:1.2px;color:var(--steel-700)}
+  .logo-card .sep{display:inline-block;width:1px;height:12px;background:var(--line-2);margin:0 3px}
+  .logo-card .p2{font-size:12px;font-weight:600;letter-spacing:.6px;color:var(--brand)}
+
+  /* 搜索胶囊 */
+  .search-pill{height:44px;width:100%;max-width:640px;justify-self:center;display:flex;align-items:center;border:2px solid var(--brand);border-radius:999px;background:#fff;padding:0 4px 0 6px;box-shadow:0 4px 14px rgba(255,106,0,.10)}
+  .search-pill .sel{position:relative;display:flex;align-items:center;gap:8px;height:100%;padding:0 12px 0 14px;border:0;background:none;font-size:14px;font-weight:800;color:var(--steel-900);white-space:nowrap;border-right:1px solid var(--line);cursor:pointer}
+  .search-pill .sel:after{content:"";width:0;height:0;border-left:4.5px solid transparent;border-right:4.5px solid transparent;border-top:5.5px solid var(--steel-700)}
+  .search-pill .lab{margin-left:12px;font-size:13px;font-weight:700;color:var(--brand);white-space:nowrap}
+  .search-pill input{flex:1;min-width:0;border:0;outline:0;background:none;padding:0 8px;font-size:13.5px;color:var(--text)}
+  .search-pill input::placeholder{color:var(--steel-300)}
+  .search-pill .btn{height:34px;padding:0 18px;border:0;border-radius:999px;background:linear-gradient(135deg,var(--brand-2),var(--brand));color:#fff;font-size:14px;font-weight:800;display:inline-flex;align-items:center;gap:6px;box-shadow:0 3px 8px rgba(255,106,0,.30);cursor:pointer}
+  .search-pill .btn:hover{filter:brightness(1.05)}
+  .search-pill .btn svg{width:15px;height:15px}
+
+  /* 快捷工具 */
+  .qtools{display:flex;gap:8px;justify-self:end}
+  .qtools .qt{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 13px;background:#fff;border:1px solid var(--line-2);color:var(--steel-500);border-radius:9px;font-size:12.5px;white-space:nowrap;transition:.16s}
+  .qtools .qt:hover{background:var(--brand-soft);color:var(--brand);border-color:var(--brand-line)}
+  .qtools .qt.hot{border-color:var(--brand-line);background:var(--brand-soft);color:var(--brand);font-weight:700}
+  .qtools .qt-i{font-size:13px}
+
+  /* ---------- 主导航（sticky） ---------- */
+  .wb-nav{position:sticky;top:var(--topbar-h);z-index:110;height:var(--nav-h);background:linear-gradient(135deg,var(--brand-2),var(--brand));transition:box-shadow .2s}
+  .wb-nav .wrap{display:flex;align-items:center;height:100%;padding-left:calc(var(--gutter) + var(--card-w) + var(--card-gap));transition:padding-left .16s}
+  .wb-nav .items{display:flex;align-items:center;height:100%}
+  .wb-nav .items a{color:rgba(255,255,255,.92);padding:0 20px;height:100%;line-height:var(--nav-h);font-size:14px;font-weight:500;position:relative;display:inline-flex;align-items:center;white-space:nowrap;transition:.16s}
+  .wb-nav .items a:hover{background:rgba(255,255,255,.14);color:#fff}
+  .wb-nav .items a.active{font-weight:700;color:#fff;background:rgba(255,255,255,.2)}
+  .wb-nav .items a.active:after{content:"";position:absolute;left:20px;right:20px;bottom:0;height:3px;background:#fff;border-radius:2px 2px 0 0}
+  .wb-nav .nav-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+  .ticker{display:inline-flex;align-items:center;gap:8px;height:28px;padding:0 12px;border-radius:999px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);color:#fff;font-size:12px;white-space:nowrap}
+  .ticker b{font-weight:800;letter-spacing:.3px;font-variant-numeric:tabular-nums}
+  .ticker .up{color:#ffe4c4;font-weight:700}
+  .ticker .lab{opacity:.85}
+
+  /* 固定态：导航内迷你 LOGO + 紧凑搜索（默认隐藏） */
+  .brand-mini{display:none;align-items:center;gap:9px;padding-right:18px;margin-right:6px;border-right:1px solid rgba(255,255,255,.28);height:32px;flex:0 0 auto}
+  .brand-mini img{height:34px;width:auto;display:block;filter:drop-shadow(0 1px 2px rgba(0,0,0,.18))}
+  .brand-mini .w{display:flex;flex-direction:column;line-height:1}
+  .brand-mini .en{font-size:7.5px;letter-spacing:2.2px;font-weight:800;color:rgba(255,255,255,.75)}
+  .brand-mini .cn{margin-top:3px;font-size:19px;font-weight:900;letter-spacing:1.5px;color:#fff}
+  .brand-mini .pos{margin-left:8px;padding-left:10px;border-left:1px solid rgba(255,255,255,.28);font-size:11.5px;font-weight:700;color:#fff8f2;letter-spacing:.8px;white-space:nowrap}
+  .mini-search{display:none;align-items:center;gap:8px;height:32px;padding:0 4px 0 14px;border-radius:999px;background:rgba(255,255,255,.96);color:var(--steel-300);font-size:12.5px;width:300px;box-shadow:0 2px 8px rgba(0,0,0,.10);cursor:pointer}
+  .mini-search span{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .mini-search i{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--brand-2),var(--brand));display:inline-flex;align-items:center;justify-content:center}
+  .mini-search i svg{width:12px;height:12px}
+  .mini-qt{display:none;align-items:center;gap:5px;height:32px;padding:0 12px;border-radius:999px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);color:#fff;font-size:12px;white-space:nowrap}
+
+  .app-header.is-stuck .logo-card{opacity:0;transform:translateY(-6px);pointer-events:none}
+  .app-header.is-stuck .wb-nav{height:48px;box-shadow:0 6px 18px rgba(255,106,0,.28)}
+  .app-header.is-stuck .wb-nav .items a{line-height:48px}
+  .app-header.is-stuck .wb-nav .wrap{padding-left:var(--gutter)}
+  .app-header.is-stuck .brand-mini,.app-header.is-stuck .mini-search,.app-header.is-stuck .mini-qt{display:inline-flex}
+  .app-header.is-stuck .ticker{display:none}
+
+  /* ---------- 响应式 ---------- */
+  @media (max-width:1360px){
+    :root{--card-w:300px}
+    .logo-card .sep,.logo-card .p2{display:none}
+    .qtools .qt span:not(.qt-i){display:none}
+    .qtools .qt{padding:0 10px}
+    .ticker{display:none}
+  }
+  @media (max-width:1100px){
+    :root{--card-w:236px}
+    .logo-card{padding-right:14px}
+    .logo-card .pos{display:none}
+    .logo-card .cn{font-size:32px}
+    .search-pill .lab{display:none}
+    .brand-mini .pos{display:none}
+    .mini-search{width:200px}
+  }
+
+  /* ---------- 页面内容（示意，用于滚动体验） ---------- */
+  .page{padding:20px 0 60px}
+  .page .wrap{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+  .blk{background:#fff;border:1px solid var(--line);border-radius:10px;padding:16px 18px;min-height:150px;box-shadow:0 4px 14px rgba(20,28,48,.04)}
+  .blk h3{margin:0 0 10px;font-size:14px;color:var(--steel-900);display:flex;align-items:center;justify-content:space-between}
+  .blk h3 small{font-size:11px;font-weight:500;color:var(--steel-400)}
+  .blk .row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px dashed var(--line);font-size:12.5px;color:var(--steel-500)}
+  .blk .row:last-child{border-bottom:0}
+  .blk .row b{color:var(--steel-900);font-variant-numeric:tabular-nums}
+  .blk .row .up{color:#e5432c;font-weight:700}
+  .blk .row .down{color:#1f9d55;font-weight:700}
+  .blk.wide{grid-column:1 / -1;min-height:220px;display:flex;align-items:center;justify-content:center;color:#b3bfd1;font-size:12px;letter-spacing:1px;border-style:dashed}
+  .hint{position:fixed;right:18px;bottom:18px;z-index:200;background:var(--steel-900);color:#fff;font-size:12px;padding:8px 12px;border-radius:8px;box-shadow:0 8px 20px rgba(20,28,48,.3);opacity:.9}
+</style>
+</head>
+<body>
+
+<header class="app-header" id="appHeader">
+  <!-- 顶栏 -->
+  <div class="wb-topbar"><div class="wrap">
+    <div class="left"><span class="city">📍 天津站</span><span class="top-sep"></span><a href="#">切换城市</a><span class="top-sep"></span><a class="pc-login" href="#">登录 / 注册</a></div>
+    <div class="right"><a href="#">个人中心</a><span class="top-sep"></span><a href="#">商城/权益</a><span class="top-sep"></span><a href="#">平台会员</a><span class="top-sep"></span><a href="#">AI助理</a><span class="top-sep"></span><a href="#">打开小程序</a><span class="top-sep"></span><a href="#">切换旧版</a></div>
+  </div></div>
+
+  <!-- 页头 -->
+  <div class="header-wb" id="headerWb"><div class="wrap">
+    <a class="logo-card" href="#" aria-label="货袋子 · 钢铁现货资源平台">
+      <img class="mark" src="data:image/png;base64,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" alt="货袋子" />
+      <span class="word">
+        <span class="en">HUODAIZI</span>
+        <span class="cn">货袋子</span>
+        <span class="pos"><i class="beam"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 4h16v4h-5v8h5v4H4v-4h5V8H4z" fill="#fff"/></svg></i><span class="p1">钢铁现货资源平台</span><i class="sep"></i><span class="p2">买钢材 上货袋子</span></span>
+      </span>
+    </a>
+    <span aria-hidden="true"></span>
+
+    <form class="search-pill" role="search" onsubmit="return false">
+      <button type="button" class="sel">AI找钢材</button>
+      <span class="lab">智能搜索：</span>
+      <input type="text" placeholder="螺纹钢HRB400E 上海 沙钢" aria-label="搜索关键词" />
+      <button type="submit" class="btn"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="11" cy="11" r="6.5" stroke="#fff" stroke-width="2.4"/><path d="M16 16l4.5 4.5" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></svg>搜索</button>
+    </form>
+
+    <nav class="qtools" aria-label="快捷工具">
+      <a class="qt hot" href="#"><span class="qt-i">🎯</span><span>AI找钢材</span></a>
+      <a class="qt" href="#"><span class="qt-i">🔔</span><span>价格订阅</span></a>
+      <a class="qt" href="#"><span class="qt-i">📡</span><span>报价雷达</span></a>
+      <a class="qt" href="#"><span class="qt-i">📊</span><span>行情对比</span></a>
+    </nav>
+  </div></div>
+
+  <!-- 主导航 -->
+  <nav class="wb-nav" aria-label="主导航"><div class="wrap">
+    <a class="brand-mini" href="#" aria-label="货袋子">
+      <img src="data:image/png;base64,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" alt="" />
+      <span class="w"><span class="en">HUODAIZI</span><span class="cn">货袋子</span></span>
+      <span class="pos">钢铁现货资源平台</span>
+    </a>
+    <div class="items">
+      <a class="active" href="#">首页</a><a href="#">AI找钢材</a><a href="#">求购广场</a><a href="#">行情中心</a><a href="#">钢材资讯</a><a href="#">行情对比</a>
+    </div>
+    <div class="nav-right">
+      <span class="ticker"><span class="lab">钢材综合指数</span><b>3,842.6</b><span class="up">▲ 0.36%</span></span>
+      <div class="mini-search" role="button" tabindex="0"><span>螺纹钢HRB400E 上海 沙钢</span><i><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="11" cy="11" r="6.5" stroke="#fff" stroke-width="2.4"/><path d="M16 16l4.5 4.5" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></svg></i></div>
+      <a class="mini-qt" href="#">🎯 AI找钢材</a>
+    </div>
+  </div></nav>
+</header>
+
+<!-- 页面内容示意 -->
+<main class="page"><div class="wrap">
+  <section class="blk"><h3>钢材综合指数 <small>09-15 更新</small></h3>
+    <div class="row"><span>综合指数</span><b>3,842.6</b><span class="up">▲ 0.36%</span></div>
+    <div class="row"><span>螺纹钢 HRB400E 20mm 上海</span><b>3,520</b><span class="up">▲ 12</span></div>
+    <div class="row"><span>热轧板卷 Q235B 4.75mm 天津</span><b>3,410</b><span class="down">▼ 10</span></div>
+    <div class="row"><span>中厚板 Q235B 20mm 天津</span><b>3,590</b><span class="up">▲ 20</span></div>
+  </section>
+  <section class="blk"><h3>钢厂出厂价快报 <small>今日 6 条</small></h3>
+    <div class="row"><span>沙钢 · 螺纹钢</span><b>3,650</b><span class="up">▲ 30</span></div>
+    <div class="row"><span>河钢 · 热卷</span><b>3,480</b><span>—</span></div>
+    <div class="row"><span>鞍钢 · 中板</span><b>3,720</b><span class="down">▼ 20</span></div>
+    <div class="row"><span>永钢 · 盘螺</span><b>3,700</b><span class="up">▲ 30</span></div>
+  </section>
+  <section class="blk"><h3>报价雷达 <small>最近 30 分钟</small></h3>
+    <div class="row"><span>天津 · 螺纹钢 HRB400E 18-25</span><b>3,530</b><span>12 家</span></div>
+    <div class="row"><span>上海 · 热轧卷板 Q235B</span><b>3,420</b><span>8 家</span></div>
+    <div class="row"><span>唐山 · 带钢 Q195</span><b>3,380</b><span>15 家</span></div>
+    <div class="row"><span>杭州 · 工字钢 Q235B 20#</span><b>3,860</b><span>6 家</span></div>
+  </section>
+  <section class="blk wide">工作台内容区（现货资源 / 求购广场 / 行情对比 …）</section>
+  <section class="blk wide">工作台内容区</section>
+  <section class="blk wide">工作台内容区</section>
+</div></main>
+
+<div class="hint" id="hint">↓ 向下滚动查看导航固定态</div>
+
+<script>
+  (function(){
+    var root = document.getElementById('appHeader');
+    var headerWb = document.getElementById('headerWb');
+    var hint = document.getElementById('hint');
+    var topbarH = 32;
+    function update(){
+      var rect = headerWb.getBoundingClientRect();
+      var stuck = rect.bottom <= topbarH;
+      root.classList.toggle('is-stuck', stuck);
+      hint.textContent = stuck ? '导航固定态：迷你 LOGO + 紧凑搜索' : '↓ 向下滚动查看导航固定态';
+    }
+    if ('IntersectionObserver' in window){
+      new IntersectionObserver(function(){ update(); }, {rootMargin: '-' + topbarH + 'px 0px 0px 0px', threshold:[0,1]}).observe(headerWb);
+    }
+    window.addEventListener('scroll', update, {passive:true});
+    update();
+  })();
+</script>
+</body>
+</html>
